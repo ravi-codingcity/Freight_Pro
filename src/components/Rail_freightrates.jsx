@@ -15,7 +15,7 @@ const fetchAllRailFreightRates = async () => {
   
   try {
     console.log('Fetching rail freight rates from API');
-    const response = await fetch('http://localhost:5000/api/railfreight/forms/all');
+    const response = await fetch('https://origin-backend-3v3f.onrender.com/api/railfreight/forms/all');
     
     if (!response.ok) {
       throw new Error(`API response error: ${response.status}`);
