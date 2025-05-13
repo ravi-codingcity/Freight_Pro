@@ -146,7 +146,7 @@ const View_rates = () => {
     return date.toLocaleDateString("en-GB");
   };
 
-  const formatRailFreightRatesForDisplay = (railFreightRates) => {
+  const formatRailFreightRatesForDisplay = (railFreightRates, containerType) => {
     if (!railFreightRates) return "No rail freight rates available";
 
     try {
@@ -163,11 +163,14 @@ const View_rates = () => {
         return "No rail freight rates available";
       }
 
+      // Get container type - use the item's container_type or default to 20ft
+      const displayContainerType = containerType || "20ft";
+
       return (
         <div className="grid gap-1 mt-1">
           {Object.entries(ratesObj).map(([weightRange, rate]) => (
             <span key={weightRange} className="text-xs">
-              <span className="font-medium">Range:</span> {weightRange}{" "}
+              <span className="font-medium">{displayContainerType}:</span> {weightRange}{" "}
               <span className="text-blue-600">{rate}</span>
               <span className="text-gray-500"> /Container</span>
             </span>
@@ -1279,7 +1282,8 @@ const View_rates = () => {
                                             </span>
                                             <div className="mt-1">
                                               {formatRailFreightRatesForDisplay(
-                                                item.railFreightRates
+                                                item.railFreightRates,
+                                                item.container_type
                                               )}
                                             </div>
                                           </div>

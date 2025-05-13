@@ -280,14 +280,14 @@ function Expired_rates() {
 
   // Add rail freight rates formatting function
   const formatRailFreightRatesForDisplay = useCallback(
-    (railFreightRates) => {
+    (railFreightRates, containerType) => {
       if (!railFreightRates) return "No rail freight rates available";
 
-      // Create a cache key based on the input type
+      // Create a cache key based on the input type and container type
       const cacheKey =
-        typeof railFreightRates === "string"
+        (typeof railFreightRates === "string"
           ? railFreightRates
-          : JSON.stringify(railFreightRates);
+          : JSON.stringify(railFreightRates)) + (containerType || "");
 
       // Check cache first for better performance
       if (railFreightRatesCache.has(cacheKey)) {
@@ -308,11 +308,17 @@ function Expired_rates() {
           return "No rail freight rates available";
         }
 
+        // Determine container size display based on container type
+        const containerSize = containerType && 
+          (containerType.startsWith("40") || containerType.startsWith("45")) 
+          ? "40ft" 
+          : "20ft";
+
         const result = (
           <div className="grid gap-1 mt-1">
             {Object.entries(ratesObj).map(([weightRange, rate]) => (
               <span key={weightRange} className="text-xs">
-                <span className="font-medium">Range:</span> {weightRange}{" "}
+                <span className="font-medium">{containerSize}:</span> {weightRange}{" "}
                 <span className="text-blue-600">{rate}</span>
                 <span className="text-gray-500"> /Container</span>
               </span>
@@ -1325,7 +1331,8 @@ function Expired_rates() {
                                     <div className="mt-1">
                                       {item.railFreightRates ? (
                                         formatRailFreightRatesForDisplay(
-                                          item.railFreightRates
+                                          item.railFreightRates,
+                                          item.container_type
                                         )
                                       ) : (
                                         <p className="text-xs text-gray-500">

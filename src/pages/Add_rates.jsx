@@ -1045,7 +1045,7 @@ const Add_rates = () => {
   };
 
   // Improve the rail freight rates display formatting function to handle different data formats
-  const formatRailFreightRatesForDisplay = (railFreightRates) => {
+  const formatRailFreightRatesForDisplay = (railFreightRates, containerType) => {
     if (!railFreightRates) return "No rail freight rates available";
 
     try {
@@ -1063,11 +1063,17 @@ const Add_rates = () => {
 
       console.log("Formatting rail freight rates:", ratesObj);
 
+      // Determine container size display based on container type
+      const containerSize = containerType && 
+        (containerType.startsWith("40") || containerType.startsWith("45")) 
+        ? "40ft" 
+        : "20ft";
+
       return (
         <div className="grid gap-1 mt-1">
           {Object.entries(ratesObj).map(([weightRange, rate]) => (
             <span key={weightRange} className="text-xs">
-              <span className="font-medium">20 ft.</span> {weightRange}{" "}
+              <span className="font-medium">{containerSize}:</span> {weightRange}{" "}
               <span className="text-blue-600">
                 {rate} {/* The rate already includes the currency symbol */}
               </span>
@@ -1867,7 +1873,7 @@ const Add_rates = () => {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0  0118 0 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2H5z"
                               />
                             </svg>
                           </div>
@@ -1926,7 +1932,7 @@ const Add_rates = () => {
                                 placeholder="Enter Routing Description"
                                 value={route}
                                 onChange={(e) => setRoute(e.target.value)}
-                                className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-800"
+                                className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out"
                                 required
                               />
                             </div>
@@ -1949,6 +1955,7 @@ const Add_rates = () => {
                                   d="M11 17l-5-5m0 0l5-5m-5 5h12"
                                 />
                               </svg>
+                              Back to selection
                             </button>
                           </div>
                         ) : (
@@ -3357,7 +3364,8 @@ const Add_rates = () => {
                                           </span>
                                           <div className="mt-1">
                                             {formatRailFreightRatesForDisplay(
-                                              item.railFreightRates
+                                              item.railFreightRates,
+                                              item.container_type
                                             )}
                                           </div>
                                         </div>
@@ -3381,3 +3389,4 @@ const Add_rates = () => {
 };
 
 export default Add_rates;
+
