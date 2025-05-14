@@ -2082,7 +2082,7 @@ const Add_rates = () => {
                               onChange={(e) => {
                                 setValidity(e.target.value);
                               }}
-                              className="block w-full pl-8 py-2 pr-1 sm:text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                              className="block w-full pl-8 py-2 pr-1 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
                               required
                               min={new Date().toISOString().split("T")[0]}
                               onKeyDown={(e) => e.preventDefault()}
@@ -2109,7 +2109,7 @@ const Add_rates = () => {
                             <select
                               value={validity_for || ""}
                               onChange={(e) => setValidity_for(e.target.value)}
-                              className="block w-full pl-8 pr-2 py-2 sm:text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                              className="block w-full pl-8 pr-2 py-2 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
                               required
                             >
                               <option value="">Validity Type</option>
