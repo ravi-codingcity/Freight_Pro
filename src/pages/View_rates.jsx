@@ -54,12 +54,15 @@ const View_rates = () => {
         setIsLoading(true);
         setError(null);
 
-        const response = await fetch("https://freightpro-4kjlzqm0.b4a.run/api/forms/all", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+        const response = await fetch(
+          "https://freightpro-4kjlzqm0.b4a.run/api/forms/all",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -146,7 +149,10 @@ const View_rates = () => {
     return date.toLocaleDateString("en-GB");
   };
 
-  const formatRailFreightRatesForDisplay = (railFreightRates, containerType) => {
+  const formatRailFreightRatesForDisplay = (
+    railFreightRates,
+    containerType
+  ) => {
     if (!railFreightRates) return "No rail freight rates available";
 
     try {
@@ -170,8 +176,8 @@ const View_rates = () => {
         <div className="grid gap-1 mt-1">
           {Object.entries(ratesObj).map(([weightRange, rate]) => (
             <span key={weightRange} className="text-xs">
-              <span className="font-medium">{displayContainerType}:</span> {weightRange}{" "}
-              <span className="text-blue-600">{rate}</span>
+              <span className="font-medium">{displayContainerType}:</span>{" "}
+              {weightRange} <span className="text-blue-600">{rate}</span>
               <span className="text-gray-500"> /Container</span>
             </span>
           ))}
@@ -1145,15 +1151,6 @@ const View_rates = () => {
                                           {item.toll || "N/A"} /Container
                                         </p>
                                       </div>
-
-                                      <div>
-                                        <span className="text-gray-500">
-                                          IHC (Railing costs):
-                                        </span>
-                                        <p className="font-medium">
-                                          {item.ihc || "N/A"} /Container
-                                        </p>
-                                      </div>
                                     </div>
                                     {/* Add custom field to display if it exists */}
                                     {!item.customCharges &&
@@ -1277,7 +1274,7 @@ const View_rates = () => {
                                           .length > 0 && (
                                           <div className="mt-2 border-t border-gray-200 pt-2">
                                             <span className="text-gray-500 text-xs ">
-                                              Rail Freight (Based on Cargo
+                                             IHC Rail Freight (Based on Cargo
                                               Weight + Tare Weight)
                                             </span>
                                             <div className="mt-1">

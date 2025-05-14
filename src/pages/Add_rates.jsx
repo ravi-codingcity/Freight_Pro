@@ -38,7 +38,6 @@ const Add_rates = () => {
   const [thc, setthc] = useState("");
   const [muc, setmuc] = useState("");
   const [toll, settoll] = useState("");
-  const [ihc, setihc] = useState("");
   const [railFreightRates, setRailFreightRates] = useState({
     "(0-10 ton)": "₹0",
     "(10-20 ton)": "₹0",
@@ -68,7 +67,6 @@ const Add_rates = () => {
     thc: "0",
     muc: "0",
     toll: "0",
-    ihc: "0",
   });
   const [currentCurrencySymbol, setCurrentCurrencySymbol] = useState("$");
 
@@ -226,7 +224,11 @@ const Add_rates = () => {
           rates = JSON.parse(item.railFreightRates);
         } catch (e) {
           console.error("Failed to parse railFreightRates string:", e);
-          rates = { "(0-10 ton)": "₹0", "(10-20 ton)": "₹0", "(20+ ton)": "₹0" };
+          rates = {
+            "(0-10 ton)": "₹0",
+            "(10-20 ton)": "₹0",
+            "(20+ ton)": "₹0",
+          };
         }
       } else if (typeof item.railFreightRates === "object") {
         rates = item.railFreightRates;
@@ -328,7 +330,6 @@ const Add_rates = () => {
             thc: rates.thc,
             muc: rates.muc,
             toll: rates.toll,
-            ihc: rates.ihc,
           });
         })
         .catch((error) => {
@@ -339,7 +340,6 @@ const Add_rates = () => {
             thc: "0",
             muc: "0",
             toll: "0",
-            ihc: "0",
           });
         });
 
@@ -366,7 +366,6 @@ const Add_rates = () => {
         thc: "0",
         muc: "0",
         toll: "0",
-        ihc: "0",
       });
       setRailFreightRates({
         "(0-10 ton)": "₹0",
@@ -458,7 +457,7 @@ const Add_rates = () => {
     setthc("");
     setmuc("");
     settoll("");
-    setihc("");
+
     setSelectedContainerSize(null);
 
     // Reset UI state
@@ -493,7 +492,7 @@ const Add_rates = () => {
     thc,
     muc,
     toll,
-    ihc,
+
     por,
     pol,
     pod,
@@ -540,7 +539,7 @@ const Add_rates = () => {
         thc: thc || "",
         muc: muc || "",
         toll: toll || "",
-        ihc: ihc || "",
+
         por: por || "",
         pol: pol || "",
         pod: pod || "",
@@ -571,15 +570,18 @@ const Add_rates = () => {
         JSON.stringify(safeRailFreightRates)
       );
 
-      const response = await fetch("https://freightpro-4kjlzqm0.b4a.run/api/forms/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
-        cache: "no-store",
-      });
+      const response = await fetch(
+        "https://freightpro-4kjlzqm0.b4a.run/api/forms/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+          cache: "no-store",
+        }
+      );
 
       // Enhanced error handling with response details
       if (!response.ok) {
@@ -626,7 +628,7 @@ const Add_rates = () => {
     thc,
     muc,
     toll,
-    ihc,
+
     por,
     pol,
     pod,
@@ -677,7 +679,7 @@ const Add_rates = () => {
           thc,
           muc,
           toll,
-          ihc,
+
           por,
           pol,
           pod,
@@ -719,7 +721,7 @@ const Add_rates = () => {
             thc,
             muc,
             toll,
-            ihc,
+
             por,
             pol,
             pod,
@@ -812,7 +814,6 @@ const Add_rates = () => {
     const thc_value = currentRates.thc;
     const muc_value = currentRates.muc;
     const toll_value = currentRates.toll;
-    const ihc_value = currentRates.ihc;
 
     // Format the ocean freight and acd_ens_afr with currency symbols
     const oceanCurrency = ocean_freight.split(" ")[0] || "USD";
@@ -863,7 +864,10 @@ const Add_rates = () => {
     const formattedRailFreightRates = { ...railFreightRates };
 
     console.log("Original Rail Freight Rates:", railFreightRates);
-    console.log("Formatted Rail Freight Rates for submission:", formattedRailFreightRates);
+    console.log(
+      "Formatted Rail Freight Rates for submission:",
+      formattedRailFreightRates
+    );
 
     // Create a unique submission ID to prevent duplicate submissions
     const submissionId = Date.now().toString();
@@ -889,7 +893,7 @@ const Add_rates = () => {
           thc_value,
           muc_value,
           toll_value,
-          ihc_value,
+
           por,
           pol,
           pod,
@@ -920,7 +924,7 @@ const Add_rates = () => {
           thc_value,
           muc_value,
           toll_value,
-          ihc_value,
+
           por,
           pol,
           pod,
@@ -968,14 +972,17 @@ const Add_rates = () => {
         return;
       }
 
-      const response = await fetch("https://freightpro-4kjlzqm0.b4a.run/api/forms/user", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        cache: "no-store",
-      });
+      const response = await fetch(
+        "https://freightpro-4kjlzqm0.b4a.run/api/forms/user",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          cache: "no-store",
+        }
+      );
 
       if (!response.ok) {
         throw new Error(
@@ -1045,7 +1052,10 @@ const Add_rates = () => {
   };
 
   // Improve the rail freight rates display formatting function to handle different data formats
-  const formatRailFreightRatesForDisplay = (railFreightRates, containerType) => {
+  const formatRailFreightRatesForDisplay = (
+    railFreightRates,
+    containerType
+  ) => {
     if (!railFreightRates) return "No rail freight rates available";
 
     try {
@@ -1064,16 +1074,18 @@ const Add_rates = () => {
       console.log("Formatting rail freight rates:", ratesObj);
 
       // Determine container size display based on container type
-      const containerSize = containerType && 
-        (containerType.startsWith("40") || containerType.startsWith("45")) 
-        ? "40ft" 
-        : "20ft";
+      const containerSize =
+        containerType &&
+        (containerType.startsWith("40") || containerType.startsWith("45"))
+          ? "40ft"
+          : "20ft";
 
       return (
         <div className="grid gap-1 mt-1">
           {Object.entries(ratesObj).map(([weightRange, rate]) => (
             <span key={weightRange} className="text-xs">
-              <span className="font-medium">{containerSize}:</span> {weightRange}{" "}
+              <span className="font-medium">{containerSize}:</span>{" "}
+              {weightRange}{" "}
               <span className="text-blue-600">
                 {rate} {/* The rate already includes the currency symbol */}
               </span>
@@ -2420,36 +2432,6 @@ const Add_rates = () => {
                             /Container
                           </td>
                         </tr>
-
-                        {/* IHC - Without currency symbol */}
-                        <tr className="bg-yellow-50 hover:bg-yellow-100 transition-colors">
-                          <td className="px-2 py-1.5 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-yellow-500 mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                              <span className="font-medium text-sm">
-                                IHC (Railing costs)
-                              </span>
-                            </div>
-                          </td>
-                          <td className="px-2 py-1.5 whitespace-nowrap text-right text-yellow-700 font-bold">
-                            {currentRates.ihc}
-                          </td>
-                          <td className="px-2 py-1.5 whitespace-nowrap text-right text-gray-500 font-medium text-xs">
-                            /Container
-                          </td>
-                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -2459,7 +2441,7 @@ const Add_rates = () => {
                     <div className="mt-4 bg-white rounded-lg border border-gray-200 overflow-hidden">
                       <div className="bg-gray-50 px-2 py-2 border-b border-gray-200">
                         <h3 className="text-xs font-medium text-gray-700">
-                          Rail Freight (Based on Cargo Weight + Tare Weight)
+                         IHC Rail Freight (Based on Cargo Weight + Tare Weight)
                         </h3>
                       </div>
 
@@ -3186,14 +3168,6 @@ const Add_rates = () => {
                                         {item.toll || "N/A"} /Container
                                       </p>
                                     </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        IHC (Railing costs):
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.ihc || "N/A"} /Container
-                                      </p>
-                                    </div>
                                   </div>
 
                                   {/* Custom Charges Section */}
@@ -3389,4 +3363,3 @@ const Add_rates = () => {
 };
 
 export default Add_rates;
-

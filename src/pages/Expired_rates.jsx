@@ -1199,14 +1199,7 @@ function Expired_rates() {
                                         {item.toll || "N/A"} /Container
                                       </p>
                                     </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        IHC (Railing costs):
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.ihc || "N/A"} /Container
-                                      </p>
-                                    </div>
+                                 
                                   </div>
 
                                   {/* Custom Charges Section */}
@@ -1325,7 +1318,7 @@ function Expired_rates() {
 
                                   <div className="mt-2 border-t border-gray-200 pt-2">
                                     <span className="text-gray-500 text-xs">
-                                      Rail Freight (Based on Cargo Weight + Tare
+                                     IHC Rail Freight (Based on Cargo Weight + Tare
                                       Weight)
                                     </span>
                                     <div className="mt-1">
