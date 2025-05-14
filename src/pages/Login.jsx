@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/omtrans_logo.png";
 import {
@@ -17,19 +17,31 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isServerSlow, setIsServerSlow] = useState(false);
+  const loginTimerRef = useRef(null);
   const navigate = useNavigate();
 
   async function loginUser(email, password) {
     setIsLoading(true);
     setError("");
+    setIsServerSlow(false);
+
+    // Set up a timer to detect if login takes too long
+    loginTimerRef.current = setTimeout(() => {
+      setIsServerSlow(true);
+    }, 10000); // 10 seconds
+
     try {
-      const response = await fetch("https://freightpro-4kjlzqm0.b4a.run/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await fetch(
+        "https://freightpro-4kjlzqm0.b4a.run/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        }
+      );
       const data = await response.json();
 
       if (data.token) {
@@ -45,7 +57,9 @@ const Login = () => {
     } catch (err) {
       setError("Connection error. Please try again later.");
     } finally {
+      clearTimeout(loginTimerRef.current);
       setIsLoading(false);
+      setIsServerSlow(false);
     }
   }
 
@@ -183,6 +197,13 @@ const Login = () => {
                 "Sign in"
               )}
             </button>
+
+            {/* Show message when login is taking too long */}
+            {isServerSlow && (
+              <div className="mt-2 text-center text-amber-600 text-sm animate-pulse">
+                Server is busy, it's almost done...
+              </div>
+            )}
           </div>
         </form>
 

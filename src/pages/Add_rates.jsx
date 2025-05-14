@@ -72,7 +72,7 @@ const Add_rates = () => {
 
   // Weight rates and custom charges
   const [customCharges, setCustomCharges] = useState([
-    { label: "", value: "", currency: "USD", unit: "" },
+    { label: "", value: "", currency: "INR", unit: "" },
   ]);
   const [showCustomCharges, setShowCustomCharges] = useState(true);
 
@@ -1847,10 +1847,10 @@ const Add_rates = () => {
                               }}
                             >
                               <option value="USD">USD $</option>
+                              <option value="INR">INR ₹</option>
                               <option value="EUR">EUR €</option>
                               <option value="GBP">GBP £</option>
                               <option value="JPY">JPY ¥</option>
-                              <option value="INR">INR ₹</option>
                             </select>
                           </span>
                           <input
@@ -2051,10 +2051,10 @@ const Add_rates = () => {
                               onChange={(e) => setAcdCurrency(e.target.value)}
                             >
                               <option value="USD">USD $</option>
+                              <option value="INR">INR ₹</option>
                               <option value="EUR">EUR €</option>
                               <option value="GBP">GBP £</option>
                               <option value="JPY">JPY ¥</option>
-                              <option value="INR">INR ₹</option>
                             </select>
                           </span>
                           <input
@@ -2617,11 +2617,12 @@ const Add_rates = () => {
                                 }
                                 className="px-1 py-1 text-xs border-l border-t border-b border-gray-300 bg-gray-50"
                               >
+                                <option value="INR">₹</option>
                                 <option value="USD">$</option>
                                 <option value="EUR">€</option>
                                 <option value="GBP">£</option>
                                 <option value="JPY">¥</option>
-                                <option value="INR">₹</option>
+                               
                               </select>
                               <input
                                 type="text"
@@ -2651,7 +2652,7 @@ const Add_rates = () => {
                                   Unit
                                 </option>
                                 <option value="/BL">/BL</option>
-                                <option value="/Container">/Cont</option>
+                                <option value="/Container">/Container</option>
                               </select>
                               <button
                                 type="button"
