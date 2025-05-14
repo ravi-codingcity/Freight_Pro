@@ -722,7 +722,7 @@ function Expired_rates() {
 
         {/* Filter summary and action bar */}
         {!loading && !error && (
-          <div className="flex flex-col mb-5 bg-white p-3 rounded-xl shadow-sm mx-5">
+          <div className="flex flex-col mb-3 bg-white p-3 rounded-xl shadow-sm mx-4">
             {/* Top row container for mobile and desktop */}
             <div className="flex flex-col justify-between items-center w-full gap-2 sm:gap-3">
               {/* Filters label and rates count - stacked in column on mobile, row on desktop */}

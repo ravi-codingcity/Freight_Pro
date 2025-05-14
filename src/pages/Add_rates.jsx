@@ -38,6 +38,7 @@ const Add_rates = () => {
   const [thc, setthc] = useState("");
   const [muc, setmuc] = useState("");
   const [toll, settoll] = useState("");
+  const [ihc, setihc] = useState("");
   const [railFreightRates, setRailFreightRates] = useState({
     "(0-10 ton)": "₹0",
     "(10-20 ton)": "₹0",
@@ -67,6 +68,7 @@ const Add_rates = () => {
     thc: "0",
     muc: "0",
     toll: "0",
+    ihc: "0",
   });
   const [currentCurrencySymbol, setCurrentCurrencySymbol] = useState("$");
 
@@ -224,11 +226,7 @@ const Add_rates = () => {
           rates = JSON.parse(item.railFreightRates);
         } catch (e) {
           console.error("Failed to parse railFreightRates string:", e);
-          rates = {
-            "(0-10 ton)": "₹0",
-            "(10-20 ton)": "₹0",
-            "(20+ ton)": "₹0",
-          };
+          rates = { "(0-10 ton)": "₹0", "(10-20 ton)": "₹0", "(20+ ton)": "₹0" };
         }
       } else if (typeof item.railFreightRates === "object") {
         rates = item.railFreightRates;
@@ -330,6 +328,7 @@ const Add_rates = () => {
             thc: rates.thc,
             muc: rates.muc,
             toll: rates.toll,
+            ihc: rates.ihc,
           });
         })
         .catch((error) => {
@@ -340,6 +339,7 @@ const Add_rates = () => {
             thc: "0",
             muc: "0",
             toll: "0",
+            ihc: "0",
           });
         });
 
@@ -366,6 +366,7 @@ const Add_rates = () => {
         thc: "0",
         muc: "0",
         toll: "0",
+        ihc: "0",
       });
       setRailFreightRates({
         "(0-10 ton)": "₹0",
@@ -457,7 +458,7 @@ const Add_rates = () => {
     setthc("");
     setmuc("");
     settoll("");
-
+    setihc("");
     setSelectedContainerSize(null);
 
     // Reset UI state
@@ -492,7 +493,7 @@ const Add_rates = () => {
     thc,
     muc,
     toll,
-
+    ihc,
     por,
     pol,
     pod,
@@ -539,7 +540,7 @@ const Add_rates = () => {
         thc: thc || "",
         muc: muc || "",
         toll: toll || "",
-
+        ihc: ihc || "",
         por: por || "",
         pol: pol || "",
         pod: pod || "",
@@ -570,18 +571,15 @@ const Add_rates = () => {
         JSON.stringify(safeRailFreightRates)
       );
 
-      const response = await fetch(
-        "https://freightpro-4kjlzqm0.b4a.run/api/forms/create",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(payload),
-          cache: "no-store",
-        }
-      );
+      const response = await fetch("https://freightpro-4kjlzqm0.b4a.run/api/forms/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+        cache: "no-store",
+      });
 
       // Enhanced error handling with response details
       if (!response.ok) {
@@ -628,7 +626,7 @@ const Add_rates = () => {
     thc,
     muc,
     toll,
-
+    ihc,
     por,
     pol,
     pod,
@@ -679,7 +677,7 @@ const Add_rates = () => {
           thc,
           muc,
           toll,
-
+          ihc,
           por,
           pol,
           pod,
@@ -721,7 +719,7 @@ const Add_rates = () => {
             thc,
             muc,
             toll,
-
+            ihc,
             por,
             pol,
             pod,
@@ -814,6 +812,7 @@ const Add_rates = () => {
     const thc_value = currentRates.thc;
     const muc_value = currentRates.muc;
     const toll_value = currentRates.toll;
+    const ihc_value = currentRates.ihc;
 
     // Format the ocean freight and acd_ens_afr with currency symbols
     const oceanCurrency = ocean_freight.split(" ")[0] || "USD";
@@ -864,10 +863,7 @@ const Add_rates = () => {
     const formattedRailFreightRates = { ...railFreightRates };
 
     console.log("Original Rail Freight Rates:", railFreightRates);
-    console.log(
-      "Formatted Rail Freight Rates for submission:",
-      formattedRailFreightRates
-    );
+    console.log("Formatted Rail Freight Rates for submission:", formattedRailFreightRates);
 
     // Create a unique submission ID to prevent duplicate submissions
     const submissionId = Date.now().toString();
@@ -893,7 +889,7 @@ const Add_rates = () => {
           thc_value,
           muc_value,
           toll_value,
-
+          ihc_value,
           por,
           pol,
           pod,
@@ -924,7 +920,7 @@ const Add_rates = () => {
           thc_value,
           muc_value,
           toll_value,
-
+          ihc_value,
           por,
           pol,
           pod,
@@ -972,17 +968,14 @@ const Add_rates = () => {
         return;
       }
 
-      const response = await fetch(
-        "https://freightpro-4kjlzqm0.b4a.run/api/forms/user",
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          cache: "no-store",
-        }
-      );
+      const response = await fetch("https://freightpro-4kjlzqm0.b4a.run/api/forms/user", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        cache: "no-store",
+      });
 
       if (!response.ok) {
         throw new Error(
@@ -1052,10 +1045,7 @@ const Add_rates = () => {
   };
 
   // Improve the rail freight rates display formatting function to handle different data formats
-  const formatRailFreightRatesForDisplay = (
-    railFreightRates,
-    containerType
-  ) => {
+  const formatRailFreightRatesForDisplay = (railFreightRates) => {
     if (!railFreightRates) return "No rail freight rates available";
 
     try {
@@ -1073,19 +1063,11 @@ const Add_rates = () => {
 
       console.log("Formatting rail freight rates:", ratesObj);
 
-      // Determine container size display based on container type
-      const containerSize =
-        containerType &&
-        (containerType.startsWith("40") || containerType.startsWith("45"))
-          ? "40ft"
-          : "20ft";
-
       return (
         <div className="grid gap-1 mt-1">
           {Object.entries(ratesObj).map(([weightRange, rate]) => (
             <span key={weightRange} className="text-xs">
-              <span className="font-medium">{containerSize}:</span>{" "}
-              {weightRange}{" "}
+              <span className="font-medium">20 ft.</span> {weightRange}{" "}
               <span className="text-blue-600">
                 {rate} {/* The rate already includes the currency symbol */}
               </span>
@@ -1194,7 +1176,7 @@ const Add_rates = () => {
                 </p>
               </div>
 
-              <div className="px-2 pb-3">
+              <div className="sm:px-2 pb-3">
                 {/* Error message display with enhanced styling */}
                 {submitError && (
                   <div className="mb-6 bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md relative animate-fade-in-down">
@@ -1286,7 +1268,7 @@ const Add_rates = () => {
                           )}
                         </label>
                         <div className="relative rounded-md shadow-sm  border border-blue-300">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               className="h-5 w-5 text-gray-400"
@@ -1682,9 +1664,9 @@ const Add_rates = () => {
                         Shipping Line Contact Person Details
                       </h4>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="sm:grid grid-cols-1 sm:grid-cols-3 gap-3  ">
                         {/* Person Name */}
-                        <div className="mb-0">
+                        <div className="mb-1 sm:mb-0">
                           <div className="relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                               <svg
@@ -1713,7 +1695,7 @@ const Add_rates = () => {
                         </div>
 
                         {/* Contact Number */}
-                        <div className="mb-0">
+                        <div className="mb-1 sm:mb-0">
                           <div className="relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                               <svg
@@ -1744,7 +1726,7 @@ const Add_rates = () => {
                         </div>
 
                         {/* Person Email */}
-                        <div className="mb-0">
+                        <div className="mb-1 sm:mb-0">
                           <div className="relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                               <svg
@@ -1775,7 +1757,7 @@ const Add_rates = () => {
                         </div>
 
                         {/* Person Address */}
-                        <div className="mb-0 col-span-3">
+                        <div className="mb-1 sm:mb-0 col-span-3">
                           <div className="relative rounded-md shadow-sm w-full">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                               <svg
@@ -1809,7 +1791,7 @@ const Add_rates = () => {
                   </div>
 
                   {/* SECTION: Freight & Routing */}
-                  <div className="bg-gray-50 py-3 px-3 rounded-lg border border-gray-200">
+                  <div className="bg-gray-50 sm:py-3 sm:px-3 py-2 px-2 rounded-lg border border-gray-200">
                     <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -1851,6 +1833,7 @@ const Add_rates = () => {
                               <option value="EUR">EUR €</option>
                               <option value="GBP">GBP £</option>
                               <option value="JPY">JPY ¥</option>
+                              
                             </select>
                           </span>
                           <input
@@ -1885,7 +1868,7 @@ const Add_rates = () => {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0  0118 0 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2H5z"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                               />
                             </svg>
                           </div>
@@ -1944,7 +1927,7 @@ const Add_rates = () => {
                                 placeholder="Enter Routing Description"
                                 value={route}
                                 onChange={(e) => setRoute(e.target.value)}
-                                className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out"
+                                className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-800"
                                 required
                               />
                             </div>
@@ -1967,7 +1950,6 @@ const Add_rates = () => {
                                   d="M11 17l-5-5m0 0l5-5m-5 5h12"
                                 />
                               </svg>
-                              Back to selection
                             </button>
                           </div>
                         ) : (
@@ -2078,7 +2060,7 @@ const Add_rates = () => {
                         </label>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="relative rounded-md shadow-sm border border-blue-300">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-5 w-5 text-gray-400"
@@ -2100,7 +2082,7 @@ const Add_rates = () => {
                               onChange={(e) => {
                                 setValidity(e.target.value);
                               }}
-                              className="block w-full pl-8 py-2 pr-1 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                              className="block w-full pl-8 py-2 pr-1 sm:text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
                               required
                               min={new Date().toISOString().split("T")[0]}
                               onKeyDown={(e) => e.preventDefault()}
@@ -2127,7 +2109,7 @@ const Add_rates = () => {
                             <select
                               value={validity_for || ""}
                               onChange={(e) => setValidity_for(e.target.value)}
-                              className="block w-full pl-7 pr-2 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                              className="block w-full pl-8 pr-2 py-2 sm:text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
                               required
                             >
                               <option value="">Validity Type</option>
@@ -2432,6 +2414,36 @@ const Add_rates = () => {
                             /Container
                           </td>
                         </tr>
+
+                        {/* IHC - Without currency symbol */}
+                        <tr className="bg-yellow-50 hover:bg-yellow-100 transition-colors">
+                          <td className="px-2 py-1.5 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4 text-yellow-500 mr-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                              <span className="font-medium text-sm">
+                                IHC (Railing costs)
+                              </span>
+                            </div>
+                          </td>
+                          <td className="px-2 py-1.5 whitespace-nowrap text-right text-yellow-700 font-bold">
+                            {currentRates.ihc}
+                          </td>
+                          <td className="px-2 py-1.5 whitespace-nowrap text-right text-gray-500 font-medium text-xs">
+                            /Container
+                          </td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -2441,7 +2453,7 @@ const Add_rates = () => {
                     <div className="mt-4 bg-white rounded-lg border border-gray-200 overflow-hidden">
                       <div className="bg-gray-50 px-2 py-2 border-b border-gray-200">
                         <h3 className="text-xs font-medium text-gray-700">
-                         IHC Rail Freight (Based on Cargo Weight + Tare Weight)
+                          Rail Freight (Based on Cargo Weight + Tare Weight)
                         </h3>
                       </div>
 
@@ -2617,12 +2629,12 @@ const Add_rates = () => {
                                 }
                                 className="px-1 py-1 text-xs border-l border-t border-b border-gray-300 bg-gray-50"
                               >
-                                <option value="INR">₹</option>
+                                  <option value="INR">₹</option>
                                 <option value="USD">$</option>
                                 <option value="EUR">€</option>
                                 <option value="GBP">£</option>
                                 <option value="JPY">¥</option>
-                               
+                              
                               </select>
                               <input
                                 type="text"
@@ -2635,7 +2647,7 @@ const Add_rates = () => {
                                     e.target.value
                                   )
                                 }
-                                className="w-16 sm:w-[68px] px-2 py-1 text-xs border-[1px] border-gray-300"
+                                className="w-20 sm:w-[68px] px-2 py-1 text-xs border-[1px] border-gray-300"
                               />
                               <select
                                 value={charge.unit}
@@ -2652,7 +2664,7 @@ const Add_rates = () => {
                                   Unit
                                 </option>
                                 <option value="/BL">/BL</option>
-                                <option value="/Container">/Container</option>
+                                <option value="/Container">/Cont</option>
                               </select>
                               <button
                                 type="button"
@@ -3169,6 +3181,14 @@ const Add_rates = () => {
                                         {item.toll || "N/A"} /Container
                                       </p>
                                     </div>
+                                    <div>
+                                      <span className="text-gray-500">
+                                        IHC (Railing costs):
+                                      </span>
+                                      <p className="font-medium">
+                                        {item.ihc || "N/A"} /Container
+                                      </p>
+                                    </div>
                                   </div>
 
                                   {/* Custom Charges Section */}
@@ -3339,8 +3359,7 @@ const Add_rates = () => {
                                           </span>
                                           <div className="mt-1">
                                             {formatRailFreightRatesForDisplay(
-                                              item.railFreightRates,
-                                              item.container_type
+                                              item.railFreightRates
                                             )}
                                           </div>
                                         </div>

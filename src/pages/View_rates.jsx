@@ -577,7 +577,7 @@ const View_rates = () => {
         </div>
 
         {/* Filter stats and controls */}
-        <div className="flex flex-col gap-3 mb-5 bg-white p-3 rounded-xl shadow-sm mt-3 sm:mx-5 mx-0">
+        <div className="flex flex-col gap-3 mb-4 bg-white p-2 rounded-xl shadow-sm mt-3 sm:mx-5 mx-0">
           {/* Top row for both mobile and desktop - Filters and Showing rates count */}
           <div className="flex flex-row items-center justify-between w-full">
             {/* Filters label with count - Left side */}
