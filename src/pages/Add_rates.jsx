@@ -1824,9 +1824,9 @@ const Add_rates = () => {
                           Ocean Freight
                         </label>
                         <div className="mt-1 flex  h-8 rounded-md border border-blue-300">
-                          <span className="inline-flex items-center px-1 rounded-l-md border-r-1 border bg-gray-50 text-gray-500 sm:text-sm ">
+                          <span className="relative inline-flex items-center px-1 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
                             <select
-                              className="h-full border-0 bg-transparent focus:ring-0 focus:outline-none text-gray-800"
+                              className="appearance-none h-full px-3 border-0 bg-transparent focus:ring-0 focus:outline-none text-gray-700"
                               value={ocean_freight.split(" ")[0] || "USD"}
                               onChange={(e) => {
                                 const currency = e.target.value;
@@ -1841,6 +1841,21 @@ const Add_rates = () => {
                               <option value="GBP">GBP £</option>
                               <option value="JPY">JPY ¥</option>
                             </select>
+                            {/* Custom dropdown arrow */}
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
                           </span>
                           <input
                             value={ocean_freight.split(" ")[1] || ""}
@@ -1993,7 +2008,7 @@ const Add_rates = () => {
                                   setRoute(e.target.value);
                                 }
                               }}
-                              className="block w-full pl-8 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                              className="appearance-none block w-full pl-8 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                               required
                             >
                               <option value="" disabled>
@@ -2005,10 +2020,16 @@ const Add_rates = () => {
                             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
+                                className="h-5 w-5 text-gray-600"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
-                              ></svg>
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
                             </div>
                           </div>
                         )}
@@ -2095,7 +2116,7 @@ const Add_rates = () => {
                               onChange={(e) => {
                                 setValidity(e.target.value);
                               }}
-                              className="block w-full pl-8 py-2 pr-1 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                              className="appearance-none block w-full pl-8 py-2 pr-1 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                               required
                               min={new Date().toISOString().split("T")[0]}
                               onKeyDown={(e) => e.preventDefault()}
@@ -2122,7 +2143,7 @@ const Add_rates = () => {
                             <select
                               value={validity_for || ""}
                               onChange={(e) => setValidity_for(e.target.value)}
-                              className="block w-full pl-8 pr-2 py-2 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                              className="appearance-none block w-full pl-8 pr-2 py-2 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                               required
                             >
                               <option value="">Validity Type</option>
