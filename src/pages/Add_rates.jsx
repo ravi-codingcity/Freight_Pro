@@ -2044,9 +2044,9 @@ const Add_rates = () => {
                           Select ACD/ENS/AFR Charges
                         </label>
                         <div className="mt-1 flex rounded-md shadow-sm h-10 border border-blue-300">
-                          <span className="inline-flex items-center px-1 rounded-l-md border border-r-1 border-gray-300 bg-gray-50 text-gray-500 sm:text-sm">
+                          <span className="relative inline-flex items-center px-2 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
                             <select
-                              className="h-full border-0 bg-transparent focus:ring-0 focus:outline-none pr-1"
+                              className="appearance-none px-2 h-full border-0 bg-transparent focus:ring-0 focus:outline-none pr-2"
                               value={acd_ens_afr.split(" ")[0] || "ACD"}
                               onChange={(e) => {
                                 const chargeType = e.target.value;
@@ -2059,10 +2059,25 @@ const Add_rates = () => {
                               <option value="ENS">ENS</option>
                               <option value="AFR">AFR</option>
                             </select>
+                            {/* Custom dropdown arrow */}
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
                           </span>
-                          <span className="inline-flex items-center border-t border-b border-gray-300 bg-gray-50 text-gray-500 sm:text-sm px-1">
+                          <span className="relative inline-flex items-center px-2 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
                             <select
-                              className="h-full border-0 bg-transparent focus:ring-0 focus:outline-none"
+                              className="appearance-none px-2 h-full border-0 bg-transparent focus:ring-0 focus:outline-none"
                               value={acdCurrency}
                               onChange={(e) => setAcdCurrency(e.target.value)}
                             >
@@ -2072,6 +2087,21 @@ const Add_rates = () => {
                               <option value="GBP">GBP £</option>
                               <option value="JPY">JPY ¥</option>
                             </select>
+                            {/* Custom dropdown arrow */}
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-4 w-4"
+                                viewBox="0 0 20 20"
+                                fill="currentColor"
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
+                            </div>
                           </span>
                           <input
                             value={acd_ens_afr.split(" ")[1] || ""}
@@ -2080,7 +2110,7 @@ const Add_rates = () => {
                                 acd_ens_afr.split(" ")[0] || "ACD";
                               setacd_ens_afr(`${chargeType} ${e.target.value}`);
                             }}
-                            className="flex-1 w-0 block  rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 border px-2"
+                            className="flex-1 w-20  rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 border px-2"
                             placeholder="Enter Charges"
                             required
                           />
@@ -2116,7 +2146,7 @@ const Add_rates = () => {
                               onChange={(e) => {
                                 setValidity(e.target.value);
                               }}
-                              className="appearance-none block w-full pl-8 py-2 pr-1 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                              className="appearance-none block w-full pl-8 py-2 pr-1 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-600"
                               required
                               min={new Date().toISOString().split("T")[0]}
                               onKeyDown={(e) => e.preventDefault()}
@@ -2124,7 +2154,7 @@ const Add_rates = () => {
                           </div>
 
                           <div className="relative shadow-sm rounded-md border border-blue-300">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-5 w-5 text-gray-400"
@@ -2143,7 +2173,7 @@ const Add_rates = () => {
                             <select
                               value={validity_for || ""}
                               onChange={(e) => setValidity_for(e.target.value)}
-                              className="appearance-none block w-full pl-8 pr-2 py-2 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                              className="appearance-none block w-full pl-8 pr-2 py-2 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-600"
                               required
                             >
                               <option value="">Validity Type</option>
@@ -2154,10 +2184,16 @@ const Add_rates = () => {
                             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
+                                className="h-5 w-5 text-gray-500"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
-                              ></svg>
+                              >
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
                             </div>
                           </div>
                         </div>
