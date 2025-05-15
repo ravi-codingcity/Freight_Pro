@@ -2936,49 +2936,49 @@ const Add_rates = () => {
                 <tr>
                   <th
                     scope="col"
-                    className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
                   >
                     POR
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
                   >
                     POL
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
                   >
                     POD
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden md:table-cell"
+                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden md:table-cell"
                   >
                     Shipping Line
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
+                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
                   >
                     Container
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
+                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
                   >
                     Freight
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-3 py-2 sm:py-3 text-left text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
+                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
                   >
                     Validity
                   </th>
                   <th
                     scope="col"
-                    className="px-2 sm:px-3 py-2 sm:py-3 text-center text-xs font-bold text-red-500 tracking-wider border-b border-gray-300"
+                    className="px-2 sm:px-2 py-2 sm:py-3 text-center text-sm font-bold text-red-500 tracking-wider border-b border-gray-300"
                   >
                     Actions
                   </th>
@@ -3004,17 +3004,17 @@ const Add_rates = () => {
                               : "hover:bg-gray-50"
                           } transition-colors duration-150`}
                         >
-                          <td className="px-2 sm:px-3 py-2 border-r border-gray-300">
+                          <td className="px-2  py-2 border-r border-gray-300">
                             <span className="font-medium text-xs sm:text-sm text-gray-900 bg-blue-50 px-1 sm:px-2 py-1 rounded truncate block">
                               {item.por || "N/A"}
                             </span>
                           </td>
-                          <td className="px-2 sm:px-3 py-2 border-r border-gray-300">
+                          <td className="px-2  py-2 border-r border-gray-300">
                             <span className="font-medium text-xs sm:text-sm text-gray-900 bg-blue-50 px-1 sm:px-2 py-1 rounded truncate block">
                               {item.pol || "N/A"}
                             </span>
                           </td>
-                          <td className="px-2 sm:px-3 py-2 border-r border-gray-300">
+                          <td className="px-2  py-2 border-r border-gray-300">
                             <div className="flex flex-col sm:flex-col sm:items-start">
                               <div>
                                 {" "}
@@ -3047,17 +3047,17 @@ const Add_rates = () => {
                               )}
                             </div>
                           </td>
-                          <td className="px-2 sm:px-3 py-2 border-r border-gray-300 hidden md:table-cell">
+                          <td className="px-2  py-2 border-r border-gray-300 hidden md:table-cell">
                             <span className="text-xs sm:text-sm font-medium text-gray-900">
                               {item.shipping_lines || "N/A"}
                             </span>
                           </td>
-                          <td className="px-2 sm:px-3 py-2 border-r border-gray-300 hidden sm:table-cell">
+                          <td className="px-2  py-2 border-r border-gray-300 hidden sm:table-cell">
                             <span className="text-xs sm:text-sm text-gray-900">
                               {item.container_type || "N/A"}
                             </span>
                           </td>
-                          <td className="px-2 sm:px-3 py-2 border-r border-gray-300">
+                          <td className="px-2  py-2 border-r border-gray-300">
                             <div className="text-xs sm:text-sm font-medium text-gray-900">
                               {item.ocean_freight || "N/A"}
                             </div>
@@ -3065,7 +3065,7 @@ const Add_rates = () => {
                               {item.acd_ens_afr || "N/A"}
                             </div>
                           </td>
-                          <td className="px-2 sm:px-3 py-2 border-r border-gray-300 hidden sm:table-cell">
+                          <td className="px-2  py-2 border-r border-gray-300 hidden sm:table-cell">
                             <span
                               className={`px-1.5 sm:px-2 py-0.5 sm:py-1 inline-flex text-[10px] sm:text-xs leading-5 font-semibold rounded-full ${"bg-green-100 text-green-800"}`}
                             >
@@ -3075,7 +3075,7 @@ const Add_rates = () => {
                                 : ""}
                             </span>
                           </td>
-                          <td className="px-2 sm:px-3 py-2 text-center">
+                          <td className="px-2  py-2 text-center">
                             <div className="flex flex-col sm:flex-row justify-center sm:space-x-2 space-y-1 sm:space-y-0">
                               {isEditable ? (
                                 <button
