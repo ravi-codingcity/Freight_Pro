@@ -1745,7 +1745,7 @@ const Add_rates = () => {
                               value={shipping_name}
                               placeholder="Enter Name"
                               onChange={(e) => setshipping_name(e.target.value)}
-                              className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
+                              className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border "
                               required
                             />
                           </div>
@@ -3015,30 +3015,35 @@ const Add_rates = () => {
                             </span>
                           </td>
                           <td className="px-2 sm:px-3 py-2 border-r border-gray-300">
-                            <div className="flex flex-col sm:flex-row sm:items-center">
-                              <span className="font-medium text-xs sm:text-sm text-gray-900 bg-indigo-50 px-1 sm:px-2 py-1 rounded truncate block">
-                                {item.pod || "N/A"}
-                              </span>
-                              {hasRemarks && (
-                                <span
-                                  className="inline-flex items-center mt-1 sm:mt-0 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 animate-pulse"
-                                  title="Contains important remarks"
-                                >
-                                  <svg
-                                    className="w-2 h-2 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 012 0zm-1 9a1 1 100-2 1 1 000 2z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                  <span className="sm:inline hidden">
-                                    Remarks
-                                  </span>
+                            <div className="flex flex-col sm:flex-col sm:items-start">
+                              <div>
+                                {" "}
+                                <span className="font-medium text-xs sm:text-sm text-gray-900 bg-indigo-50 px-1 sm:px-2 py-1 rounded truncate block">
+                                  {item.pod || "N/A"}
                                 </span>
+                              </div>
+                              {hasRemarks && (
+                                <div className="flex items-center mt-2">
+                                  <span
+                                    className="inline-flex items-center mt-1 sm:mt-0 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 animate-pulse"
+                                    title="Contains important remarks"
+                                  >
+                                    <svg
+                                      className="w-2 h-2 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
+                                      fill="currentColor"
+                                      viewBox="0 0 20 20"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 012 0zm-1 9a1 1 100-2 1 1 000 2z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                    <span className="sm:inline hidden">
+                                      Remarks
+                                    </span>
+                                  </span>
+                                </div>
                               )}
                             </div>
                           </td>
