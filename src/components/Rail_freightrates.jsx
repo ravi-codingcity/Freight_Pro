@@ -40,7 +40,8 @@ export const getRailFreightRates = async (por, pol, shippingLine, containerType)
       return {
         "(0-10 ton)": "₹0",
         "(10-20 ton)": "₹0",
-        "(20+ ton)": "₹0"
+        "(20-26 ton)": "₹0",
+        "(26+ ton)": "₹0"
       };
     } else if (containerType && (containerType.startsWith('40') || containerType.startsWith('45'))) {
       return {
@@ -88,7 +89,8 @@ export const getRailFreightRates = async (por, pol, shippingLine, containerType)
         return {
           "(0-10 ton)": `${currency}${matchedRate.weight20ft0_10 || "0"}`,
           "(10-20 ton)": `${currency}${matchedRate.weight20ft10_20 || "0"}`,
-          "(20+ ton)": `${currency}${matchedRate.weight20ft20Plus || "0"}`
+           "(20-26 ton)": `${currency}${matchedRate.weight20ft10_20 || "0"}`,
+          "(26+ ton)": `${currency}${matchedRate.weight20ft20Plus || "0"}`
         };
       } 
       // Check if it's a 40ft container
@@ -114,7 +116,8 @@ export const getWeightRates = () => {
     "20ft": {
       "(0-10 ton)": "0",
       "(10-20 ton)": "0",
-      "(20+ ton)": "0"
+       "(20-26 ton)": "0",
+      "(26+ ton)": "0"
     },
     "40ft": {
       "(10-20 ton)": "0",
@@ -127,7 +130,7 @@ export const getWeightRates = () => {
 export const getWeightRatesByPOR = (por, containerSize) => {
   console.log('Warning: getWeightRatesByPOR is deprecated, use getRailFreightRates instead');
   return containerSize === "20ft" ? 
-    { "(0-10 ton)": "0", "(10-20 ton)": "0", "(20+ ton)": "0" } : 
+    { "(0-10 ton)": "0", "(10-20 ton)": "0", "(20-26 ton)": "0", "(26+ ton)": "0" } : 
     { "(10-20 ton)": "0", "(20+ ton)": "0" };
 };
 

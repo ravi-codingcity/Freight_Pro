@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import "react-datepicker/dist/react-datepicker.css";
 import Navbar from "../components/Navbar";
 import { getPOROptions } from "../components/POR";
 import { getPOLOptions } from "../components/POL";
@@ -10,6 +11,7 @@ import {
   getContainerSizeOptions,
   getContainerSizeCategory,
 } from "../components/Container_size"; // Import the container size functions
+import DatePicker from "react-datepicker";
 
 const Add_rates = () => {
   // Basic form state variables
@@ -41,9 +43,10 @@ const Add_rates = () => {
   const [railFreightRates, setRailFreightRates] = useState({
     "(0-10 ton)": "₹0",
     "(10-20 ton)": "₹0",
-    "(20+ ton)": "₹0",
+    "(20-26 ton)": "₹0",
+    "(26+ ton)": "₹0",
   });
-
+  const datePickerRef = useRef(null);
   // UI state variables
   const [forms, setForms] = useState([]);
   const [editFormId, setEditFormId] = useState(null);
@@ -227,13 +230,19 @@ const Add_rates = () => {
           rates = {
             "(0-10 ton)": "₹0",
             "(10-20 ton)": "₹0",
-            "(20+ ton)": "₹0",
+            "(20-26 ton)": "₹0",
+            "(26+ ton)": "₹0",
           };
         }
       } else if (typeof item.railFreightRates === "object") {
         rates = item.railFreightRates;
       } else {
-        rates = { "(0-10 ton)": "₹0", "(10-20 ton)": "₹0", "(20+ ton)": "₹0" };
+        rates = {
+          "(0-10 ton)": "₹0",
+          "(10-20 ton)": "₹0",
+          "(20-26 ton)": "₹0",
+          "(26+ ton)": "₹0",
+        };
       }
 
       setRailFreightRates(rates);
@@ -242,7 +251,8 @@ const Add_rates = () => {
       setRailFreightRates({
         "(0-10 ton)": "₹0",
         "(10-20 ton)": "₹0",
-        "(20+ ton)": "₹0",
+        "(20-26 ton)": "₹0",
+        "(26+ ton)": "₹0",
       });
     }
 
@@ -355,7 +365,8 @@ const Add_rates = () => {
           setRailFreightRates({
             "(0-10 ton)": "₹0",
             "(10-20 ton)": "₹0",
-            "(20+ ton)": "₹0",
+            "(20-26 ton)": "₹0",
+            "(26+ ton)": "₹0",
           });
         });
     } else {
@@ -370,7 +381,8 @@ const Add_rates = () => {
       setRailFreightRates({
         "(0-10 ton)": "₹0",
         "(10-20 ton)": "₹0",
-        "(20+ ton)": "₹0",
+        "(20-26 ton)": "₹0",
+        "(26+ ton)": "₹0",
       });
     }
   }, [por, pol, shipping_lines, container_type]); // Updated dependency array
@@ -470,7 +482,8 @@ const Add_rates = () => {
     setRailFreightRates({
       "(0-10 ton)": "₹0",
       "(10-20 ton)": "₹0",
-      "(20+ ton)": "₹0",
+      "(20-26 ton)": "₹0",
+      "(26+ ton)": "₹0",
     });
 
     // Reset edit mode
@@ -492,7 +505,6 @@ const Add_rates = () => {
     thc,
     muc,
     toll,
-
     por,
     pol,
     pod,
@@ -529,7 +541,8 @@ const Add_rates = () => {
       const safeRailFreightRates = railFreightRates || {
         "(0-10 ton)": "₹0",
         "(10-20 ton)": "₹0",
-        "(20+ ton)": "₹0",
+        "(20-26 ton)": "₹0",
+        "(26+ ton)": "₹0",
       };
 
       // Create a clean payload with no undefined values and both formats
@@ -539,7 +552,6 @@ const Add_rates = () => {
         thc: thc || "",
         muc: muc || "",
         toll: toll || "",
-
         por: por || "",
         pol: pol || "",
         pod: pod || "",
@@ -628,7 +640,6 @@ const Add_rates = () => {
     thc,
     muc,
     toll,
-
     por,
     pol,
     pod,
@@ -665,7 +676,8 @@ const Add_rates = () => {
       const safeRailFreightRates = railFreightRates || {
         "(0-10 ton)": "₹0",
         "(10-20 ton)": "₹0",
-        "(20+ ton)": "₹0",
+        "(20-26 ton)": "₹0",
+        "(26+ ton)": "₹0",
       };
 
       // Convert customCharges array to string as expected by the backend
@@ -679,7 +691,6 @@ const Add_rates = () => {
           thc,
           muc,
           toll,
-
           por,
           pol,
           pod,
@@ -721,7 +732,6 @@ const Add_rates = () => {
             thc,
             muc,
             toll,
-
             por,
             pol,
             pod,
@@ -893,7 +903,6 @@ const Add_rates = () => {
           thc_value,
           muc_value,
           toll_value,
-
           por,
           pol,
           pod,
@@ -924,7 +933,6 @@ const Add_rates = () => {
           thc_value,
           muc_value,
           toll_value,
-
           por,
           pol,
           pod,
@@ -1300,7 +1308,7 @@ const Add_rates = () => {
                           <select
                             value={por}
                             onChange={(e) => setpor(e.target.value)}
-                            className="appearance-none block w-full pl-8 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-8 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                             required
                           >
                             <option value="" disabled>
@@ -1351,7 +1359,7 @@ const Add_rates = () => {
                           <select
                             value={pol}
                             onChange={(e) => setpol(e.target.value)}
-                            className="appearance-none block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                             required
                           >
                             <option value="" disabled>
@@ -1411,7 +1419,7 @@ const Add_rates = () => {
                           <select
                             value={container_type}
                             onChange={handleContainerTypeChange}
-                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                             required
                           >
                             <option value="" disabled>
@@ -1466,7 +1474,7 @@ const Add_rates = () => {
                           <select
                             value={pod}
                             onChange={(e) => setpod(e.target.value)}
-                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                             required
                           >
                             <option value="" disabled>
@@ -2165,36 +2173,38 @@ const Add_rates = () => {
                           Validity (End Date)
                         </label>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="relative w-full">
-                            <div className="relative">
-                              {/* Calendar Icon */}
-                              <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 text-gray-400"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                  />
-                                </svg>
-                              </div>
-
-                              {/* Native Date Picker Input */}
-                              <input
-                                type="date"
-                                value={validity || ""}
-                                onChange={(e) => setValidity(e.target.value)}
-                                className="block w-full pl-10 pr-3 py-2 border border-blue-300 rounded-md text-sm text-gray-700 focus:ring-blue-500 focus:border-blue-500"
-                                min={new Date().toISOString().split("T")[0]}
-                                required
-                              />
+                          <div className="relative">
+                            {/* Calendar Icon */}
+                            <div
+                              className="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer z-10"
+                              onClick={() => datePickerRef.current.setFocus()} // Focus input when clicking the icon
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 text-gray-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                />
+                              </svg>
                             </div>
+
+                            {/* Native Date Picker Input */}
+                            <DatePicker
+                              selected={validity || ""}
+                              onChange={(date) => setValidity(date)}
+                              dateFormat="dd-MM-yyyy"
+                              placeholderText="Select a date"
+                              className="pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              min={new Date().toISOString().split("T")[0]}
+                              required
+                            />
                           </div>
 
                           {/* Validity Type Dropdowns */}
@@ -2601,12 +2611,26 @@ const Add_rates = () => {
                               <tr className="bg-yellow-50 hover:bg-yellow-100 transition-colors">
                                 <td className="px-2 py-1.5 whitespace-nowrap">
                                   <span className="font-medium text-sm">
-                                    20ft: (20+ Ton)
+                                    20ft: (20-26 Ton)
                                   </span>
                                 </td>
                                 <td className="text-sm px-2 py-1.5 whitespace-nowrap text-right text-yellow-700 font-bold">
                                   {/* Ensure currency symbol is displayed */}
-                                  {railFreightRates["(20+ ton)"]}
+                                  {railFreightRates["(20-26 ton)"]}
+                                </td>
+                                <td className="px-2 py-1.5 whitespace-nowrap text-right text-gray-500 font-medium text-xs">
+                                  /Container
+                                </td>
+                              </tr>
+                              <tr className="bg-yellow-50 hover:bg-yellow-100 transition-colors">
+                                <td className="px-2 py-1.5 whitespace-nowrap">
+                                  <span className="font-medium text-sm">
+                                    20ft: (26+ Ton)
+                                  </span>
+                                </td>
+                                <td className="text-sm px-2 py-1.5 whitespace-nowrap text-right text-yellow-700 font-bold">
+                                  {/* Ensure currency symbol is displayed */}
+                                  {railFreightRates["(26+ ton)"]}
                                 </td>
                                 <td className="px-2 py-1.5 whitespace-nowrap text-right text-gray-500 font-medium text-xs">
                                   /Container
