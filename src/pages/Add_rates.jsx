@@ -1300,7 +1300,7 @@ const Add_rates = () => {
                           <select
                             value={por}
                             onChange={(e) => setpor(e.target.value)}
-                            className="block w-full pl-8 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-8 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
                             required
                           >
                             <option value="" disabled>
@@ -1314,7 +1314,14 @@ const Add_rates = () => {
                               className="h-5 w-5 text-gray-400"
                               viewBox="0 0 20 20"
                               fill="currentColor"
-                            ></svg>
+                            >
+                              {" "}
+                              <path
+                                fillRule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
                           </div>
                         </div>
                       </div>
@@ -1344,7 +1351,7 @@ const Add_rates = () => {
                           <select
                             value={pol}
                             onChange={(e) => setpol(e.target.value)}
-                            className="block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
                             required
                           >
                             <option value="" disabled>
@@ -1364,7 +1371,14 @@ const Add_rates = () => {
                               className="h-5 w-5 text-gray-400"
                               viewBox="0 0 20 20"
                               fill="currentColor"
-                            ></svg>
+                            >
+                              {" "}
+                              <path
+                                fillRule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
                           </div>
                         </div>
                       </div>
@@ -1397,7 +1411,7 @@ const Add_rates = () => {
                           <select
                             value={container_type}
                             onChange={handleContainerTypeChange}
-                            className="block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
                             required
                           >
                             <option value="" disabled>
@@ -1415,7 +1429,14 @@ const Add_rates = () => {
                               className="h-5 w-5 text-gray-400"
                               viewBox="0 0 20 20"
                               fill="currentColor"
-                            ></svg>
+                            >
+                              {" "}
+                              <path
+                                fillRule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
                           </div>
                         </div>
                       </div>
@@ -1445,7 +1466,7 @@ const Add_rates = () => {
                           <select
                             value={pod}
                             onChange={(e) => setpod(e.target.value)}
-                            className="block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
                             required
                           >
                             <option value="" disabled>
@@ -1465,7 +1486,14 @@ const Add_rates = () => {
                               className="h-5 w-5 text-gray-400"
                               viewBox="0 0 20 20"
                               fill="currentColor"
-                            ></svg>
+                            >
+                              {" "}
+                              <path
+                                fillRule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
                           </div>
                         </div>
                       </div>
@@ -1538,7 +1566,14 @@ const Add_rates = () => {
                                 className="h-5 w-5 text-gray-400"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
-                              ></svg>
+                              >
+                                {" "}
+                                <path
+                                  fillRule="evenodd"
+                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                  clipRule="evenodd"
+                                />
+                              </svg>
                             </div>
                           </div>
                         </div>
@@ -1572,7 +1607,7 @@ const Add_rates = () => {
                                   placeholder="Enter commodity specific description"
                                   value={commodity}
                                   onChange={(e) => setCommodity(e.target.value)}
-                                  className="appearance-none block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-700"
+                                  className=" block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-700"
                                   required
                                 />
                               </div>
@@ -1626,7 +1661,7 @@ const Add_rates = () => {
                                     setCommodity(e.target.value);
                                   }
                                 }}
-                                className="block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                                className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                                 required
                               >
                                 <option value="" disabled>
@@ -1643,7 +1678,14 @@ const Add_rates = () => {
                                   className="h-5 w-5 text-gray-400"
                                   viewBox="0 0 20 20"
                                   fill="currentColor"
-                                ></svg>
+                                >
+                                  {" "}
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
                               </div>
                             </div>
                           )}
@@ -2670,7 +2712,7 @@ const Add_rates = () => {
                                     e.target.value
                                   )
                                 }
-                                className="px-1 py-1 text-xs border-l border-t border-b border-gray-300 bg-gray-50"
+                                className="appearance-auto px-2 py-1 text-xs border-l border-t border-b border-gray-300 bg-gray-50"
                               >
                                 <option value="INR">₹</option>
                                 <option value="USD">$</option>
@@ -2700,7 +2742,7 @@ const Add_rates = () => {
                                     e.target.value
                                   )
                                 }
-                                className="px-1 py-1 text-xs border-t border-b border-gray-300 bg-gray-50"
+                                className="appearance-auto px-1 py-1 text-xs border-t border-b border-gray-300 bg-gray-50"
                               >
                                 <option value="" disabled>
                                   Unit
@@ -2722,10 +2764,9 @@ const Add_rates = () => {
                                   stroke="currentColor"
                                 >
                                   <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M19 7l-5-5-4 4-4-4-5 5 4 4-4 4 5 5 4-4 4 4 5-5-4-4z"
+                                    fillRule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                    clipRule="evenodd"
                                   />
                                 </svg>
                               </button>
