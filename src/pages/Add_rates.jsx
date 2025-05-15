@@ -1881,7 +1881,7 @@ const Add_rates = () => {
                           <select
                             value={transit}
                             onChange={(e) => setTransittime(e.target.value)}
-                            className="appearance-none block w-full pl-8 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-[36px] pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-600"
                             required
                           >
                             <option value="" disabled>
@@ -1894,12 +1894,19 @@ const Add_rates = () => {
                             ))}
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            ></svg>
+                           <svg
+  xmlns="http://www.w3.org/2000/svg"
+  className="h-5 w-5 text-gray-400"
+  viewBox="0 0 20 20"
+  fill="currentColor"
+>
+  <path
+    fillRule="evenodd"
+    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+    clipRule="evenodd"
+  />
+</svg>
+
                           </div>
                         </div>
                       </div>
