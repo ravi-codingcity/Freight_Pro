@@ -1524,7 +1524,7 @@ const Add_rates = () => {
                               onChange={(e) =>
                                 setshipping_lines(e.target.value)
                               }
-                              className="block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                              className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                               required
                             >
                               <option value="" disabled>
@@ -1572,7 +1572,7 @@ const Add_rates = () => {
                                   placeholder="Enter commodity specific description"
                                   value={commodity}
                                   onChange={(e) => setCommodity(e.target.value)}
-                                  className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-800"
+                                  className="appearance-none block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-700"
                                   required
                                 />
                               </div>
@@ -1626,7 +1626,7 @@ const Add_rates = () => {
                                     setCommodity(e.target.value);
                                   }
                                 }}
-                                className="block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                                className="block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                                 required
                               >
                                 <option value="" disabled>
@@ -2110,7 +2110,7 @@ const Add_rates = () => {
                                 acd_ens_afr.split(" ")[0] || "ACD";
                               setacd_ens_afr(`${chargeType} ${e.target.value}`);
                             }}
-                            className="flex-1 w-20  rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 border px-2"
+                            className="flex-1 w-full rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 border px-2"
                             placeholder="Enter Charges"
                             required
                           />
@@ -2123,36 +2123,39 @@ const Add_rates = () => {
                           Validity (End Date)
                         </label>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="relative rounded-md shadow-sm border border-blue-300">
-                            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                              </svg>
+                          <div className="relative w-full">
+                            <div className="relative">
+                              {/* Calendar Icon */}
+                              <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5 text-gray-400"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              </div>
+
+                              {/* Native Date Picker Input */}
+                              <input
+                                type="date"
+                                value={validity || ""}
+                                onChange={(e) => setValidity(e.target.value)}
+                                className="block w-full pl-10 pr-3 py-2 border border-blue-300 rounded-md text-sm text-gray-700 focus:ring-blue-500 focus:border-blue-500"
+                                min={new Date().toISOString().split("T")[0]}
+                                required
+                              />
                             </div>
-                            <input
-                              type="date"
-                              value={validity || ""}
-                              onChange={(e) => {
-                                setValidity(e.target.value);
-                              }}
-                              className="appearance-none block w-full pl-8 py-2 pr-1 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-600"
-                              required
-                              min={new Date().toISOString().split("T")[0]}
-                              onKeyDown={(e) => e.preventDefault()}
-                            />
                           </div>
 
+                          {/* Validity Type Dropdowns */}
                           <div className="relative shadow-sm rounded-md border border-blue-300">
                             <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                               <svg
