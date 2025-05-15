@@ -1155,9 +1155,9 @@ const Add_rates = () => {
       <Navbar />
       <div className="max-w-6xl px-5 mx-auto">
         {/* Rate Card Form */}
-        <div className="flex flex-col-reverse lg:flex-row justify-between gap-4 lg:gap-8">
+        <div className="flex flex-col-reverse lg:flex-row justify-between">
           {/* Form Section - Enhanced UI with card-like appearance */}
-          <div className="w-full lg:w-3/5 mx-auto order-2 lg:order-1 mt-3">
+          <div className="w-full lg:w-3/5 mx-auto sm:mx-3 order-2 lg:order-1 mt-3 ">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-blue-600 ">
               {/* Form Header with gradient */}
               <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-2 relative overflow-hidden">
@@ -1861,7 +1861,7 @@ const Add_rates = () => {
                         <label className="block text-sm font-medium text-black mb-1">
                           Transit Time (Days)
                         </label>
-                        <div className="relative shadow-sm rounded-md border border-blue-300">
+                        <div className="relative shadow-sm rounded-md border border-blue-300 ">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
@@ -1881,7 +1881,7 @@ const Add_rates = () => {
                           <select
                             value={transit}
                             onChange={(e) => setTransittime(e.target.value)}
-                            className="block w-full pl-8 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
+                            className="appearance-none block w-full pl-8 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-800"
                             required
                           >
                             <option value="" disabled>
@@ -2252,7 +2252,7 @@ const Add_rates = () => {
           </div>
 
           {/* Rate Card Calculator - Now sticky/floating */}
-          <div className="w-full lg:w-2/5 order-1 lg:order-2">
+          <div className="w-full lg:w-2/5 order-1 lg:order-2 sm:mx-3 mx-auto">
             <div className="sticky top-6 self-start mt-4">
               <div className="border rounded-xl shadow-md overflow-hidden border-red-500">
                 <div className="bg-gradient-to-r from-red-500 to-red-700 p-2 text-white text-center">

@@ -14,6 +14,7 @@ export const getPOROptions = () => {
       "ICD Nagpur (NGP)",
       "ICD Bhiwadi (BWD)",
       "ICD Loni (LON)",
+      "ICD Jodhpur (RJ)",
       "ICD Khodiyar (KHODIYAR)",
       "ICD Bangalore Whitefield (WFD)",
       "ICD Durgapur (DGP)",
