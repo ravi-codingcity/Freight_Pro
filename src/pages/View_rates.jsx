@@ -804,7 +804,7 @@ const View_rates = () => {
           // Data loaded state - The table needs the most significant changes for mobile
           <>
             {/* Responsive table with horizontal scrolling on small screens */}
-            <div className="overflow-x-auto shadow-md rounded-lg border border-gray-300 mx-5">
+            <div className="overflow-x-auto shadow-md rounded-lg border border-gray-300 sm:mx-5 mx-2">
               <div className="inline-block min-w-full align-middle">
                 <table className="min-w-full divide-y divide-gray-200 table-fixed border-collapse">
                   <thead className="bg-gray-100">

@@ -1082,8 +1082,8 @@ const Add_rates = () => {
         <div className="grid gap-1 mt-1">
           {Object.entries(ratesObj).map(([weightRange, rate]) => (
             <span key={weightRange} className="text-xs">
-              <span className="font-medium"></span>{weightRange}:{" "}
-              <span className="text-black font-semibold">
+              <span className="font-medium">20 ft.</span> {weightRange}{" "}
+              <span className="text-blue-600">
                 {rate} {/* The rate already includes the currency symbol */}
               </span>
               <span className="text-gray-500"> /Container</span>
@@ -2181,7 +2181,7 @@ const Add_rates = () => {
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-600"
+                                className="h-5 w-5 text-gray-500"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -2201,7 +2201,7 @@ const Add_rates = () => {
                               onChange={(date) => setValidity(date)}
                               dateFormat="dd-MM-yyyy"
                               placeholderText="Select a date"
-                              className="pl-10 pr-3 py-2 text-gray-500 border border-gray-300 rounded-md shadow-sm text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               min={new Date().toISOString().split("T")[0]}
                               required
                             />
@@ -2378,8 +2378,8 @@ const Add_rates = () => {
                   <h2 className="text-lg sm:text-xl font-bold">
                     Origin Rate Calculator
                   </h2>
-                  <p className="text-xs sm:text-sm text-blue-100 mt-1 px-2">
-                    Select POR, POL, Container Type and Shipping Lines to view local rates
+                  <p className="text-xs sm:text-sm text-blue-100 mt-1">
+                    Select POR and Shipping Lines to view applicable rates
                   </p>
                 </div>
 
@@ -2930,557 +2930,579 @@ const Add_rates = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto shadow-md rounded-lg">
-            <table className="min-w-full divide-y divide-gray-200 table-fixed border-collapse border border-gray-300">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
-                  >
-                    POR
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
-                  >
-                    POL
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
-                  >
-                    POD
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden md:table-cell"
-                  >
-                    Shipping Line
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
-                  >
-                    Container
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
-                  >
-                    Freight
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
-                  >
-                    Validity
-                  </th>
-                  <th
-                    scope="col"
-                    className="px-2 sm:px-2 py-2 sm:py-3 text-center text-sm font-bold text-red-500 tracking-wider border-b border-gray-300"
-                  >
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {forms
-                  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-                  // Filter out expired rates
-                  .filter((item) => !isValidityExpired(item.validity))
-                  .map((item) => {
-                    const hasRemarks =
-                      item.remarks && item.remarks.trim().length > 0;
-                    const isEditable = isFormEditable(item.createdAt);
-                    const isExpanded = expandedRows[item._id] || false;
+          <div className="overflow-x-auto shadow-md rounded-lg border border-gray-300 sm:mx-4 mx-1">
+            <div className="inline-block min-w-full align-middle">
+              <table className="min-w-full divide-y divide-gray-200 table-fixed border-collapse">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                    >
+                      POR
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                    >
+                      POL
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                    >
+                      POD
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden md:table-cell"
+                    >
+                      Shipping Line
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
+                    >
+                      Container
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
+                    >
+                      Freight
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
+                    >
+                      Validity
+                    </th>
+                    <th
+                      scope="col"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-center text-sm font-bold text-red-500 tracking-wider border-b border-gray-300"
+                    >
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {forms
+                    .sort(
+                      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+                    )
+                    // Filter out expired rates
+                    .filter((item) => !isValidityExpired(item.validity))
+                    .map((item) => {
+                      const hasRemarks =
+                        item.remarks && item.remarks.trim().length > 0;
+                      const isEditable = isFormEditable(item.createdAt);
+                      const isExpanded = expandedRows[item._id] || false;
 
-                    return (
-                      <React.Fragment key={item._id}>
-                        <tr
-                          className={`${
-                            hasRemarks
-                              ? "bg-yellow-50 hover:bg-yellow-100"
-                              : "hover:bg-gray-50"
-                          } transition-colors duration-150`}
-                        >
-                          <td className="px-2  py-2 border-r border-gray-300">
-                            <span className="font-medium text-xs sm:text-sm text-gray-900 bg-blue-50 px-1 sm:px-2 py-1 rounded truncate block">
-                              {item.por || "N/A"}
-                            </span>
-                          </td>
-                          <td className="px-2  py-2 border-r border-gray-300">
-                            <span className="font-medium text-xs sm:text-sm text-gray-900 bg-blue-50 px-1 sm:px-2 py-1 rounded truncate block">
-                              {item.pol || "N/A"}
-                            </span>
-                          </td>
-                          <td className="px-2  py-2 border-r border-gray-300">
-                            <div className="flex flex-col sm:flex-col sm:items-start">
-                              <div>
-                                {" "}
-                                <span className="font-medium text-xs sm:text-sm text-gray-900 bg-indigo-50 px-1 sm:px-2 py-1 rounded truncate block">
-                                  {item.pod || "N/A"}
-                                </span>
-                              </div>
-                              {hasRemarks && (
-                                <div className="flex items-center mt-2">
-                                  <span
-                                    className="inline-flex items-center mt-1 sm:mt-0 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 animate-pulse"
-                                    title="Contains important remarks"
-                                  >
-                                    <svg
-                                      className="w-2 h-2 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
-                                      fill="currentColor"
-                                      viewBox="0 0 20 20"
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 012 0zm-1 9a1 1 100-2 1 1 000 2z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
-                                    <span className="sm:inline hidden">
-                                      Remarks
-                                    </span>
+                      return (
+                        <React.Fragment key={item._id}>
+                          <tr
+                            className={`${
+                              hasRemarks
+                                ? "bg-yellow-50 hover:bg-yellow-100"
+                                : "hover:bg-gray-50"
+                            } transition-colors duration-150`}
+                          >
+                            <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
+                              <div className="flex items-center text-[10px] sm:text-xs">
+                                <div className="bg-blue-50 px-1.5 sm:px-2 py-1 rounded-l border border-blue-200 flex items-center">
+                                  <span className="font-medium text-black">
+                                    {item.por}
                                   </span>
                                 </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-2  py-2 border-r border-gray-300 hidden md:table-cell">
-                            <span className="text-xs sm:text-sm font-medium text-gray-900">
-                              {item.shipping_lines || "N/A"}
-                            </span>
-                          </td>
-                          <td className="px-2  py-2 border-r border-gray-300 hidden sm:table-cell">
-                            <span className="text-xs sm:text-sm text-gray-900">
-                              {item.container_type || "N/A"}
-                            </span>
-                          </td>
-                          <td className="px-2  py-2 border-r border-gray-300">
-                            <div className="text-xs sm:text-sm font-medium text-gray-900">
-                              {item.ocean_freight || "N/A"}
-                            </div>
-                            <div className="text-[10px] sm:text-xs text-gray-500">
-                              {item.acd_ens_afr || "N/A"}
-                            </div>
-                          </td>
-                          <td className="px-2  py-2 border-r border-gray-300 hidden sm:table-cell">
-                            <span
-                              className={`px-1.5 sm:px-2 py-0.5 sm:py-1 inline-flex text-[10px] sm:text-xs leading-5 font-semibold rounded-full ${"bg-green-100 text-green-800"}`}
-                            >
-                              {formatDate(item.validity)}{" "}
-                              {item.validity_for
-                                ? `(${item.validity_for})`
-                                : ""}
-                            </span>
-                          </td>
-                          <td className="px-2  py-2 text-center">
-                            <div className="flex flex-col sm:flex-row justify-center sm:space-x-2 space-y-1 sm:space-y-0">
-                              {isEditable ? (
-                                <button
-                                  onClick={() => handleEdit(item)}
-                                  className="inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-transparent text-[10px] sm:text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                  >
-                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                  </svg>
-                                  Edit
-                                </button>
-                              ) : (
-                                <span className="inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-gray-200 text-[10px] sm:text-xs font-medium rounded text-gray-400 bg-gray-50">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                  >
-                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                  </svg>
-                                  <span className="hidden sm:inline">Edit</span>
-                                  <span className="sm:hidden">Expired</span>
-                                </span>
-                              )}
-                              <button
-                                onClick={() => toggleRowExpansion(item._id)}
-                                className={`inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-transparent text-[10px] sm:text-xs font-medium rounded ${
-                                  isExpanded
-                                    ? "text-white bg-blue-600 hover:bg-blue-700"
-                                    : "text-blue-700 bg-blue-100 hover:bg-blue-200"
-                                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
-                              >
-                                {isExpanded ? (
-                                  <>
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 01-1.414-1.414l4-4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
-                                    Hide
-                                  </>
-                                ) : (
-                                  <>
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 111.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
-                                    <span>Details</span>
-                                  </>
-                                )}
-                              </button>
-                            </div>
-                            {isEditable && (
-                              <div className="mt-1 text-[9px] sm:text-xs text-yellow-600">
-                                {formatRemainingTime(
-                                  remainingTimes[item._id] || 0
-                                )}
                               </div>
-                            )}
-                          </td>
-                        </tr>
-                        {isExpanded && (
-                          <tr className="border-t border-gray-300">
-                            <td
-                              colSpan="8"
-                              className="px-3 sm:px-6 py-4 border-b border-gray-300 bg-slate-100"
-                            >
-                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <div className="bg-white p-4 rounded-lg shadow-sm border-[1px] border-gray-400">
-                                  <h4 className="font-medium text-sm text-red-500 mb-2">
-                                    Route & Commodity Details
-                                  </h4>
-                                  <div className="grid grid-cols-3 gap-2 text-xs">
-                                    <div>
-                                      <span className="text-gray-500">
-                                        POR:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.por || "N/A"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        POL:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.pol || "N/A"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        POD:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.pod || "N/A"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        Commodity Type:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.commodity || "N/A"}
-                                      </p>
-                                    </div>
-
-                                    <div>
-                                      <span className="text-gray-500">
-                                        Transit Time:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.transit
-                                          ? `${item.transit} ${
-                                              parseInt(item.transit) === 1
-                                                ? "Day"
-                                                : "Days"
-                                            }`
-                                          : "N/A"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        Route Type:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.route || "Direct"}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        Validity For:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.validity_for || "N/A"}
-                                      </p>
-                                    </div>
-                                  </div>
-                                  <div className="mt-3 border-t border-gray-200 pt-2">
-                                    <div>
-                                      <span className="text-red-500 text-xs font-medium">
-                                        Shipping Line Contact Person Details
-                                      </span>
-                                      <p className=" text-xs ">
-                                        Name: {item.shipping_name || "N/A"}
-                                      </p>
-
-                                      <p className=" text-xs ">
-                                        Contact No:{" "}
-                                        {item.shipping_number || "N/A"}
-                                      </p>
-                                      <p className=" text-xs ">
-                                        Email: {item.shipping_email || "N/A"}
-                                      </p>
-                                      <p className=" text-xs ">
-                                        Address:{" "}
-                                        {item.shipping_address || "N/A"}
-                                      </p>
-                                    </div>
-                                  </div>
+                            </td>
+                            <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
+                              <div className="flex items-center text-[10px] sm:text-xs">
+                                <div className="bg-blue-50 px-1.5 sm:px-2 py-1 rounded-l border border-blue-200 flex items-center">
+                                  <span className="font-medium text-black">
+                                    {item.pol}
+                                  </span>
                                 </div>
-
-                                <div className="bg-white p-3 rounded-lg shadow-sm border-[1px] border-gray-400">
-                                  <h4 className="font-medium text-sm text-red-500 mb-2">
-                                    Origin Charges
-                                  </h4>
-                                  <div className="grid grid-cols-3 gap-2 text-xs">
-                                    <div>
-                                      <span className="text-gray-500">
-                                        BL Fees:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.bl_fees || "N/A"} /BL
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        THC:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.thc || "N/A"} /Container
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        MUC:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.muc || "N/A"} /BL
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        TOLL:
-                                      </span>
-                                      <p className="font-medium">
-                                        {item.toll || "N/A"} /Container
-                                      </p>
-                                    </div>
+                              </div>
+                            </td>
+                            <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
+                              <div className="flex items-center text-[10px] sm:text-xs">
+                                <div>
+                                  <div className="bg-blue-50 px-1.5 sm:px-2 py-1 rounded-l border border-blue-200 flex items-center">
+                                    <span className="font-medium text-black">
+                                      {item.pod}
+                                    </span>
                                   </div>
-
-                                  {/* Custom Charges Section */}
-                                  {item.customCharges &&
-                                    Array.isArray(item.customCharges) &&
-                                    item.customCharges.length > 0 && (
-                                      <div className="mt-2 border-t border-gray-200 pt-2">
-                                        <span className="text-xs font-medium text-gray-500">
-                                          Other Charges:
-                                        </span>
-                                        <div className="mt-1 grid grid-cols-2 gap-2">
-                                          {item.customCharges.map(
-                                            (charge, index) => (
-                                              <p
-                                                key={index}
-                                                className="text-xs font-medium"
-                                              >
-                                                {charge.label}: {charge.value}{" "}
-                                                <span className="text-gray-500">
-                                                  {charge.unit || ""}
-                                                </span>
-                                              </p>
-                                            )
-                                          )}
-                                        </div>
-                                      </div>
-                                    )}
-
-                                  {/* For backward compatibility with old format */}
-                                  {!item.customCharges &&
-                                    item.customLabel &&
-                                    item.customValue && (
-                                      <div className="mt-2 border-t border-gray-200 pt-2">
-                                        <span className="text-xs font-medium text-gray-500">
-                                          Other Charges:
-                                        </span>
-                                        {/* Parse and display multiple charges if they use the delimiter */}
-                                        {item.customLabel.includes("|||") ? (
-                                          <div className="mt-1 grid grid-cols-3 gap-2">
-                                            {item.customLabel
-                                              .split("|||")
-                                              .map((label, index) => {
-                                                const values =
-                                                  item.customValue.split("|||");
-                                                // Properly split the units string and get the corresponding unit for this charge
-                                                const units = item.customUnit
-                                                  ? item.customUnit.split("|||")
-                                                  : [];
-                                                const unit = units[index] || ""; // Default to /BL if no unit is found
-
-                                                return label &&
-                                                  values[index] ? (
-                                                  <p
-                                                    key={index}
-                                                    className="text-xs font-medium"
-                                                  >
-                                                    {label}: {values[index]}{" "}
-                                                    <span className="text-gray-500">
-                                                      {unit}
-                                                    </span>
-                                                  </p>
-                                                ) : null;
-                                              })}
-                                          </div>
-                                        ) : (
-                                          // Display single charge (legacy format)
-                                          <p className="text-xs font-medium">
-                                            {item.customLabel}:{" "}
-                                            {item.customValue}{" "}
-                                            <span className="text-gray-500">
-                                              {item.customUnit}
-                                            </span>
-                                          </p>
-                                        )}
-                                      </div>
-                                    )}
-                                </div>
-
-                                <div className="bg-white p-3 rounded-lg shadow-sm border-[1px] border-gray-400">
-                                  <h4 className="font-medium text-sm text-red-500 mb-2">
-                                    Additional Information
-                                  </h4>
                                   {hasRemarks && (
-                                    <div className="mb-2 bg-yellow-100 p-2 rounded text-xs">
-                                      <span className="text-yellow-700 font-medium">
-                                        Remarks:
+                                    <div className="sm:flex hidden items-center mt-2">
+                                      <span
+                                        className="inline-flex items-center mt-1 sm:mt-0 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 animate-pulse"
+                                        title="Contains important remarks"
+                                      >
+                                        <svg
+                                          className="w-2 h-2 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
+                                          fill="currentColor"
+                                          viewBox="0 0 20 20"
+                                        >
+                                          <path
+                                            fillRule="evenodd"
+                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 012 0zm-1 9a1 1 100-2 1 1 000 2z"
+                                            clipRule="evenodd"
+                                          />
+                                        </svg>
+                                        <span className="sm:inline hidden">
+                                          Remarks
+                                        </span>
                                       </span>
-                                      <p className="mt-1 text-gray-800">
-                                        {item.remarks}
-                                      </p>
                                     </div>
                                   )}
-                                  <div className="grid grid-cols-3 gap-2 text-xs">
-                                    <div>
-                                      <span className="text-gray-500">
-                                        Created:
-                                      </span>
-                                      <p className="font-medium">
-                                        {new Date(
-                                          item.createdAt
-                                        ).toLocaleDateString("en-GB")}
-                                        ,
-                                        {new Date(
-                                          item.createdAt
-                                        ).toLocaleTimeString([], {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })}
-                                      </p>
-                                    </div>
-                                    <div>
-                                      <span className="text-gray-500">
-                                        Updated:
-                                      </span>
-                                      <p className="font-medium">
-                                        {new Date(
-                                          item.updatedAt
-                                        ).toLocaleDateString("en-GB")}
-                                        ,
-                                        {new Date(
-                                          item.updatedAt
-                                        ).toLocaleTimeString([], {
-                                          hour: "2-digit",
-                                          minute: "2-digit",
-                                        })}
-                                      </p>
-                                    </div>
-
-                                    <div>
-                                      <span className="text-gray-500">
-                                        Edit Status:
-                                      </span>
-                                      <p
-                                        className={`font-medium ${
-                                          isEditable
-                                            ? "text-green-600"
-                                            : "text-red-600"
-                                        }`}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-2  py-2 border-r border-gray-300 hidden md:table-cell">
+                              <span className="text-xs sm:text-sm font-medium text-gray-900">
+                                {item.shipping_lines || "N/A"}
+                              </span>
+                            </td>
+                            <td className="px-2  py-2 border-r border-gray-300 hidden sm:table-cell">
+                              <span className="text-xs sm:text-sm text-gray-900">
+                                {item.container_type || "N/A"}
+                              </span>
+                            </td>
+                            <td className="px-2  py-2 border-r border-gray-300">
+                              <div className="text-xs sm:text-sm font-medium text-gray-900">
+                                {item.ocean_freight || "N/A"}
+                              </div>
+                              <div className="text-[10px] sm:text-xs text-gray-500">
+                                {item.acd_ens_afr || "N/A"}
+                              </div>
+                            </td>
+                            <td className="px-2  py-2 border-r border-gray-300 hidden sm:table-cell">
+                              <span
+                                className={`px-1.5 sm:px-2 py-0.5 sm:py-1 inline-flex text-[10px] sm:text-xs leading-5 font-semibold rounded-full ${"bg-green-100 text-green-800"}`}
+                              >
+                                {formatDate(item.validity)}{" "}
+                                {item.validity_for
+                                  ? `(${item.validity_for})`
+                                  : ""}
+                              </span>
+                            </td>
+                            <td className="px-2  py-2 text-center">
+                              <div className="flex flex-col sm:flex-row justify-center sm:space-x-2 space-y-1 sm:space-y-0">
+                                {isEditable ? (
+                                  <button
+                                    onClick={() => handleEdit(item)}
+                                    className="inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-transparent text-[10px] sm:text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                    </svg>
+                                    Edit
+                                  </button>
+                                ) : (
+                                  <span className="inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-gray-200 text-[10px] sm:text-xs font-medium rounded text-gray-400 bg-gray-50">
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
+                                      viewBox="0 0 24 24"
+                                      fill="currentColor"
+                                    >
+                                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                    </svg>
+                                    <span className="hidden sm:inline">
+                                      Edit
+                                    </span>
+                                    <span className="sm:hidden">Expired</span>
+                                  </span>
+                                )}
+                                <button
+                                  onClick={() => toggleRowExpansion(item._id)}
+                                  className={`inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-transparent text-[10px] sm:text-xs font-medium rounded ${
+                                    isExpanded
+                                      ? "text-white bg-blue-600 hover:bg-blue-700"
+                                      : "text-blue-700 bg-blue-100 hover:bg-blue-200"
+                                  } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+                                >
+                                  {isExpanded ? (
+                                    <>
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
                                       >
-                                        {isEditable ? (
-                                          "Editable until " +
-                                          new Date(
-                                            new Date(item.createdAt).getTime() +
-                                              30 * 60 * 1000
-                                          ).toLocaleTimeString([], {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                          })
-                                        ) : (
-                                          <>
-                                            Edit period expired. Contact IT
-                                            Department for rate change 746.
-                                          </>
-                                        )}
-                                      </p>
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 01-1.414-1.414l4-4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                      Hide
+                                    </>
+                                  ) : (
+                                    <>
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 111.414 1.414l-4 4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                      <span>Details</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                              {isEditable && (
+                                <div className="mt-1 text-[9px] sm:text-xs text-yellow-600">
+                                  {formatRemainingTime(
+                                    remainingTimes[item._id] || 0
+                                  )}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                          {isExpanded && (
+                            <tr className="border-t border-gray-300">
+                              <td
+                                colSpan="8"
+                                className="px-3 sm:px-6 py-4 border-b border-gray-300 bg-slate-100"
+                              >
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                  <div className="bg-white p-4 rounded-lg shadow-sm border-[1px] border-gray-400">
+                                    <h4 className="font-medium text-sm text-red-500 mb-2">
+                                      Route & Commodity Details
+                                    </h4>
+                                    <div className="grid grid-cols-3 gap-2 text-xs">
+                                      <div>
+                                        <span className="text-gray-500">
+                                          POR:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.por || "N/A"}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
+                                          POL:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.pol || "N/A"}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
+                                          POD:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.pod || "N/A"}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
+                                          Commodity Type:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.commodity || "N/A"}
+                                        </p>
+                                      </div>
+
+                                      <div>
+                                        <span className="text-gray-500">
+                                          Transit Time:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.transit
+                                            ? `${item.transit} ${
+                                                parseInt(item.transit) === 1
+                                                  ? "Day"
+                                                  : "Days"
+                                              }`
+                                            : "N/A"}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
+                                          Route Type:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.route || "Direct"}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
+                                          Validity For:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.validity_for || "N/A"}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <div className="mt-3 border-t border-gray-200 pt-2">
+                                      <div>
+                                        <span className="text-red-500 text-xs font-medium">
+                                          Shipping Line Contact Person Details
+                                        </span>
+                                        <p className=" text-xs ">
+                                          Name: {item.shipping_name || "N/A"}
+                                        </p>
+
+                                        <p className=" text-xs ">
+                                          Contact No:{" "}
+                                          {item.shipping_number || "N/A"}
+                                        </p>
+                                        <p className=" text-xs ">
+                                          Email: {item.shipping_email || "N/A"}
+                                        </p>
+                                        <p className=" text-xs ">
+                                          Address:{" "}
+                                          {item.shipping_address || "N/A"}
+                                        </p>
+                                      </div>
                                     </div>
                                   </div>
 
-                                  {/* Rail Freight Rates Section */}
-                                  <div className="mt-0">
-                                    {item.railFreightRates &&
-                                      Object.keys(item.railFreightRates)
-                                        .length > 0 && (
+                                  <div className="bg-white p-3 rounded-lg shadow-sm border-[1px] border-gray-400">
+                                    <h4 className="font-medium text-sm text-red-500 mb-2">
+                                      Origin Charges
+                                    </h4>
+                                    <div className="grid grid-cols-3 gap-2 text-xs">
+                                      <div>
+                                        <span className="text-gray-500">
+                                          BL Fees:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.bl_fees || "N/A"} /BL
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
+                                          THC:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.thc || "N/A"} /Container
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
+                                          MUC:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.muc || "N/A"} /BL
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
+                                          TOLL:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.toll || "N/A"} /Container
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Custom Charges Section */}
+                                    {item.customCharges &&
+                                      Array.isArray(item.customCharges) &&
+                                      item.customCharges.length > 0 && (
                                         <div className="mt-2 border-t border-gray-200 pt-2">
-                                          <span className="text-gray-700 text-xs font-medium">
-                                            Rail Freight (Based on Cargo Weight
-                                            + Tare Weight)
+                                          <span className="text-xs font-medium text-gray-500">
+                                            Other Charges:
                                           </span>
-                                          <div className="mt-1">
-                                            {formatRailFreightRatesForDisplay(
-                                              item.railFreightRates
+                                          <div className="mt-1 grid grid-cols-2 gap-2">
+                                            {item.customCharges.map(
+                                              (charge, index) => (
+                                                <p
+                                                  key={index}
+                                                  className="text-xs font-medium"
+                                                >
+                                                  {charge.label}: {charge.value}{" "}
+                                                  <span className="text-gray-500">
+                                                    {charge.unit || ""}
+                                                  </span>
+                                                </p>
+                                              )
                                             )}
                                           </div>
                                         </div>
                                       )}
+
+                                    {/* For backward compatibility with old format */}
+                                    {!item.customCharges &&
+                                      item.customLabel &&
+                                      item.customValue && (
+                                        <div className="mt-2 border-t border-gray-200 pt-2">
+                                          <span className="text-xs font-medium text-gray-500">
+                                            Other Charges:
+                                          </span>
+                                          {/* Parse and display multiple charges if they use the delimiter */}
+                                          {item.customLabel.includes("|||") ? (
+                                            <div className="mt-1 grid grid-cols-3 gap-2">
+                                              {item.customLabel
+                                                .split("|||")
+                                                .map((label, index) => {
+                                                  const values =
+                                                    item.customValue.split(
+                                                      "|||"
+                                                    );
+                                                  // Properly split the units string and get the corresponding unit for this charge
+                                                  const units = item.customUnit
+                                                    ? item.customUnit.split(
+                                                        "|||"
+                                                      )
+                                                    : [];
+                                                  const unit =
+                                                    units[index] || ""; // Default to /BL if no unit is found
+
+                                                  return label &&
+                                                    values[index] ? (
+                                                    <p
+                                                      key={index}
+                                                      className="text-xs font-medium"
+                                                    >
+                                                      {label}: {values[index]}{" "}
+                                                      <span className="text-gray-500">
+                                                        {unit}
+                                                      </span>
+                                                    </p>
+                                                  ) : null;
+                                                })}
+                                            </div>
+                                          ) : (
+                                            // Display single charge (legacy format)
+                                            <p className="text-xs font-medium">
+                                              {item.customLabel}:{" "}
+                                              {item.customValue}{" "}
+                                              <span className="text-gray-500">
+                                                {item.customUnit}
+                                              </span>
+                                            </p>
+                                          )}
+                                        </div>
+                                      )}
+                                  </div>
+
+                                  <div className="bg-white p-3 rounded-lg shadow-sm border-[1px] border-gray-400">
+                                    <h4 className="font-medium text-sm text-red-500 mb-2">
+                                      Additional Information
+                                    </h4>
+                                    {hasRemarks && (
+                                      <div className="mb-2 bg-yellow-100 p-2 rounded text-xs">
+                                        <span className="text-yellow-700 font-medium">
+                                          Remarks:
+                                        </span>
+                                        <p className="mt-1 text-gray-800">
+                                          {item.remarks}
+                                        </p>
+                                      </div>
+                                    )}
+                                    <div className="grid grid-cols-3 gap-2 text-xs">
+                                      <div>
+                                        <span className="text-gray-500">
+                                          Created:
+                                        </span>
+                                        <p className="font-medium">
+                                          {new Date(
+                                            item.createdAt
+                                          ).toLocaleDateString("en-GB")}
+                                          ,
+                                          {new Date(
+                                            item.createdAt
+                                          ).toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          })}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
+                                          Updated:
+                                        </span>
+                                        <p className="font-medium">
+                                          {new Date(
+                                            item.updatedAt
+                                          ).toLocaleDateString("en-GB")}
+                                          ,
+                                          {new Date(
+                                            item.updatedAt
+                                          ).toLocaleTimeString([], {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          })}
+                                        </p>
+                                      </div>
+
+                                      <div>
+                                        <span className="text-gray-500">
+                                          Edit Status:
+                                        </span>
+                                        <p
+                                          className={`font-medium ${
+                                            isEditable
+                                              ? "text-green-600"
+                                              : "text-red-600"
+                                          }`}
+                                        >
+                                          {isEditable ? (
+                                            "Editable until " +
+                                            new Date(
+                                              new Date(
+                                                item.createdAt
+                                              ).getTime() +
+                                                30 * 60 * 1000
+                                            ).toLocaleTimeString([], {
+                                              hour: "2-digit",
+                                              minute: "2-digit",
+                                            })
+                                          ) : (
+                                            <>
+                                              Edit period expired. Contact IT
+                                              Department for rate change 746.
+                                            </>
+                                          )}
+                                        </p>
+                                      </div>
+                                    </div>
+
+                                    {/* Rail Freight Rates Section */}
+                                    <div className="mt-0">
+                                      {item.railFreightRates &&
+                                        Object.keys(item.railFreightRates)
+                                          .length > 0 && (
+                                          <div className="mt-2 border-t border-gray-200 pt-2">
+                                            <span className="text-gray-500 text-xs ">
+                                              Rail Freight (Based on Cargo
+                                              Weight + Tare Weight)
+                                            </span>
+                                            <div className="mt-1">
+                                              {formatRailFreightRatesForDisplay(
+                                                item.railFreightRates
+                                              )}
+                                            </div>
+                                          </div>
+                                        )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    );
-                  })}
-              </tbody>
-            </table>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
