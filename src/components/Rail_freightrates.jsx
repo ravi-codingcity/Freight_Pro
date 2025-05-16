@@ -89,8 +89,8 @@ export const getRailFreightRates = async (por, pol, shippingLine, containerType)
         return {
           "(0-10 ton)": `${currency}${matchedRate.weight20ft0_10 || "0"}`,
           "(10-20 ton)": `${currency}${matchedRate.weight20ft10_20 || "0"}`,
-           "(20-26 ton)": `${currency}${matchedRate.weight20ft10_20 || "0"}`,
-          "(26+ ton)": `${currency}${matchedRate.weight20ft20Plus || "0"}`
+           "(20-26 ton)": `${currency}${matchedRate.weight20ft20_26 || "0"}`,
+          "(26+ ton)": `${currency}${matchedRate.weight20ft26Plus || "0"}`
         };
       } 
       // Check if it's a 40ft container

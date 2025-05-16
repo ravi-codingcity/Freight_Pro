@@ -1082,8 +1082,8 @@ const Add_rates = () => {
         <div className="grid gap-1 mt-1">
           {Object.entries(ratesObj).map(([weightRange, rate]) => (
             <span key={weightRange} className="text-xs">
-              <span className="font-medium">20 ft.</span> {weightRange}{" "}
-              <span className="text-blue-600">
+              <span className="font-medium"></span>{weightRange}:{" "}
+              <span className="text-black font-semibold">
                 {rate} {/* The rate already includes the currency symbol */}
               </span>
               <span className="text-gray-500"> /Container</span>
@@ -2181,7 +2181,7 @@ const Add_rates = () => {
                             >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-500"
+                                className="h-5 w-5 text-gray-600"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -2201,7 +2201,7 @@ const Add_rates = () => {
                               onChange={(date) => setValidity(date)}
                               dateFormat="dd-MM-yyyy"
                               placeholderText="Select a date"
-                              className="pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                              className="pl-10 pr-3 py-2 text-gray-500 border border-gray-300 rounded-md shadow-sm text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                               min={new Date().toISOString().split("T")[0]}
                               required
                             />
@@ -2378,8 +2378,8 @@ const Add_rates = () => {
                   <h2 className="text-lg sm:text-xl font-bold">
                     Origin Rate Calculator
                   </h2>
-                  <p className="text-xs sm:text-sm text-blue-100 mt-1">
-                    Select POR and Shipping Lines to view applicable rates
+                  <p className="text-xs sm:text-sm text-blue-100 mt-1 px-2">
+                    Select POR, POL, Container Type and Shipping Lines to view local rates
                   </p>
                 </div>
 
@@ -3459,7 +3459,7 @@ const Add_rates = () => {
                                       Object.keys(item.railFreightRates)
                                         .length > 0 && (
                                         <div className="mt-2 border-t border-gray-200 pt-2">
-                                          <span className="text-gray-500 text-xs ">
+                                          <span className="text-gray-700 text-xs font-medium">
                                             Rail Freight (Based on Cargo Weight
                                             + Tare Weight)
                                           </span>
