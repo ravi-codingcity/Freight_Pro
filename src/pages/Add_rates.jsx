@@ -1082,11 +1082,11 @@ const Add_rates = () => {
         <div className="grid gap-1 mt-1">
           {Object.entries(ratesObj).map(([weightRange, rate]) => (
             <span key={weightRange} className="text-xs">
-              <span className="font-medium">20 ft.</span> {weightRange}{" "}
-              <span className="text-blue-600">
+              <span className="font-medium"></span> {weightRange}:{" "}
+              <span className="text-black font-semibold">
                 {rate} {/* The rate already includes the currency symbol */}
               </span>
-              <span className="text-gray-500"> /Container</span>
+              <span className="text-gray-600"> /Container</span>
             </span>
           ))}
         </div>
@@ -2378,8 +2378,8 @@ const Add_rates = () => {
                   <h2 className="text-lg sm:text-xl font-bold">
                     Origin Rate Calculator
                   </h2>
-                  <p className="text-xs sm:text-sm text-blue-100 mt-1">
-                    Select POR and Shipping Lines to view applicable rates
+                  <p className="text-xs sm:text-sm text-blue-100 mt-1 sm:px-3 px-8">
+                    Select POR, POL, Container Size and Shipping Lines to view applicable rates
                   </p>
                 </div>
 
@@ -3466,8 +3466,7 @@ const Add_rates = () => {
                                             })
                                           ) : (
                                             <>
-                                              Edit period expired. Contact IT
-                                              Department for rate change 746.
+                                              Edit period expired. Contact Admin for any change 746.
                                             </>
                                           )}
                                         </p>
@@ -3480,7 +3479,7 @@ const Add_rates = () => {
                                         Object.keys(item.railFreightRates)
                                           .length > 0 && (
                                           <div className="mt-2 border-t border-gray-200 pt-2">
-                                            <span className="text-gray-500 text-xs ">
+                                            <span className="text-gray-600 text-xs font-medium">
                                               Rail Freight (Based on Cargo
                                               Weight + Tare Weight)
                                             </span>
