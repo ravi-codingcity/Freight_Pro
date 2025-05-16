@@ -8,26 +8,34 @@ export const getContainerSizeOptions = () => {
     { label: "20ft Reefer Container", value: "20ft RF" },
     { label: "40ft Reefer Container", value: "40ft RF" },
     { label: "40ft High Cube Reefer Container", value: "40ft H.Q-RF" },
-    { label: "20ft Open Top In-Gauge Container", value: "20-OT-In" },
-    { label: "40ft Open Top In-Gauge Container", value: "40-OT-In" },
+    { label: "20ft Open Top In-Gauge Container", value: "20ft OT-In" },
+    { label: "40ft Open Top In-Gauge Container", value: "40ft OT-In" },
+    { label: "20ft Open Top Out-of-Gauge Container", value: "20ft OT-Out" },
+    { label: "40ft Open Top Out-of-Gauge Container", value: "40ft OT-Out" },
+    { label: "20ft Flat Rack Container", value: "20ft FR" },
+    { label: "40ft Flat Rack Container", value: "40ft FR" },
   ];
 };
 
 // Helper function to determine container size category (20ft or 40ft) based on container type
 export const getContainerSizeCategory = (containerType) => {
   if (!containerType) return null;
-  
-  if (containerType.startsWith("20") || containerType.startsWith("20ft") || containerType === "20-OT-In") {
+
+  if (
+    containerType.startsWith("20") ||
+    containerType.startsWith("20ft") ||
+    containerType === "20ft-OT-In"
+  ) {
     return "20ft";
   } else if (
-    containerType.startsWith("40") || 
-    containerType.startsWith("40ft") || 
-    containerType.startsWith("45") || 
+    containerType.startsWith("40") ||
+    containerType.startsWith("40ft") ||
+    containerType.startsWith("45") ||
     containerType.startsWith("45ft") ||
-    containerType === "40-OT-In"
+    containerType === "40ft-OT-In"
   ) {
     return "40ft";
   }
-  
+
   return null;
 };
