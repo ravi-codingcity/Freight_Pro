@@ -1719,7 +1719,7 @@ const Add_rates = () => {
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                           />
                         </svg>
-                        Shipping Line Contact Person Details
+                        Shipping Line Contact Person Details <span className="text-red-500 ">*</span>
                       </h4>
 
                       <div className="sm:grid grid-cols-1 sm:grid-cols-3 gap-3  ">
@@ -1746,7 +1746,7 @@ const Add_rates = () => {
                               value={shipping_name}
                               placeholder="Enter Name *"
                               onChange={(e) => setshipping_name(e.target.value)}
-                              className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
+                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
                               required
                             />
                           </div>
@@ -1777,7 +1777,7 @@ const Add_rates = () => {
                               onChange={(e) =>
                                 setshipping_number(e.target.value)
                               }
-                              className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
+                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
                               required
                             />
                           </div>
@@ -1808,7 +1808,7 @@ const Add_rates = () => {
                               onChange={(e) =>
                                 setshipping_email(e.target.value)
                               }
-                              className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
+                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
                               required
                             />
                           </div>
@@ -1839,7 +1839,7 @@ const Add_rates = () => {
                               onChange={(e) =>
                                 setshipping_address(e.target.value)
                               }
-                              className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
+                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
                               required
                             />
                           </div>
