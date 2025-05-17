@@ -38,9 +38,18 @@ const View_rates = () => {
 
   const getUserData = (name) => {
     const userData = {
-      Vikram: { branch: "Delhi", phoneNumber: "123456789" },
-      Harmeet: { branch: "Kolkata", phoneNumber: "987654321" },
-      Kapil: { branch: "Mumbai", phoneNumber: "456789123" },
+      Vikram: { branch: "Delhi", phoneNumber: "701" },
+      Harmeet: { branch: "Delhi", phoneNumber: "705" },
+      Tarun: { branch: "Delhi", phoneNumber: "735" },
+      Archana: { branch: "Kolkata", phoneNumber: "" },
+      Manoj: { branch: "Ahmedabad", phoneNumber: "450" },
+      Manjunath: { branch: "Bengaluru", phoneNumber: "514" },
+      Param: { branch: "Chennai", phoneNumber: "768" },
+      Mahesh: { branch: "Mumbai", phoneNumber: "" },
+      Rajeshwari: { branch: "Mumbai", phoneNumber: "" },
+      Ragbir: { branch: "Mumbai", phoneNumber: "" },
+      Macwin: { branch: "Mumbai", phoneNumber: "" },
+      Prashant: { branch: "Mumbai", phoneNumber: "" },
     };
     return userData[name] || { branch: "N/A", phoneNumber: "N/A" };
   };
@@ -1274,7 +1283,7 @@ const View_rates = () => {
                                           .length > 0 && (
                                           <div className="mt-2 border-t border-gray-200 pt-2">
                                             <span className="text-gray-500 text-xs ">
-                                             IHC Rail Freight (Based on Cargo
+                                              IHC Rail Freight (Based on Cargo
                                               Weight + Tare Weight)
                                             </span>
                                             <div className="mt-1">
