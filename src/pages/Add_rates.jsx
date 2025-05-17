@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { IoStarSharp } from "react-icons/io5";
 import "react-datepicker/dist/react-datepicker.css";
 import Navbar from "../components/Navbar";
 import { getPOROptions } from "../components/POR";
@@ -1275,7 +1276,7 @@ const Add_rates = () => {
                       {/* POR */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          POR (Place of Receipt)
+                          POR (Place of Receipt) <span className="text-red-500 ">*</span>
                           {!optionsLoaded && (
                             <span className="text-xs text-gray-500 ml-2 animate-pulse">
                               (Loading...)
@@ -1337,7 +1338,7 @@ const Add_rates = () => {
                       {/* POL */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          POL (Port of Loading)
+                          POL (Port of Loading) <span className="text-red-500 ">*</span>
                         </label>
                         <div className="relative rounded-md shadow-sm  border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1397,7 +1398,7 @@ const Add_rates = () => {
                       {/* Container Type */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          Container Type
+                          Container Type <span className="text-red-500 ">*</span>
                         </label>
                         <div className="relative rounded-md shadow-sm  border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1452,7 +1453,7 @@ const Add_rates = () => {
                       {/* POD */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          POD (Port of Discharge)
+                            POD (Port of Discharge) <span className="text-red-500 ">*</span>
                         </label>
                         <div className="relative rounded-md shadow-sm border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1536,7 +1537,7 @@ const Add_rates = () => {
                         {/* Shipping Lines */}
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
-                            Shipping Line
+                            Shipping Lines <span className="text-red-500 ">*</span>
                           </label>
                           <div className="relative  shadow-sm rounded-md border border-blue-300">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1589,7 +1590,7 @@ const Add_rates = () => {
                         {/* Commodity Type */}
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
-                            Commodity Type
+                            Commodity Type <span className="text-red-500 ">*</span>
                           </label>
                           {showDescription ? (
                             <div>
@@ -1722,7 +1723,7 @@ const Add_rates = () => {
                       </h4>
 
                       <div className="sm:grid grid-cols-1 sm:grid-cols-3 gap-3  ">
-                        {/* Person Name */}
+                       { /* Person Name */}
                         <div className="mb-1 sm:mb-0">
                           <div className="relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1743,9 +1744,9 @@ const Add_rates = () => {
                             </div>
                             <input
                               value={shipping_name}
-                              placeholder="Enter Name"
+                              placeholder="Enter Name *"
                               onChange={(e) => setshipping_name(e.target.value)}
-                              className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border "
+                              className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
                               required
                             />
                           </div>
@@ -1772,7 +1773,7 @@ const Add_rates = () => {
                             </div>
                             <input
                               value={shipping_number}
-                              placeholder="Enter Number"
+                              placeholder="Enter Number *"
                               onChange={(e) =>
                                 setshipping_number(e.target.value)
                               }
@@ -1803,7 +1804,7 @@ const Add_rates = () => {
                             </div>
                             <input
                               value={shipping_email}
-                              placeholder="Enter Email"
+                              placeholder="Enter Email *"
                               onChange={(e) =>
                                 setshipping_email(e.target.value)
                               }
@@ -1834,7 +1835,7 @@ const Add_rates = () => {
                             </div>
                             <input
                               value={shipping_address}
-                              placeholder="Enter Address"
+                              placeholder="Enter Address *"
                               onChange={(e) =>
                                 setshipping_address(e.target.value)
                               }
@@ -1871,7 +1872,7 @@ const Add_rates = () => {
                       {/* Ocean Freight */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          Ocean Freight
+                          Ocean Freight <span className="text-red-500 ">*</span>
                         </label>
                         <div className="mt-1 flex  h-8 rounded-md border border-blue-300">
                           <span className="relative inline-flex items-center px-1 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
@@ -1924,7 +1925,7 @@ const Add_rates = () => {
                       {/* Transit Time */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          Transit Time (Days)
+                          Transit Time (Days) <span className="text-red-500 ">*</span>
                         </label>
                         <div className="relative shadow-sm rounded-md border border-blue-300 ">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1978,7 +1979,7 @@ const Add_rates = () => {
                       {/* Routing */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          Routing
+                          Routing <span className="text-red-500 ">*</span>
                         </label>
                         {showRouteDescription ? (
                           <div>
@@ -2091,7 +2092,7 @@ const Add_rates = () => {
                       {/* ACD/ENS/AFR */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          Select ACD/ENS/AFR Charges
+                          Select ACD/ENS/AFR Charges <span className="text-red-500 ">*</span>
                         </label>
                         <div className="mt-1 flex rounded-md shadow-sm h-10 border border-blue-300">
                           <span className="relative inline-flex items-center px-2 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
@@ -2170,7 +2171,7 @@ const Add_rates = () => {
                       {/* Validity */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          Validity (End Date)
+                          Validity (End Date) <span className="text-red-500 ">*</span>
                         </label>
                         <div className="grid grid-cols-2 gap-3">
                           <div className="relative">

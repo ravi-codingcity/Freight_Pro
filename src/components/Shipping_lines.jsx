@@ -17,7 +17,7 @@ export const getShippingLinesOptions = () => {
     "Yang Ming",
     "Wan Hai",
     "PIL",
-     "Goodrich Maritime",
+    "Goodrich Maritime",
     "WINWIN Lines",
     "SeaLead Shipping",
     "X-Press Feeders",
