@@ -321,7 +321,7 @@ const View_rates = () => {
                 </div>
 
                 {/* POD Filter */}
-                <div className="w-full sm:max-w-60 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
+                <div className="w-full sm:max-w-64 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1 min-w-[200px]">
                   <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
                     Port of Delivery (POD)
                   </label>
