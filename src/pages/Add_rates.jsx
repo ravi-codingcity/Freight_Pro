@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { IoStarSharp } from "react-icons/io5";
 import "react-datepicker/dist/react-datepicker.css";
 import Navbar from "../components/Navbar";
 import { getPOROptions } from "../components/POR";
