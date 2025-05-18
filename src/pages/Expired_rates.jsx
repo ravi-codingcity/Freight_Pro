@@ -29,7 +29,7 @@ function Expired_rates() {
       Vikram: vikramImg,
       Harmeet: harmeetImg,
       Kapil: kapilImg,
-      Rajeev: rajeevImg,
+     
     }),
     []
   );
@@ -103,9 +103,36 @@ function Expired_rates() {
     setSelectedPOD("");
   }, []);
 
+  // Add this utility function at the top of your component
+  const handleAuthError = (error) => {
+    if (error?.response?.status === 401 || error?.message?.includes('token')) {
+      // Clear user data from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('currentUser');
+      
+      // Alert the user
+      alert('Your session has expired. Please login again.');
+      
+      // Redirect to login page
+      window.location.href = '/';
+      return true;
+    }
+    return false;
+  };
+
   useEffect(() => {
     const loggedInUser = localStorage.getItem("currentUser") || "";
     setCurrentUser(loggedInUser);
+
+    // Check if token exists
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // If no token exists, redirect to login
+      alert('Authentication required. Please login.');
+      window.location.href = '/';
+      return;
+    }
 
     // Add AbortController for proper fetch cleanup
     const controller = new AbortController();
@@ -119,9 +146,16 @@ function Expired_rates() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
           signal, // Pass the signal to make the fetch abortable
         });
+
+        if (response.status === 401) {
+          // Handle expired token
+          handleAuthError({ response: { status: 401 } });
+          return;
+        }
 
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -155,8 +189,11 @@ function Expired_rates() {
       } catch (error) {
         // Only set error if the fetch wasn't aborted
         if (!signal.aborted) {
-          console.error("Error fetching forms:", error);
-          setError("Failed to fetch data. Please try again later.");
+          // Check if this is an auth error
+          if (!handleAuthError(error)) {
+            console.error("Error fetching forms:", error);
+            setError("Failed to fetch data. Please try again later.");
+          }
         }
       } finally {
         if (!signal.aborted) {

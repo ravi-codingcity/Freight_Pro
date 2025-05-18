@@ -534,7 +534,9 @@ const Add_rates = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error("Authentication token not found");
+        // If no token, treat as an auth error
+        handleAuthError({ message: 'token not found' });
+        return false;
       }
 
       // Make sure railFreightRates is defined and properly formatted
@@ -595,6 +597,12 @@ const Add_rates = () => {
         }
       );
 
+      // Check for authentication errors
+      if (response.status === 401) {
+        handleAuthError({ response: { status: 401 } });
+        return false;
+      }
+
       // Enhanced error handling with response details
       if (!response.ok) {
         let errorMessage = `Server returned ${response.status}: ${response.statusText}`;
@@ -623,10 +631,14 @@ const Add_rates = () => {
       return true;
     } catch (error) {
       console.error("Error creating form:", error);
-      console.error("Error details:", error.message);
-      setSubmitError(
-        error.message || "Failed to submit form. Please try again."
-      );
+      // Check if this is an auth error
+      if (!handleAuthError(error)) {
+        // Only set other errors if not an auth error
+        console.error("Error details:", error.message);
+        setSubmitError(
+          error.message || "Failed to submit form. Please try again."
+        );
+      }
       setIsSubmitting(false);
       return false;
     }
@@ -669,7 +681,9 @@ const Add_rates = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error("Authentication token not found");
+        // If no token, treat as an auth error
+        handleAuthError({ message: 'token not found' });
+        return false;
       }
 
       // Use railFreightRates as-is, with currency symbols included
@@ -758,6 +772,12 @@ const Add_rates = () => {
         }
       );
 
+      // Check for authentication errors
+      if (response.status === 401) {
+        handleAuthError({ response: { status: 401 } });
+        return false;
+      }
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to update form");
@@ -781,9 +801,13 @@ const Add_rates = () => {
       return true;
     } catch (error) {
       console.error("Error updating form:", error);
-      setSubmitError(
-        error.message || "Failed to update form. Please try again."
-      );
+      // Check if this is an auth error
+      if (!handleAuthError(error)) {
+        // Only set other errors if not an auth error
+        setSubmitError(
+          error.message || "Failed to update form. Please try again."
+        );
+      }
       setIsSubmitting(false);
       return false;
     }
@@ -975,8 +999,9 @@ const Add_rates = () => {
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        console.error("Authentication token not found");
-        setIsDataLoading(false); // End loading if no token
+        // If no token exists, redirect to login
+        alert('Authentication required. Please login.');
+        window.location.href = '/';
         return;
       }
 
@@ -991,6 +1016,12 @@ const Add_rates = () => {
           cache: "no-store",
         }
       );
+
+      if (response.status === 401) {
+        // Handle expired token
+        handleAuthError({ response: { status: 401 } });
+        return;
+      }
 
       if (!response.ok) {
         throw new Error(
@@ -1015,7 +1046,11 @@ const Add_rates = () => {
       }
     } catch (error) {
       console.error("Error fetching user forms:", error);
-      // Don't clear existing forms on error
+      // Check if this is an auth error before proceeding
+      if (!handleAuthError(error)) {
+        // Only set other errors if not an auth error
+        // Don't clear existing forms on error
+      }
     } finally {
       setIsDataLoading(false); // End loading state regardless of outcome
     }
@@ -1156,6 +1191,24 @@ const Add_rates = () => {
         {option}
       </option>
     ));
+  };
+
+  // Add this utility function near the top of your component - make sure it's defined only once
+  const handleAuthError = (error) => {
+    if (error?.response?.status === 401 || error?.message?.includes('token')) {
+      // Clear user data from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('currentUser');
+      
+      // Alert the user
+      alert('Your session has expired. Please login again.');
+      
+      // Redirect to login page
+      window.location.href = '/';
+      return true;
+    }
+    return false;
   };
 
   return (
@@ -1526,7 +1579,7 @@ const Add_rates = () => {
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            d="M19 11H5m14 0a2 2 0 002 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m14 0h-2.5M6.5 7H4"
+                            d="M19 11H5m14 0a2 2 0 002 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 002-2m14 0V9a2 2 0 00-2-2M9 11V9a2 2 0 012-2m14 0h-2.5M6.5 7H4"
                           />
                         </svg>
                         Shipping Line & Commodity Details
@@ -1606,7 +1659,7 @@ const Add_rates = () => {
                                       strokeLinecap="round"
                                       strokeLinejoin="round"
                                       strokeWidth={2}
-                                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 01-.707.293h-3.172a1 1 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H9m11 0a2 2 0 002 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6a2 2 0 012-2m11 0V9a2 2 0 00-2-2M9 11V9a2 2 0 012-2m14 0h-2.5M6.5 7H4"
                                     />
                                   </svg>
                                 </div>
@@ -1655,7 +1708,7 @@ const Add_rates = () => {
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
                                     strokeWidth={2}
-                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 01-.707.293h-3.172a1 1 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H9m11 0a2 2 0 002 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6a2 2 0 012-2m11 0V9a2 2 0 00-2-2M9 11V9a2 2 0 012-2m14 0h-2.5M6.5 7H4"
                                   />
                                 </svg>
                               </div>
@@ -1797,7 +1850,7 @@ const Add_rates = () => {
                                   strokeLinecap="round"
                                   strokeLinejoin="round"
                                   strokeWidth={2}
-                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2  0 00-2 2v10a2 2 0 002 2z"
                                 />
                               </svg>
                             </div>
@@ -1845,57 +1898,121 @@ const Add_rates = () => {
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* SECTION: Freight & Routing */}
-                  <div className="bg-gray-50 sm:py-3 sm:px-3 py-2 px-2 rounded-lg border border-gray-200">
-                    <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-2 text-blue-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                      Freight Details & Routing
-                    </h3>
+                    {/* SECTION: Freight & Routing */}
+                    <div className="bg-gray-50 sm:py-3 sm:px-3 py-2 px-2 rounded-lg border border-gray-200">
+                      <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-2 text-blue-600"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
+                        </svg>
+                        Freight Details & Routing
+                      </h3>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      {/* Ocean Freight */}
-                      <div className="mb-1">
-                        <label className="block text-sm font-medium text-black mb-1">
-                          Ocean Freight <span className="text-red-500 ">*</span>
-                        </label>
-                        <div className="mt-1 flex  h-8 rounded-md border border-blue-300">
-                          <span className="relative inline-flex items-center px-1 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
-                            <select
-                              className="appearance-none h-full px-3 border-0 bg-transparent focus:ring-0 focus:outline-none text-gray-700"
-                              value={ocean_freight.split(" ")[0] || "USD"}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {/* Ocean Freight */}
+                        <div className="mb-1">
+                          <label className="block text-sm font-medium text-black mb-1">
+                            Ocean Freight <span className="text-red-500 ">*</span>
+                          </label>
+                          <div className="mt-1 flex  h-8 rounded-md border border-blue-300">
+                            <span className="relative inline-flex items-center px-1 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
+                              <select
+                                className="appearance-none h-full px-3 border-0 bg-transparent focus:ring-0 focus:outline-none text-gray-700"
+                                value={ocean_freight.split(" ")[0] || "USD"}
+                                onChange={(e) => {
+                                  const currency = e.target.value;
+                                  const amount =
+                                    ocean_freight.split(" ")[1] || "";
+                                  setOcean_freight(`${currency} ${amount}`);
+                                }}
+                              >
+                                <option value="USD">USD $</option>
+                                <option value="INR">INR ₹</option>
+                                <option value="EUR">EUR €</option>
+                                <option value="GBP">GBP £</option>
+                                <option value="JPY">JPY ¥</option>
+                              </select>
+                              {/* Custom dropdown arrow */}
+                              <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+                            </span>
+                            <input
+                              value={ocean_freight.split(" ")[1] || ""}
                               onChange={(e) => {
-                                const currency = e.target.value;
-                                const amount =
-                                  ocean_freight.split(" ")[1] || "";
-                                setOcean_freight(`${currency} ${amount}`);
+                                const currency =
+                                  ocean_freight.split(" ")[0] || "USD";
+                                setOcean_freight(`${currency} ${e.target.value}`);
                               }}
-                            >
-                              <option value="USD">USD $</option>
-                              <option value="INR">INR ₹</option>
-                              <option value="EUR">EUR €</option>
-                              <option value="GBP">GBP £</option>
-                              <option value="JPY">JPY ¥</option>
-                            </select>
-                            {/* Custom dropdown arrow */}
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
+                              className="flex-1 min-w-0 block w-full rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm  px-1"
+                              placeholder="Enter Amount"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Transit Time */}
+                        <div className="mb-1">
+                          <label className="block text-sm font-medium text-black mb-1">
+                            Transit Time (Days) <span className="text-red-500 ">*</span>
+                          </label>
+                          <div className="relative shadow-sm rounded-md border border-blue-300 ">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4"
+                                className="h-5 w-5 text-gray-400"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                            </div>
+                            <select
+                              value={transit}
+                              onChange={(e) => setTransittime(e.target.value)}
+                              className="appearance-none block w-full pl-[36px] pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-600"
+                            >
+                              <option value="" disabled>
+                                Select Transit Time
+                              </option>
+                              {[...Array(100)].map((_, i) => (
+                                <option key={i + 1} value={i + 1}>
+                                  {i + 1} {i + 1 === 1 ? "Day" : "Days"}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 text-gray-400"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
                               >
@@ -1906,82 +2023,65 @@ const Add_rates = () => {
                                 />
                               </svg>
                             </div>
-                          </span>
-                          <input
-                            value={ocean_freight.split(" ")[1] || ""}
-                            onChange={(e) => {
-                              const currency =
-                                ocean_freight.split(" ")[0] || "USD";
-                              setOcean_freight(`${currency} ${e.target.value}`);
-                            }}
-                            className="flex-1 min-w-0 block w-full rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm  px-1"
-                            placeholder="Enter Amount"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      {/* Transit Time */}
-                      <div className="mb-1">
-                        <label className="block text-sm font-medium text-black mb-1">
-                          Transit Time (Days) <span className="text-red-500 ">*</span>
-                        </label>
-                        <div className="relative shadow-sm rounded-md border border-blue-300 ">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                          </div>
-                          <select
-                            value={transit}
-                            onChange={(e) => setTransittime(e.target.value)}
-                            className="appearance-none block w-full pl-[36px] pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-600"
-                            required
-                          >
-                            <option value="" disabled>
-                              Select Transit Time
-                            </option>
-                            {[...Array(100)].map((_, i) => (
-                              <option key={i + 1} value={i + 1}>
-                                {i + 1} {i + 1 === 1 ? "Day" : "Days"}
-                              </option>
-                            ))}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
                           </div>
                         </div>
-                      </div>
 
-                      {/* Routing */}
-                      <div className="mb-1">
-                        <label className="block text-sm font-medium text-black mb-1">
-                          Routing <span className="text-red-500 ">*</span>
-                        </label>
-                        {showRouteDescription ? (
-                          <div>
+                        {/* Routing */}
+                        <div className="mb-1">
+                          <label className="block text-sm font-medium text-black mb-1">
+                            Routing <span className="text-red-500 ">*</span>
+                          </label>
+                          {showRouteDescription ? (
+                            <div>
+                              <div className="relative shadow-sm rounded-md border border-blue-300">
+                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-5 w-5 text-gray-400"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9 20l-5-5m0 0l5-5m-5 5h12"
+                                    />
+                                  </svg>
+                                </div>
+                                <input
+                                  type="text"
+                                  placeholder="Enter Routing Description"
+                                  value={route}
+                                  onChange={(e) => setRoute(e.target.value)}
+                                  className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out"
+                                  required
+                                />
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => setShowRouteDescription(false)}
+                                className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 inline-flex items-center"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4 mr-1"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M11 17l-5-5m0 0l5-5m-5 5h12"
+                                  />
+                                </svg>
+                                Back to Selection
+                              </button>
+                            </div>
+                          ) : (
                             <div className="relative shadow-sm rounded-md border border-blue-300">
                               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg
@@ -1999,337 +2099,223 @@ const Add_rates = () => {
                                   />
                                 </svg>
                               </div>
-                              <input
-                                type="text"
-                                placeholder="Enter Routing Description"
+                              <select
                                 value={route}
-                                onChange={(e) => setRoute(e.target.value)}
-                                className="block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-800"
+                                onChange={(e) => {
+                                  if (e.target.value === "Via") {
+                                    setShowRouteDescription(true);
+                                    setRoute("");
+                                  } else {
+                                    setRoute(e.target.value);
+                                  }
+                                }}
+                                className="appearance-none block w-full pl-8 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                                required
+                              >
+                                <option value="" disabled>
+                                  Select Route
+                                </option>
+                                <option value="Direct">Direct</option>
+                                <option value="Via">Via</option>
+                              </select>
+                              <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5 text-gray-600"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* ACD/ENS/AFR + Validity Section */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
+                        {/* ACD/ENS/AFR */}
+                        <div className="mb-1">
+                          <label className="block text-sm font-medium text-black mb-1">
+                            Select ACD/ENS/AFR Charges <span className="text-red-500 ">*</span>
+                          </label>
+                          <div className="mt-1 flex rounded-md shadow-sm h-10 border border-blue-300">
+                            <span className="relative inline-flex items-center px-2 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
+                              <select
+                                className="appearance-none px-2 h-full border-0 bg-transparent focus:ring-0 focus:outline-none pr-2"
+                                value={acd_ens_afr.split(" ")[0] || "ACD"}
+                                onChange={(e) => {
+                                  const chargeType = e.target.value;
+                                  const chargeAmount =
+                                    acd_ens_afr.split(" ")[1] || "";
+                                  setacd_ens_afr(`${chargeType} ${chargeAmount}`);
+                                }}
+                              >
+                                <option value="ACD">ACD</option>
+                                <option value="ENS">ENS</option>
+                                <option value="AFR">AFR</option>
+                              </select>
+                              {/* Custom dropdown arrow */}
+                              <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+                            </span>
+                            <span className="relative inline-flex items-center px-2 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
+                              <select
+                                className="appearance-none px-2 h-full border-0 bg-transparent focus:ring-0 focus:outline-none"
+                                value={acdCurrency}
+                                onChange={(e) => setAcdCurrency(e.target.value)}
+                              >
+                                <option value="USD">USD $</option>
+                                <option value="INR">INR ₹</option>
+                                <option value="EUR">EUR €</option>
+                                <option value="GBP">GBP £</option>
+                                <option value="JPY">JPY ¥</option>
+                              </select>
+                              {/* Custom dropdown arrow */}
+                              <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-4 w-4"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+                            </span>
+                            <input
+                              value={acd_ens_afr.split(" ")[1] || ""}
+                              onChange={(e) => {
+                                const chargeType =
+                                  acd_ens_afr.split(" ")[0] || "ACD";
+                                setacd_ens_afr(`${chargeType} ${e.target.value}`);
+                              }}
+                              className="flex-1 w-full rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 border px-2"
+                              placeholder="Enter Charges"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Validity */}
+                        <div className="mb-1">
+                          <label className="block text-sm font-medium text-black mb-1">
+                            Validity (End Date) <span className="text-red-500 ">*</span>
+                          </label>
+                          <div className="grid grid-cols-2 gap-2 ">
+                            <div className="relative pl-10 sm:pl-0">
+                              {/* Calendar Icon */}
+                              <div
+                                className="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer z-10"
+                                onClick={() => datePickerRef.current.setFocus()} // Focus input when clicking the icon
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5 text-gray-500"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                                  />
+                                </svg>
+                              </div>
+
+                              {/* Native Date Picker Input */}
+                              <DatePicker
+                                selected={validity || ""}
+                                onChange={(date) => setValidity(date)}
+                                dateFormat="dd-MM-yyyy"
+                                placeholderText="Select a date"
+                                className="pl-3 sm:pl-10 pr-5 py-2 border border-gray-300 rounded-md shadow-sm text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 "
+                                min={new Date().toISOString().split("T")[0]}
                                 required
                               />
                             </div>
-                            <button
-                              type="button"
-                              onClick={() => setShowRouteDescription(false)}
-                              className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 inline-flex items-center"
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M11 17l-5-5m0 0l5-5m-5 5h12"
-                                />
-                              </svg>
-                              Back to Selection
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="relative shadow-sm rounded-md border border-blue-300">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M9 20l-5-5m0 0l5-5m-5 5h12"
-                                />
-                              </svg>
-                            </div>
-                            <select
-                              value={route}
-                              onChange={(e) => {
-                                if (e.target.value === "Via") {
-                                  setShowRouteDescription(true);
-                                  setRoute("");
-                                } else {
-                                  setRoute(e.target.value);
-                                }
-                              }}
-                              className="appearance-none block w-full pl-8 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
-                              required
-                            >
-                              <option value="" disabled>
-                                Select Route
-                              </option>
-                              <option value="Direct">Direct</option>
-                              <option value="Via">Via</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-600"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
 
-                    {/* ACD/ENS/AFR + Validity Section */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                      {/* ACD/ENS/AFR */}
-                      <div className="mb-1">
+                            {/* Validity Type Dropdowns */}
+                            <div className="relative shadow-sm rounded-md border border-blue-300 ">
+                              <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5 text-gray-400"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                                  />
+                                </svg>
+                              </div>
+                              <select
+                                value={validity_for || ""}
+                                onChange={(e) => setValidity_for(e.target.value)}
+                                className="appearance-none block w-full pl-8 pr-2 py-2 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-600"
+                                required
+                              >
+                                <option value="">Validity Type</option>
+                                <option value="Gate-in">For Gate-in</option>
+                                <option value="Sailing">For Sailing</option>
+                                <option value="Handover">For Handover</option>
+                              </select>
+                              <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-5 w-5 text-gray-500"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
+                                    clipRule="evenodd"
+                                  />
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Remarks */}
+                      <div className="mt-4">
                         <label className="block text-sm font-medium text-black mb-1">
-                          Select ACD/ENS/AFR Charges <span className="text-red-500 ">*</span>
+                          Remarks (Optional)
                         </label>
-                        <div className="mt-1 flex rounded-md shadow-sm h-10 border border-blue-300">
-                          <span className="relative inline-flex items-center px-2 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
-                            <select
-                              className="appearance-none px-2 h-full border-0 bg-transparent focus:ring-0 focus:outline-none pr-2"
-                              value={acd_ens_afr.split(" ")[0] || "ACD"}
-                              onChange={(e) => {
-                                const chargeType = e.target.value;
-                                const chargeAmount =
-                                  acd_ens_afr.split(" ")[1] || "";
-                                setacd_ens_afr(`${chargeType} ${chargeAmount}`);
-                              }}
-                            >
-                              <option value="ACD">ACD</option>
-                              <option value="ENS">ENS</option>
-                              <option value="AFR">AFR</option>
-                            </select>
-                            {/* Custom dropdown arrow */}
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </div>
-                          </span>
-                          <span className="relative inline-flex items-center px-2 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
-                            <select
-                              className="appearance-none px-2 h-full border-0 bg-transparent focus:ring-0 focus:outline-none"
-                              value={acdCurrency}
-                              onChange={(e) => setAcdCurrency(e.target.value)}
-                            >
-                              <option value="USD">USD $</option>
-                              <option value="INR">INR ₹</option>
-                              <option value="EUR">EUR €</option>
-                              <option value="GBP">GBP £</option>
-                              <option value="JPY">JPY ¥</option>
-                            </select>
-                            {/* Custom dropdown arrow */}
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </div>
-                          </span>
-                          <input
-                            value={acd_ens_afr.split(" ")[1] || ""}
-                            onChange={(e) => {
-                              const chargeType =
-                                acd_ens_afr.split(" ")[0] || "ACD";
-                              setacd_ens_afr(`${chargeType} ${e.target.value}`);
-                            }}
-                            className="flex-1 w-full rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 border px-2"
-                            placeholder="Enter Charges"
-                            required
-                          />
-                        </div>
-                      </div>
-
-                      {/* Validity */}
-                      <div className="mb-1">
-                        <label className="block text-sm font-medium text-black mb-1">
-                          Validity (End Date) <span className="text-red-500 ">*</span>
-                        </label>
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="relative">
-                            {/* Calendar Icon */}
-                            <div
-                              className="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer z-10"
-                              onClick={() => datePickerRef.current.setFocus()} // Focus input when clicking the icon
-                            >
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                />
-                              </svg>
-                            </div>
-
-                            {/* Native Date Picker Input */}
-                            <DatePicker
-                              selected={validity || ""}
-                              onChange={(date) => setValidity(date)}
-                              dateFormat="dd-MM-yyyy"
-                              placeholderText="Select a date"
-                              className="pl-10 pr-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                              min={new Date().toISOString().split("T")[0]}
-                              required
-                            />
-                          </div>
-
-                          {/* Validity Type Dropdowns */}
-                          <div className="relative shadow-sm rounded-md border border-blue-300">
-                            <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                                />
-                              </svg>
-                            </div>
-                            <select
-                              value={validity_for || ""}
-                              onChange={(e) => setValidity_for(e.target.value)}
-                              className="appearance-none block w-full pl-8 pr-2 py-2 sm:text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-xs rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-600"
-                              required
-                            >
-                              <option value="">Validity Type</option>
-                              <option value="Gate-in">For Gate-in</option>
-                              <option value="Sailing">For Sailing</option>
-                              <option value="Handover">For Handover</option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-500"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 0 011.08 1.04l-4.25 4.65a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Remarks */}
-                    <div className="mt-4">
-                      <label className="block text-sm font-medium text-black mb-1">
-                        Remarks (Optional)
-                      </label>
-                      <div className="relative rounded-md border border-blue-300 shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 pt-2 flex items-start pointer-events-none">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5 text-gray-400"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                            />
-                          </svg>
-                        </div>
-                        <textarea
-                          value={remarks}
-                          onChange={(e) => setRemarks(e.target.value)}
-                          className="block w-full pl-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md transition-shadow duration-150 ease-in-out"
-                          rows="2"
-                          placeholder="Add any special instructions related to this shippment"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-md text-sm font-medium text-white focus:outline-none transition duration-150 ease-in-out transform hover:scale-[1.02] active:scale-[0.98] ${
-                      isSubmitting
-                        ? "bg-indigo-400 cursor-not-allowed"
-                        : "bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    }`}
-                  >
-                    {isSubmitting ? (
-                      <div className="flex items-center">
-                        <svg
-                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          />
-                        </svg>
-
-                        {editFormId ? "Updating Rate..." : "Submitting Rate..."}
-                      </div>
-                    ) : (
-                      <div className="flex items-center">
-                        {editFormId ? (
-                          <>
+                        <div className="relative rounded-md border border-blue-300 shadow-sm">
+                          <div className="absolute inset-y-0 left-0 pl-3 pt-2 flex items-start pointer-events-none">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 mr-2"
+                              className="h-5 w-5 text-gray-400"
                               fill="none"
                               viewBox="0 0 24 24"
                               stroke="currentColor"
@@ -2338,33 +2324,99 @@ const Add_rates = () => {
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth={2}
-                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
                               />
                             </svg>
-                            Update Rate
-                          </>
-                        ) : (
-                          <>
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 mr-2 text-white"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth={2}
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M9 12l2 2 4-4m6-2a9 9 0 11-18 0 9 9 0 0118 0z"
-                              />
-                            </svg>
-                            Submit Rate
-                          </>
-                        )}
+                          </div>
+                          <textarea
+                            value={remarks}
+                            onChange={(e) => setRemarks(e.target.value)}
+                            className="block w-full pl-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md transition-shadow duration-150 ease-in-out"
+                            rows="2"
+                            placeholder="Add any special instructions related to this shippment"
+                          />
+                        </div>
                       </div>
-                    )}
-                  </button>
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-md text-sm font-medium text-white focus:outline-none transition duration-150 ease-in-out transform hover:scale-[1.02] active:scale-[0.98] ${
+                        isSubmitting
+                          ? "bg-indigo-400 cursor-not-allowed"
+                          : "bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      }`}
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center">
+                          <svg
+                            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            />
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            />
+                          </svg>
+
+                          {editFormId ? "Updating Rate..." : "Submitting Rate..."}
+                        </div>
+                      ) : (
+                        <div className="flex items-center">
+                          {editFormId ? (
+                            <>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 mr-2"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                                />
+                              </svg>
+                              Update Rate
+                            </>
+                          ) : (
+                            <>
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="h-5 w-5 mr-2 text-white"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M9 12l2 2 4-4m6-2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                              Submit Rate
+                            </>
+                          )}
+                        </div>
+                      )}
+                    </button>
+                  </div>
                 </form>
               </div>
             </div>
@@ -2937,49 +2989,49 @@ const Add_rates = () => {
                   <tr>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
                     >
                       POR
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
                     >
                       POL
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
                     >
                       POD
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden md:table-cell"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold  text-red-500 tracking-wider border-b border-r border-gray-300"
                     >
                       Shipping Line
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
                     >
                       Container
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
                     >
                       Freight
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left text-sm font-bold text-red-500 tracking-wider border-b border-r border-gray-300 hidden sm:table-cell"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
                     >
                       Validity
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-center text-sm font-bold text-red-500 tracking-wider border-b border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-center sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-gray-300"
                     >
                       Actions
                     </th>
@@ -3059,27 +3111,27 @@ const Add_rates = () => {
                                 </div>
                               </div>
                             </td>
-                            <td className="px-2  py-2 border-r border-gray-300 hidden md:table-cell">
-                              <span className="text-xs sm:text-sm font-medium text-gray-900">
+                            <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
+                              <span className="text-[10px] sm:text-sm font-medium text-gray-900">
                                 {item.shipping_lines || "N/A"}
                               </span>
                             </td>
-                            <td className="px-2  py-2 border-r border-gray-300 hidden sm:table-cell">
-                              <span className="text-xs sm:text-sm text-gray-900">
+                            <td className="px-2 py-2 border-r border-gray-300">
+                              <span className="text-[10px] sm:text-sm font-medium text-gray-900">
                                 {item.container_type || "N/A"}
                               </span>
                             </td>
-                            <td className="px-2  py-2 border-r border-gray-300">
-                              <div className="text-xs sm:text-sm font-medium text-gray-900">
+                            <td className="px-2 py-2 border-r border-gray-300">
+                              <div className="text-[10px] sm:text-sm font-medium text-gray-900">
                                 {item.ocean_freight || "N/A"}
                               </div>
-                              <div className="text-[10px] sm:text-xs text-gray-500">
+                              <div className="text-xs text-gray-500">
                                 {item.acd_ens_afr || "N/A"}
                               </div>
                             </td>
-                            <td className="px-2  py-2 border-r border-gray-300 hidden sm:table-cell">
+                            <td className="px-2 py-2 border-r border-gray-300">
                               <span
-                                className={`px-1.5 sm:px-2 py-0.5 sm:py-1 inline-flex text-[10px] sm:text-xs leading-5 font-semibold rounded-full ${"bg-green-100 text-green-800"}`}
+                                className={`px-1.5 sm:px-2 py-0.5 sm:py-1 inline-flex text-[8px] sm:text-xs leading-5 font-semibold sm:rounded-md rounded-sm ${"bg-green-100 text-green-800"}`}
                               >
                                 {formatDate(item.validity)}{" "}
                                 {item.validity_for
@@ -3087,7 +3139,7 @@ const Add_rates = () => {
                                   : ""}
                               </span>
                             </td>
-                            <td className="px-2  py-2 text-center">
+                            <td className="px-2 py-2 text-center">
                               <div className="flex flex-col sm:flex-row justify-center sm:space-x-2 space-y-1 sm:space-y-0">
                                 {isEditable ? (
                                   <button

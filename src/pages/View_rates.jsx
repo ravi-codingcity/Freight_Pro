@@ -54,9 +54,36 @@ const View_rates = () => {
     return userData[name] || { branch: "N/A", phoneNumber: "N/A" };
   };
 
+  // Add this utility function at the top of your component
+  const handleAuthError = (error) => {
+    if (error?.response?.status === 401 || error?.message?.includes("token")) {
+      // Clear user data from localStorage
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("currentUser");
+
+      // Alert the user
+      alert("Your session has expired. Please login again.");
+
+      // Redirect to login page
+      window.location.href = "/";
+      return true;
+    }
+    return false;
+  };
+
   useEffect(() => {
     const loggedInUser = localStorage.getItem("currentUser") || "";
     setCurrentUser(loggedInUser);
+
+    // Check if token exists
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // If no token exists, redirect to login
+      alert("Authentication required. Please login.");
+      window.location.href = "/";
+      return;
+    }
 
     const fetchAllForms = async () => {
       try {
@@ -69,9 +96,16 @@ const View_rates = () => {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
             },
           }
         );
+
+        if (response.status === 401) {
+          // Handle expired token
+          handleAuthError({ response: { status: 401 } });
+          return;
+        }
 
         if (!response.ok) {
           throw new Error("Network response was not ok");
@@ -106,8 +140,11 @@ const View_rates = () => {
           )
         );
       } catch (error) {
-        console.error("Error fetching forms:", error);
-        setError(error.message);
+        // Check if this is an auth error
+        if (!handleAuthError(error)) {
+          console.error("Error fetching forms:", error);
+          setError(error.message);
+        }
       } finally {
         setIsLoading(false);
       }
@@ -934,7 +971,7 @@ const View_rates = () => {
                             <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
                               <div className="flex items-center text-[10px] sm:text-xs">
                                 <div className="bg-blue-50 px-1.5 sm:px-2 py-1 rounded-l border border-blue-200 flex items-center">
-                                  <span className="font-medium text-gray-700">
+                                  <span className="font-medium text-gray-900">
                                     {item.pol}
                                   </span>
                                 </div>
@@ -943,14 +980,14 @@ const View_rates = () => {
                             <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
                               <div className="flex items-center text-[10px] sm:text-xs">
                                 <div className="bg-indigo-50 px-1.5 sm:px-2 py-1 rounded-r border border-indigo-200 flex items-center">
-                                  <span className="font-medium text-gray-700">
+                                  <span className="font-medium text-gray-900">
                                     {item.pod}
                                   </span>
                                 </div>
                               </div>
                             </td>
                             <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                              <span className="text-sm text-gray-900">
+                              <span className="text-sm text-gray-900 font-medium">
                                 {item.container_type}
                               </span>
                             </td>
