@@ -1,6 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import { IoLocationOutline } from "react-icons/io5";
+import { LuTruck } from "react-icons/lu";
+import { TbReceiptTax } from "react-icons/tb";
+import { LuMessageSquareMore } from "react-icons/lu";
+import { HiOutlineCurrencyDollar } from "react-icons/hi";
+import { GoPencil } from "react-icons/go";
+import { FaRegBookmark } from "react-icons/fa";
+import { AiOutlineControl } from "react-icons/ai";
+import { BsTrainFreightFront } from "react-icons/bs";
+import { LuContact } from "react-icons/lu";
+import { LuFileSpreadsheet } from "react-icons/lu";
+import { PiNewspaper } from "react-icons/pi";
+import {
+  LiaTruckLoadingSolid,
+  LiaShippingFastSolid,
+  LiaShipSolid,
+} from "react-icons/lia";
+import { MdDeleteForever } from "react-icons/md";
 
+import { IoMailOutline } from "react-icons/io5";
+import { FiHome } from "react-icons/fi";
+import { MdOutlineEditLocation } from "react-icons/md";
+import { IoMdTimer } from "react-icons/io";
+import { PiShippingContainer } from "react-icons/pi";
+import { HiOutlineBuildingOffice } from "react-icons/hi2";
+import { IoCallOutline } from "react-icons/io5";
+import { FiBox } from "react-icons/fi";
+import { IoIosContact } from "react-icons/io";
+import { FaArrowLeft } from "react-icons/fa6";
+import { IoIosArrowDown } from "react-icons/io";
 import "react-datepicker/dist/react-datepicker.css";
 import Navbar from "../components/Navbar";
 import { getPOROptions } from "../components/POR";
@@ -1342,20 +1370,7 @@ const Add_rates = () => {
               {/* Form Header with gradient */}
               <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-2 relative overflow-hidden">
                 <h1 className="text-xl sm:text-2xl font-bold text-white flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                    />
-                  </svg>
+                  <LuFileSpreadsheet className="mr-1" />
                   Rate Filings
                 </h1>
                 <p className="text-blue-100 mt-1 text-sm">
@@ -1425,20 +1440,7 @@ const Add_rates = () => {
                   {/* SECTION: Route Information */}
                   <div className="bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 mt-0">
                     <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-2 text-blue-600"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 20l-5-5m0 0l5-5m-5 5h12"
-                        />
-                      </svg>
+                      <FaArrowLeft className="mr-2" />
                       Route Information
                     </h3>
 
@@ -1466,24 +1468,12 @@ const Add_rates = () => {
                             required
                           >
                             <option value="" disabled>
-                              Select Place of Receipt
+                              Select POR
                             </option>
                             {renderPOROptions()}
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              {" "}
-                              <path
-                                fillRule="evenodd"
-                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                            <IoIosArrowDown />
                           </div>
                         </div>
                       </div>
@@ -1496,20 +1486,7 @@ const Add_rates = () => {
                         </label>
                         <div className="relative rounded-md shadow-sm  border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2H5z"
-                              />
-                            </svg>
+                            <LiaTruckLoadingSolid />
                           </div>
                           <select
                             value={pol}
@@ -1518,7 +1495,7 @@ const Add_rates = () => {
                             required
                           >
                             <option value="" disabled>
-                              Select Port of Loading
+                              Select POL
                             </option>
                             {polOptions && polOptions.length > 0
                               ? polOptions.map((option) => (
@@ -1529,19 +1506,7 @@ const Add_rates = () => {
                               : null}
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              {" "}
-                              <path
-                                fillRule="evenodd"
-                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                            <IoIosArrowDown />
                           </div>
                         </div>
                       </div>
@@ -1554,20 +1519,7 @@ const Add_rates = () => {
                         </label>
                         <div className="relative rounded-md shadow-sm border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                              />
-                            </svg>
+                            <LiaShippingFastSolid />
                           </div>
                           <select
                             value={pod}
@@ -1576,7 +1528,7 @@ const Add_rates = () => {
                             required
                           >
                             <option value="" disabled>
-                              Select Port of Discharge
+                              Select POD
                             </option>
                             {podOptions && podOptions.length > 0
                               ? podOptions.map((option) => (
@@ -1587,19 +1539,7 @@ const Add_rates = () => {
                               : null}
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              {" "}
-                              <path
-                                fillRule="evenodd"
-                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                            <IoIosArrowDown />
                           </div>
                         </div>
                       </div>
@@ -1615,20 +1555,7 @@ const Add_rates = () => {
                         </label>
                         <div className="relative rounded-md shadow-sm  border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                              />
-                            </svg>
+                            <PiShippingContainer />
                           </div>
                           <select
                             value={container_type}
@@ -1646,19 +1573,7 @@ const Add_rates = () => {
                             ))}
                           </select>
                           <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              {" "}
-                              <path
-                                fillRule="evenodd"
-                                d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
+                            <IoIosArrowDown />
                           </div>
                         </div>
                       </div>
@@ -1670,20 +1585,7 @@ const Add_rates = () => {
                         </label>
                         <div className="relative rounded-md shadow-sm border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                              />
-                            </svg>
+                            <HiOutlineBuildingOffice />
                           </div>
                           <input
                             value={fdrr}
@@ -1722,25 +1624,7 @@ const Add_rates = () => {
                     {/* SECTION: Shipping Line & Commodity */}
                     <div className="bg-gray-50 py-3">
                       <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 mr-2 text-blue-600"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={1.5}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                          />
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M19 11H5m14 0a2 2 0 002 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 002-2m14 0V9a2 2 0 00-2-2M9 11V9a2 2 0 012-2m14 0h-2.5M6.5 7H4"
-                          />
-                        </svg>
+                        <BsTrainFreightFront className="mr-2" />
                         Shipping Line & Commodity Details
                       </h3>
 
@@ -1753,20 +1637,7 @@ const Add_rates = () => {
                           </label>
                           <div className="relative  shadow-sm rounded-md border border-blue-300">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                />
-                              </svg>
+                              <LiaShipSolid />
                             </div>
                             <select
                               value={shipping_lines}
@@ -1782,18 +1653,7 @@ const Add_rates = () => {
                               {renderShippingLinesOptions()}
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <IoIosArrowDown />
                             </div>
                           </div>
                         </div>
@@ -1808,20 +1668,7 @@ const Add_rates = () => {
                             <div>
                               <div className="relative rounded-md shadow-sm">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-5 w-5 text-gray-400"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H9m11 0a2 2 0 002 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6a2 2 0 012-2m11 0V9a2 2 0 00-2-2M9 11V9a2 2 0 012-2m14 0h-2.5M6.5 7H4"
-                                    />
-                                  </svg>
+                                  <FiBox />
                                 </div>
                                 <input
                                   type="text"
@@ -1837,40 +1684,14 @@ const Add_rates = () => {
                                 onClick={() => setShowDescription(false)}
                                 className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 inline-flex items-center"
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 mr-1"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M11 17l-5-5m0 0l5-5m-5 5h12"
-                                  />
-                                </svg>
+                                <FaArrowLeft />
                                 Back to selection
                               </button>
                             </div>
                           ) : (
                             <div className="relative rounded-md shadow-sm border border-blue-300">
                               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 text-gray-400"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H9m11 0a2 2 0 002 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6a2 2 0 012-2m11 0V9a2 2 0 00-2-2M9 11V9a2 2 0 012-2m14 0h-2.5M6.5 7H4"
-                                  />
-                                </svg>
+                                <FiBox />
                               </div>
                               <select
                                 value={commodity}
@@ -1894,20 +1715,7 @@ const Add_rates = () => {
                                 </option>
                               </select>
                               <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 text-gray-400"
-                                  fill="none"
-                                  viewBox="0 0 20 20"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0H9m11 0a2 2 0 002 2v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6a2 2 0 012-2m11 0V9a2 2 0 00-2-2M9 11V9a2 2 0 012-2m14 0h-2.5M6.5 7H4"
-                                  />
-                                </svg>
+                                <IoIosArrowDown />
                               </div>
                             </div>
                           )}
@@ -1918,20 +1726,7 @@ const Add_rates = () => {
                     {/* Shipping Line Contact Details Card */}
                     <div className="mt-2 bg-white py-3 px-2 rounded-lg border border-blue-300 shadow-sm hover:shadow-md transition-shadow duration-150 ease-in-out">
                       <h4 className="text-sm font-medium text-blue-700 mb-3 flex items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 mr-1"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                          />
-                        </svg>
+                        <LuContact className="mr-2" />
                         Shipping Line Contact Person Details{" "}
                         <span className="text-red-500 ">*</span>
                       </h4>
@@ -1941,20 +1736,7 @@ const Add_rates = () => {
                         <div className="mb-1 sm:mb-0 relative">
                           <div className="relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                                />
-                              </svg>
+                              <IoIosContact className="text-gray-500 text-lg" />
                             </div>
                             <input
                               value={shipping_name}
@@ -2004,20 +1786,7 @@ const Add_rates = () => {
                         <div className="mb-1 sm:mb-0">
                           <div className="relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                                />
-                              </svg>
+                              <IoCallOutline className="text-gray-400 text-lg" />
                             </div>
                             <input
                               value={shipping_number}
@@ -2035,20 +1804,7 @@ const Add_rates = () => {
                         <div className="mb-1 sm:mb-0">
                           <div className="relative rounded-md shadow-sm">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                />
-                              </svg>
+                              <IoMailOutline className="text-gray-400 text-lg" />
                             </div>
                             <input
                               value={shipping_email}
@@ -2066,20 +1822,7 @@ const Add_rates = () => {
                         <div className="mb-1 sm:mb-0 col-span-3">
                           <div className="relative rounded-md shadow-sm w-full">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M3 12l2-2m0 0l7-7 7 7m-9 8v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                                />
-                              </svg>
+                              <FiHome className="text-gray-400 text-lg" />
                             </div>
                             <input
                               value={shipping_address}
@@ -2098,20 +1841,7 @@ const Add_rates = () => {
                     {/* SECTION: Freight & Routing */}
                     <div className="bg-gray-50 sm:py-3 sm:px-3 py-2 px-2 rounded-lg border border-gray-200">
                       <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5 mr-2 text-blue-600"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
+                        <HiOutlineCurrencyDollar className="mr-2 text-lg" />
                         Freight Details & Routing
                       </h3>
 
@@ -2142,18 +1872,7 @@ const Add_rates = () => {
                               </select>
                               {/* Custom dropdown arrow */}
                               <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <IoIosArrowDown />
                               </div>
                             </span>
                             <input
@@ -2179,20 +1898,7 @@ const Add_rates = () => {
                           </label>
                           <div className="relative shadow-sm rounded-md border border-blue-300 ">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0zm-7-4a1 1 0 100-2 1 1 012 0zm1 9a1 1 100-2 1 1 000 2z"
-                                />
-                              </svg>
+                              <IoMdTimer className="text-gray-400 text-lg" />
                             </div>
                             <select
                               value={transit}
@@ -2209,18 +1915,7 @@ const Add_rates = () => {
                               ))}
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 text-gray-400"
-                                viewBox="0 0 20 20"
-                                fill="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <IoIosArrowDown className="text-gray-500 " />
                             </div>
                           </div>
                         </div>
@@ -2234,20 +1929,7 @@ const Add_rates = () => {
                             <div>
                               <div className="relative shadow-sm rounded-md border border-blue-300">
                                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-5 w-5 text-gray-400"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                  >
-                                    <path
-                                      strokeLinecap="round"
-                                      strokeLinejoin="round"
-                                      strokeWidth={2}
-                                      d="M9 20l-5-5m0 0l5-5m-5 5h12"
-                                    />
-                                  </svg>
+                                  <MdOutlineEditLocation />
                                 </div>
                                 <input
                                   type="text"
@@ -2262,40 +1944,14 @@ const Add_rates = () => {
                                 onClick={() => setShowRouteDescription(false)}
                                 className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 inline-flex items-center"
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4 mr-1"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M11 17l-5-5m0 0l5-5m-5 5h12"
-                                  />
-                                </svg>
+                                <FaArrowLeft />
                                 Back to Selection
                               </button>
                             </div>
                           ) : (
                             <div className="relative shadow-sm rounded-md border border-blue-300">
                               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 text-gray-400"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M9 20l-5-5m0 0l5-5m-5 5h12"
-                                  />
-                                </svg>
+                                <MdOutlineEditLocation className="text-gray-500 " />
                               </div>
                               <select
                                 value={route}
@@ -2317,18 +1973,7 @@ const Add_rates = () => {
                                 <option value="Via">Via</option>
                               </select>
                               <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 text-gray-600"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <IoIosArrowDown className="text-gray-500 " />
                               </div>
                             </div>
                           )}
@@ -2362,18 +2007,7 @@ const Add_rates = () => {
                               </select>
                               {/* Custom dropdown arrow */}
                               <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <IoIosArrowDown className="text-gray-500 " />
                               </div>
                             </span>
                             <span className="relative inline-flex items-center px-2 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
@@ -2390,18 +2024,7 @@ const Add_rates = () => {
                               </select>
                               {/* Custom dropdown arrow */}
                               <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <IoIosArrowDown className="text-gray-500 " />
                               </div>
                             </span>
                             <input
@@ -2463,20 +2086,7 @@ const Add_rates = () => {
                             {/* Validity Type Dropdowns */}
                             <div className="relative shadow-sm rounded-md border border-blue-300 ">
                               <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 text-gray-400"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth={2}
-                                    d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                                  />
-                                </svg>
+                                <FaRegBookmark className="text-gray-400" />
                               </div>
                               <select
                                 value={validity_for || ""}
@@ -2492,18 +2102,7 @@ const Add_rates = () => {
                                 <option value="Handover">For Handover</option>
                               </select>
                               <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-5 w-5 text-gray-500"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M5.23 7.21a.75.75 0 011.06.02L10 11.292l3.71-4.06a.75.75 011.08 1.04l-4.25 4.65a.75.75 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
+                                <IoIosArrowDown className="text-gray-500 " />
                               </div>
                             </div>
                           </div>
@@ -2516,26 +2115,13 @@ const Add_rates = () => {
                           Remarks (Optional)
                         </label>
                         <div className="relative rounded-md border border-blue-300 shadow-sm">
-                          <div className="absolute inset-y-0 left-0 pl-3 pt-2 flex items-start pointer-events-none">
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-5 w-5 text-gray-400"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
-                              />
-                            </svg>
+                          <div className="absolute inset-y-0 left-0 pl-2 pt-2 flex items-start pointer-events-none">
+                            <LuMessageSquareMore className="text-gray-400" />
                           </div>
                           <textarea
                             value={remarks}
                             onChange={(e) => setRemarks(e.target.value)}
-                            className="block w-full pl-10 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md transition-shadow duration-150 ease-in-out"
+                            className="block w-full pl-8 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md transition-shadow duration-150 ease-in-out"
                             rows="2"
                             placeholder="Add any special instructions related to this shippment"
                           />
@@ -2693,19 +2279,8 @@ const Add_rates = () => {
                         <tr className="bg-blue-50 hover:bg-blue-100 transition-colors">
                           <td className="px-2 py-1.5 whitespace-nowrap">
                             <div className="flex items-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-blue-500 mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M4 4a2 2 0 002-2h8a2 2 0 002 2v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4zm3 1h6v4H7V5z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <PiNewspaper className="text-blue-700 mr-1" />
+
                               <span className="font-medium text-sm">
                                 BL Fees
                               </span>
@@ -2723,16 +2298,8 @@ const Add_rates = () => {
                         <tr className="bg-indigo-50 hover:bg-indigo-100 transition-colors">
                           <td className="px-2 py-1.5 whitespace-nowrap">
                             <div className="flex items-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-indigo-500 mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                                <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0h1.05a1 1 0 001-1V5a1 1 0 00-1-1H3z" />
-                              </svg>
+                              <AiOutlineControl className="text-green-600 mr-1" />
+
                               <span className="font-medium text-sm">THC</span>
                             </div>
                           </td>
@@ -2748,19 +2315,8 @@ const Add_rates = () => {
                         <tr className="bg-purple-50 hover:bg-purple-100 transition-colors">
                           <td className="px-2 py-1.5 whitespace-nowrap">
                             <div className="flex items-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-purple-500 mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9h6v2H7V9z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <TbReceiptTax className="text-purple-600 mr-1" />
+
                               <span className="font-medium text-sm">MUC</span>
                             </div>
                           </td>
@@ -2776,19 +2332,8 @@ const Add_rates = () => {
                         <tr className="bg-red-50 hover:bg-red-100 transition-colors">
                           <td className="px-2 py-1.5 whitespace-nowrap">
                             <div className="flex items-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-4 w-4 text-red-500 mr-1"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
+                              <LuTruck className="text-red-600 mr-1" />
+
                               <span className="font-medium text-sm">TOLL</span>
                             </div>
                           </td>
@@ -3040,20 +2585,7 @@ const Add_rates = () => {
                                 className="text-red-500 hover:text-red-700 p-1 border border-gray-200 rounded-r"
                                 title="Remove charge"
                               >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-4 w-4"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                  stroke="currentColor"
-                                  strokeWidth={2}
-                                >
-                                  <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"
-                                  />
-                                </svg>
+                                <MdDeleteForever className="text-red-600 text-lg" />
                               </button>
                             </div>
                           </div>
@@ -3083,14 +2615,6 @@ const Add_rates = () => {
 
           {/* Add count indicator with loading state */}
           <div className="bg-blue-50 text-blue-700 rounded-lg px-4 py-2 font-medium inline-flex items-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 sm:h-5 sm:w-5 mr-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 00-1 1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
             <span className="text-xs sm:text-sm">
               {isDataLoading ? (
                 <span className="flex items-center">
@@ -3263,7 +2787,7 @@ const Add_rates = () => {
                           <tr
                             className={`${
                               hasRemarks
-                                ? "bg-yellow-50 hover:bg-yellow-100"
+                                ? "bg-orange-100 hover:bg-orange-200"
                                 : "hover:bg-gray-50"
                             } transition-colors duration-150`}
                           >
@@ -3287,42 +2811,33 @@ const Add_rates = () => {
                             </td>
                             <td className="px-2  py-2 border-r border-gray-200">
                               <div className="flex items-center text-[10px] sm:text-xs">
-                                <div>
-                                  <div className="">
-                                    <span className="font-medium text-black">
-                                      {item.pod}
-                                    </span>
-                                  </div>
-                                  {hasRemarks && (
-                                    <div className="sm:flex hidden items-center mt-2">
-                                      <span
-                                        className="inline-flex items-center mt-1 sm:mt-0 sm:ml-2 px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 animate-pulse"
-                                        title="Contains important remarks"
-                                      >
-                                        <svg
-                                          className="w-2 h-2 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
-                                          fill="currentColor"
-                                          viewBox="0 0 20 20"
-                                        >
-                                          <path
-                                            fillRule="evenodd"
-                                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 100-2 1 1 012 0zm1 9a1 1 100-2 1 1 000 2z"
-                                            clipRule="evenodd"
-                                          />
-                                        </svg>
-                                        <span className="sm:inline hidden">
-                                          Remarks
-                                        </span>
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
+                                <span className="font-medium text-black">
+                                  {item.pod}
+                                </span>
                               </div>
                             </td>
                             <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
                               <span className="text-[10px] sm:text-sm font-medium text-gray-900">
                                 {item.shipping_lines || "N/A"}
                               </span>
+                              {hasRemarks && (
+                                <span
+                                  className="sm:inline-flex hidden items-center mt-1 sm:mt-0 sm:ml-2 px-1.5 sm:px-1 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-blue-50 text-orange-800 border border-orange-300 animate-pulse"
+                                  title="Contain important remarks"
+                                >
+                                  <svg
+                                    className="w-2 h-2 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 100-2 1 1 012 0zm1 9a1 1 100-2 1 1 000 2z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </span>
+                              )}
                             </td>
                             <td className="px-2 py-2 border-r border-gray-300">
                               <span className="text-[10px] sm:text-sm font-medium text-gray-900">
@@ -3354,26 +2869,13 @@ const Add_rates = () => {
                                     onClick={() => handleEdit(item)}
                                     className="inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-transparent text-[10px] sm:text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                   >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                    >
-                                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                    </svg>
+                                    <GoPencil className="mr-1" />
                                     Edit
                                   </button>
                                 ) : (
                                   <span className="inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-gray-200 text-[10px] sm:text-xs font-medium rounded text-gray-400 bg-gray-50">
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
-                                      viewBox="0 0 24 24"
-                                      fill="currentColor"
-                                    >
-                                      <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                    </svg>
+                                    <GoPencil className="mr-1" />
+
                                     <span className="hidden sm:inline">
                                       Edit
                                     </span>
@@ -3390,41 +2892,19 @@ const Add_rates = () => {
                                 >
                                   {isExpanded ? (
                                     <>
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 01-1.414-1.414l4-4a1 1 01-1.414 0l-4-4a1 1 010-1.414z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
+                                      <IoIosArrowDown className="text-white mr-1" />
                                       Hide
                                     </>
                                   ) : (
                                     <>
-                                      <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-3 w-3 sm:h-4 sm:w-4 mr-0.5 sm:mr-1"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M5.293 7.293a1 1 0 011.414 0L10 11.292l3.293-4.293a1 1 011.414 1.414l-4 4a1 1 01-1.414 0L5.293 8.707a1 1 0 01.02-1.06z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
+                                      <IoIosArrowDown className="text-blue-700 mr-1" />
                                       <span>Details</span>
                                     </>
                                   )}
                                 </button>
                               </div>
                               {isEditable && (
-                                <div className="mt-1 text-[9px] sm:text-xs text-yellow-600">
+                                <div className="mt-1 text-[9px] sm:text-xs text-black">
                                   {formatRemainingTime(
                                     remainingTimes[item._id] || 0
                                   )}

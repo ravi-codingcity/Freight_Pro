@@ -918,7 +918,7 @@ const View_rates = () => {
                           <tr
                             className={`${
                               hasRemarks
-                                ? "bg-yellow-50 hover:bg-yellow-100"
+                                ? "bg-orange-100 hover:bg-orange-200"
                                 : "hover:bg-gray-50"
                             } transition-colors duration-150`}
                           >
@@ -944,7 +944,7 @@ const View_rates = () => {
                                 </div>
                                 {hasRemarks && (
                                   <div className="hidden sm:block mt-0 ml-2">
-                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 animate-pulse">
+                                    <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-300 animate-pulse">
                                       <svg
                                         className="w-3 h-3 mr-1"
                                         fill="currentColor"
