@@ -50,6 +50,7 @@ const View_rates = () => {
       Ragbir: { branch: "Mumbai", phoneNumber: "" },
       Macwin: { branch: "Mumbai", phoneNumber: "" },
       Prashant: { branch: "Mumbai", phoneNumber: "" },
+      Ravi: { branch: "Delhi", phoneNumber: "724" },
     };
     return userData[name] || { branch: "N/A", phoneNumber: "N/A" };
   };
@@ -963,24 +964,24 @@ const View_rates = () => {
                             </td>
 
                             {/* Other columns */}
-                            <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
+                            <td className="px-2 py-2 whitespace-nowrap border-r border-gray-200">
                               <span className="text-xs sm:text-sm font-medium text-gray-900">
                                 {item.shipping_lines}
                               </span>
                             </td>
-                            <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
-                              <div className="flex items-center text-[10px] sm:text-xs">
-                                <div className="bg-blue-50 px-1.5 sm:px-2 py-1 rounded-l border border-blue-200 flex items-center">
-                                  <span className="font-medium text-gray-900">
+                            <td className="px-2  py-2 border-r border-gray-200">
+                              <div className="flex items-center text-[8px] sm:text-xs">
+                                <div className="">
+                                  <span className="text-xs sm:text-sm font-medium text-gray-800">
                                     {item.pol}
                                   </span>
                                 </div>
                               </div>
                             </td>
-                            <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
-                              <div className="flex items-center text-[10px] sm:text-xs">
-                                <div className="bg-indigo-50 px-1.5 sm:px-2 py-1 rounded-r border border-indigo-200 flex items-center">
-                                  <span className="font-medium text-gray-900">
+                            <td className="px-2  py-2 border-r border-gray-200">
+                              <div className="flex items-center text-[8px] sm:text-xs">
+                                <div className="">
+                                  <span className="text-xs sm:text-sm font-medium text-gray-900">
                                     {item.pod}
                                   </span>
                                 </div>
