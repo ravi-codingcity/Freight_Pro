@@ -3,7 +3,35 @@ import { useState, useEffect } from 'react';
 // Store cached data to avoid repeated API calls
 let cachedShippingLineDetails = null;
 let lastFetchTime = 0;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes cache duration
+
+// Track if we're currently fetching to avoid duplicate requests
+let isFetchingData = false;
+// Add a promise to track ongoing fetch operations
+let currentFetchPromise = null;
+
+/**
+ * Prefetch shipping line contact details in the background immediately
+ * This can be called when the app initializes to have data ready before user interaction
+ */
+export const prefetchShippingLineContactDetails = async () => {
+  console.log('Prefetching shipping line contact details...');
+  try {
+    // Use existing promise if there's already a fetch in progress
+    if (currentFetchPromise) {
+      console.log('Using existing fetch promise for prefetch');
+      return await currentFetchPromise;
+    }
+    
+    // Start new fetch operation
+    const result = await fetchShippingLineContactDetails();
+    console.log(`Prefetch complete, cached ${Object.keys(result).length} shipping lines`);
+    return result;
+  } catch (err) {
+    console.error('Background prefetch error:', err);
+    throw err;
+  }
+};
 
 /**
  * Fetches all shipping line contact details from the API
@@ -13,67 +41,93 @@ export const fetchShippingLineContactDetails = async () => {
   // Check if we have valid cached data
   const now = Date.now();
   if (cachedShippingLineDetails && (now - lastFetchTime < CACHE_DURATION)) {
+    console.log('Using cached shipping line details');
     return cachedShippingLineDetails;
   }
-
-  try {
-    const response = await fetch('https://freightpro-4kjlzqm0.b4a.run/api/forms/all', {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate',
-        'Pragma': 'no-cache',
-        'Expires': '0'
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API request failed with status ${response.status}`);
-    }
-    
-    const data = await response.json();
-    
-    // Process the data to create a mapping of shipping lines to contact details
-    const shippingLineMap = {};
-    
-    data.forEach(item => {
-      if (!item.shipping_lines) return;
-      
-      if (!shippingLineMap[item.shipping_lines]) {
-        shippingLineMap[item.shipping_lines] = [];
-      }
-      
-      // Only add contact details if they exist
-      if (item.shipping_name || item.shipping_number || item.shipping_email || item.shipping_address) {
-        // Create a contact details object
-        const contactDetails = {
-          name: item.shipping_name || '',
-          number: item.shipping_number || '',
-          email: item.shipping_email || '',
-          address: item.shipping_address || ''
-        };
-        
-        // Check if this exact combination already exists to avoid duplicates
-        const exists = shippingLineMap[item.shipping_lines].some(contact => 
-          contact.name === contactDetails.name && 
-          contact.number === contactDetails.number &&
-          contact.email === contactDetails.email &&
-          contact.address === contactDetails.address
-        );
-        
-        if (!exists) {
-          shippingLineMap[item.shipping_lines].push(contactDetails);
-        }
-      }
-    });
-    
-    // Update cache
-    cachedShippingLineDetails = shippingLineMap;
-    lastFetchTime = now;
-    
-    return shippingLineMap;
-  } catch (err) {
-    console.error('Error fetching shipping line details:', err);
-    return {};
+  
+  // Return existing promise if we're already fetching
+  if (currentFetchPromise) {
+    console.log('Reusing in-progress fetch operation');
+    return currentFetchPromise;
   }
+  
+  // Set flag to indicate we're fetching
+  isFetchingData = true;
+  
+  // Create a new promise for this fetch operation
+  currentFetchPromise = (async () => {
+    try {
+      console.log('Fetching shipping line details from API');
+      const response = await fetch('https://freightpro-4kjlzqm0.b4a.run/api/forms/all', {
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Process the data to create a mapping of shipping lines to contact details
+      const shippingLineMap = {};
+      
+      data.forEach(item => {
+        if (!item.shipping_lines) return;
+        
+        if (!shippingLineMap[item.shipping_lines]) {
+          shippingLineMap[item.shipping_lines] = [];
+        }
+        
+        // Only add contact details if they exist
+        if (item.shipping_name || item.shipping_number || item.shipping_email || item.shipping_address) {
+          // Create a contact details object
+          const contactDetails = {
+            name: item.shipping_name || '',
+            number: item.shipping_number || '',
+            email: item.shipping_email || '',
+            address: item.shipping_address || ''
+          };
+          
+          // Check if this exact combination already exists to avoid duplicates
+          const exists = shippingLineMap[item.shipping_lines].some(contact => 
+            contact.name === contactDetails.name && 
+            contact.number === contactDetails.number &&
+            contact.email === contactDetails.email &&
+            contact.address === contactDetails.address
+          );
+          
+          if (!exists) {
+            shippingLineMap[item.shipping_lines].push(contactDetails);
+          }
+        }
+      });
+      
+      // Update cache
+      cachedShippingLineDetails = shippingLineMap;
+      lastFetchTime = now;
+      console.log('Shipping line details fetched and cached successfully');
+      
+      return shippingLineMap;
+    } catch (err) {
+      console.error('Error fetching shipping line details:', err);
+      // Return existing cache even if expired in case of error
+      if (cachedShippingLineDetails) {
+        return cachedShippingLineDetails;
+      }
+      return {};
+    } finally {
+      // Reset fetching flag and promise
+      isFetchingData = false;
+      currentFetchPromise = null;
+    }
+  })();
+  
+  // Return the promise
+  return currentFetchPromise;
 };
 
 /**
@@ -85,6 +139,16 @@ export const getContactSuggestions = async (shippingLine) => {
   if (!shippingLine) return [];
   
   try {
+    console.log(`Getting contact suggestions for: ${shippingLine}`);
+    
+    // Try to get from cache first (this will be very fast)
+    if (cachedShippingLineDetails && Date.now() - lastFetchTime < CACHE_DURATION) {
+      console.log('Returning contact suggestions from cache');
+      return cachedShippingLineDetails[shippingLine] || [];
+    }
+    
+    // If not in cache or cache expired, fetch from API
+    console.log('Cache miss or expired, fetching fresh data');
     const shippingLineMap = await fetchShippingLineContactDetails();
     return shippingLineMap[shippingLine] || [];
   } catch (err) {
@@ -116,6 +180,13 @@ export const getUniqueContactValues = async (field) => {
     console.error(`Error getting unique ${field} values:`, err);
     return [];
   }
+};
+
+// Add a function to clear the cache (for use after form submission)
+export const clearShippingLineContactCache = () => {
+  cachedShippingLineDetails = null;
+  lastFetchTime = 0;
+  currentFetchPromise = null;
 };
 
 // Component for debugging - can be used to display shipping line details

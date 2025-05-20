@@ -17,7 +17,6 @@ import {
   LiaShipSolid,
 } from "react-icons/lia";
 import { MdDeleteForever } from "react-icons/md";
-
 import { IoMailOutline } from "react-icons/io5";
 import { FiHome } from "react-icons/fi";
 import { MdOutlineEditLocation } from "react-icons/md";
@@ -44,7 +43,11 @@ import {
 import DatePicker from "react-datepicker";
 import { fetchUniqueRailRamps } from "../components/FDRR";
 // Import needed functions from ShippingLine_PersonDetails
-import { getContactSuggestions } from "../components/ShippingLine_PersonDetails";
+import {
+  getContactSuggestions,
+  prefetchShippingLineContactDetails,
+  clearShippingLineContactCache, // <-- Add this import
+} from "../components/ShippingLine_PersonDetails";
 
 const Add_rates = () => {
   // Basic form state variables
@@ -124,6 +127,10 @@ const Add_rates = () => {
   // Add state for contact suggestions
   const [contactSuggestions, setContactSuggestions] = useState([]);
   const [showContactSuggestions, setShowContactSuggestions] = useState(false);
+
+  // Add state for contact suggestions loading
+  const [contactSuggestionsLoading, setContactSuggestionsLoading] =
+    useState(false);
 
   // Define toggle row expansion function
   const toggleRowExpansion = (id) => {
@@ -1036,6 +1043,15 @@ const Add_rates = () => {
       // (belt and suspenders approach), clear them again here
       if (success) {
         clearFormFields();
+        // Clear the contact cache and refresh suggestions for the selected shipping line
+        clearShippingLineContactCache();
+        if (shipping_lines) {
+          setContactSuggestionsLoading(true);
+          getContactSuggestions(shipping_lines).then((suggestions) => {
+            setContactSuggestions(suggestions);
+            setContactSuggestionsLoading(false);
+          });
+        }
       }
     } catch (error) {
       console.error("Error during form submission:", error);
@@ -1316,9 +1332,24 @@ const Add_rates = () => {
 
   // Add function to handle input field focus for contact name
   const handleContactNameFocus = () => {
-    // Show suggestions when the field is focused if we have shipping_lines and suggestions
-    if (shipping_lines && contactSuggestions && contactSuggestions.length > 0) {
+    // Always check for fresh suggestions when focusing, even if we already have some
+    if (shipping_lines) {
+      // Show loading state first
+      setContactSuggestionsLoading(true);
       setShowContactSuggestions(true);
+
+      // Get fresh suggestions or from cache
+      getContactSuggestions(shipping_lines)
+        .then((suggestions) => {
+          setContactSuggestions(suggestions);
+          setContactSuggestionsLoading(false);
+          // Keep the dropdown open even if we have no suggestions
+          // (we'll show a "No suggestions found" message)
+        })
+        .catch((error) => {
+          console.error("Error fetching contact suggestions on focus:", error);
+          setContactSuggestionsLoading(false);
+        });
     }
   };
 
@@ -1328,35 +1359,183 @@ const Add_rates = () => {
     setShowRailRampDropdown(false);
   };
 
-  // Fetch contact suggestions when shipping_lines changes
+  // Add a new useEffect at the beginning of the component to prefetch contact data
   useEffect(() => {
+    // Prefetch shipping line contact details in the background
+    const prefetchContacts = async () => {
+      try {
+        console.log("Prefetching shipping line contact details...");
+        await prefetchShippingLineContactDetails();
+        console.log("Contact details prefetched successfully");
+      } catch (error) {
+        console.error("Error prefetching contact details:", error);
+        // Non-critical error, can continue without blocking the UI
+      }
+    };
+
+    prefetchContacts();
+  }, []); // Run once when component mounts
+
+  // Enhance the existing useEffect for contact suggestions to handle loading states better
+  useEffect(() => {
+    let isMounted = true;
     if (shipping_lines) {
+      setContactSuggestionsLoading(true);
       getContactSuggestions(shipping_lines)
         .then((suggestions) => {
-          setContactSuggestions(suggestions);
-          // Only show suggestions if there are any
-          setShowContactSuggestions(suggestions && suggestions.length > 0);
+          if (isMounted) {
+            setContactSuggestions(suggestions);
+            setContactSuggestionsLoading(false);
+          }
         })
         .catch((error) => {
-          console.error("Error fetching contact suggestions:", error);
+          if (isMounted) {
+            setContactSuggestions([]);
+            setContactSuggestionsLoading(false);
+          }
         });
     } else {
       setContactSuggestions([]);
-      setShowContactSuggestions(false);
+      setContactSuggestionsLoading(false);
     }
+    return () => { isMounted = false; };
   }, [shipping_lines]);
 
   const handleContactSelect = (suggestion) => {
-    setshipping_name(suggestion.name);
-    setshipping_number(suggestion.number);
-    setshipping_email(suggestion.email);
-    setshipping_address(suggestion.address);
+    console.log("Selected contact:", suggestion);
+
+    // Only update fields that have values, preserving any manually entered data
+    if (suggestion.name) setshipping_name(suggestion.name);
+    if (suggestion.number) setshipping_number(suggestion.number);
+    if (suggestion.email) setshipping_email(suggestion.email);
+    if (suggestion.address) setshipping_address(suggestion.address);
+
     setShowContactSuggestions(false);
   };
 
   // Then modify the shipping line contact person section to add the suggestions dropdown
   // Find the Person Name input field inside the "Shipping Line Contact Person Details" section
   // and replace it with this code:
+
+  // Add a function to copy a row's data into the form for new submission
+  const handleCopy = (item) => {
+    // Populate basic fields (same as handleEdit, but do NOT set editFormId)
+    setpor(item.por || "");
+    setpol(item.pol || "");
+    setpod(item.pod || "");
+    setfdrr(item.fdrr || "");
+    setshipping_lines(item.shipping_lines || "");
+    setshipping_name(item.shipping_name || "");
+    setshipping_number(item.shipping_number || "");
+    setshipping_address(item.shipping_address || "");
+    setshipping_email(item.shipping_email || "");
+    setContainer_type(item.container_type || "");
+    setCommodity(item.commodity || "");
+    setRoute(item.route || "");
+    setOcean_freight(item.ocean_freight || "");
+    setacd_ens_afr(item.acd_ens_afr || "");
+    setValidity(item.validity || "");
+    setValidity_for(item.validity_for || "");
+    setRemarks(item.remarks || "");
+    setTransittime(item.transit || "");
+
+    // Set container size based on the container type
+    const sizeCategory = getContainerSizeCategory(item.container_type || "");
+    setSelectedContainerSize(sizeCategory);
+
+    // Handle ACD currency separately
+    if (item.acd_ens_afr) {
+      const match = item.acd_ens_afr.match(/[₹$€£¥]/);
+      if (match) {
+        const symbol = match[0];
+        switch (symbol) {
+          case "$": setAcdCurrency("USD"); break;
+          case "€": setAcdCurrency("EUR"); break;
+          case "£": setAcdCurrency("GBP"); break;
+          case "¥": setAcdCurrency("JPY"); break;
+          case "₹": setAcdCurrency("INR"); break;
+          default: setAcdCurrency("USD");
+        }
+      } else {
+        setAcdCurrency("USD");
+      }
+    }
+
+    // Handle custom charges
+    if (item.customCharges && Array.isArray(item.customCharges) && item.customCharges.length > 0) {
+      setCustomCharges(
+        item.customCharges.map((charge) => ({
+          label: charge.label || "",
+          value: charge.value ? charge.value.replace(/[₹$€£¥]/g, "") : "",
+          currency: getCurrencyFromSymbol(charge.value) || "USD",
+          unit: charge.unit || "",
+        }))
+      );
+    } else if (item.customLabel && item.customValue) {
+      if (item.customLabel.includes("|||") && item.customValue.includes("|||")) {
+        const labels = item.customLabel.split("|||");
+        const values = item.customValue.split("|||");
+        const units = item.customUnit ? item.customUnit.split("|||") : [];
+        const charges = labels.map((label, i) => ({
+          label: label || "",
+          value: values[i] ? values[i].replace(/[₹$€£¥]/g, "") : "",
+          currency: getCurrencyFromSymbol(values[i]) || "USD",
+          unit: units[i] || "",
+        }));
+        setCustomCharges(charges);
+      } else {
+        setCustomCharges([
+          {
+            label: item.customLabel || "",
+            value: item.customValue ? item.customValue.replace(/[₹$€£¥]/g, "") : "",
+            currency: getCurrencyFromSymbol(item.customValue) || "USD",
+            unit: item.customUnit || "",
+          },
+        ]);
+      }
+    } else {
+      setCustomCharges([{ label: "", value: "", currency: "USD", unit: "" }]);
+    }
+
+    // Handle rail freight rates
+    if (item.railFreightRates) {
+      let rates;
+      if (typeof item.railFreightRates === "string") {
+        try {
+          rates = JSON.parse(item.railFreightRates);
+        } catch (e) {
+          rates = {
+            "(0-10 ton)": "₹0",
+            "(10-20 ton)": "₹0",
+            "(20-26 ton)": "₹0",
+            "(26+ ton)": "₹0",
+          };
+        }
+      } else if (typeof item.railFreightRates === "object") {
+        rates = item.railFreightRates;
+      } else {
+        rates = {
+          "(0-10 ton)": "₹0",
+          "(10-20 ton)": "₹0",
+          "(20-26 ton)": "₹0",
+          "(26+ ton)": "₹0",
+        };
+      }
+      setRailFreightRates(rates);
+    } else {
+      setRailFreightRates({
+        "(0-10 ton)": "₹0",
+        "(10-20 ton)": "₹0",
+        "(20-26 ton)": "₹0",
+        "(26+ ton)": "₹0",
+      });
+    }
+
+    // Make sure we are NOT in edit mode
+    setEditFormId(null);
+    // Scroll to the top of the form for better UX
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   return (
     <>
@@ -1754,14 +1933,44 @@ const Add_rates = () => {
                             />
                           </div>
 
-                          {/* Contact suggestions dropdown */}
-                          {showContactSuggestions &&
-                            contactSuggestions.length > 0 && (
-                              <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                <div className="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-50 border-b">
-                                  Suggested contacts for {shipping_lines}
+                          {/* Enhanced Contact suggestions dropdown */}
+                          {showContactSuggestions && (
+                            <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                              <div className="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-50 border-b flex justify-between items-center">
+                                <span>Contacts for {shipping_lines}</span>
+                                {contactSuggestionsLoading && (
+                                  <span className="text-blue-500 flex items-center">
+                                    <svg
+                                      className="animate-spin h-3 w-3 mr-1"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                      ></circle>
+                                      <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                      ></path>
+                                    </svg>
+                                    Loading...
+                                  </span>
+                                )}
+                              </div>
+
+                              {contactSuggestionsLoading ? (
+                                <div className="py-2 px-3 text-gray-900 italic text-center">
+                                  Loading contact suggestions...
                                 </div>
-                                {contactSuggestions.map((suggestion, index) => (
+                              ) : contactSuggestions.length > 0 ? (
+                                contactSuggestions.map((suggestion, index) => (
                                   <div
                                     key={index}
                                     className="cursor-pointer hover:bg-indigo-50 py-2 px-3 text-gray-900"
@@ -1777,9 +1986,15 @@ const Add_rates = () => {
                                       <span>{suggestion.email}</span>
                                     </div>
                                   </div>
-                                ))}
-                              </div>
-                            )}
+                                ))
+                              ) : (
+                                <div className="py-2 px-3 text-gray-500 italic text-center">
+                                  No contact suggestions found for this shipping
+                                  line
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         {/* Contact Number */}
@@ -1844,15 +2059,15 @@ const Add_rates = () => {
                         <HiOutlineCurrencyDollar className="mr-2 text-lg" />
                         Freight Details & Routing
                       </h3>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      {/* First row: Ocean Freight, Transit Time, Routing */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-2">
                         {/* Ocean Freight */}
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
                             Ocean Freight{" "}
                             <span className="text-red-500 ">*</span>
                           </label>
-                          <div className="mt-1 flex  h-8 rounded-md border border-blue-300">
+                          <div className="mt-1 flex h-8 rounded-md border border-blue-300">
                             <span className="relative inline-flex items-center px-1 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
                               <select
                                 className="appearance-none h-full px-3 border-0 bg-transparent focus:ring-0 focus:outline-none text-gray-700"
@@ -1870,7 +2085,6 @@ const Add_rates = () => {
                                 <option value="GBP">GBP £</option>
                                 <option value="JPY">JPY ¥</option>
                               </select>
-                              {/* Custom dropdown arrow */}
                               <div className="pointer-events-none absolute inset-y-0 right-0 flex pl-3 items-center text-gray-600">
                                 <IoIosArrowDown />
                               </div>
@@ -1884,13 +2098,12 @@ const Add_rates = () => {
                                   `${currency} ${e.target.value}`
                                 );
                               }}
-                              className="flex-1 min-w-0 block w-full rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm  px-1"
+                              className="flex-1 min-w-0 block w-full rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-1"
                               placeholder="Enter Amount"
                               required
                             />
                           </div>
                         </div>
-
                         {/* Transit Time */}
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
@@ -1915,11 +2128,10 @@ const Add_rates = () => {
                               ))}
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                              <IoIosArrowDown className="text-gray-500 " />
+                              <IoIosArrowDown />
                             </div>
                           </div>
                         </div>
-
                         {/* Routing */}
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
@@ -1980,9 +2192,10 @@ const Add_rates = () => {
                         </div>
                       </div>
 
-                      {/* ACD/ENS/AFR + Validity Section */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-3">
-                        {/* ACD/ENS/AFR */}
+                      {/* Second row: Select ACD/ENS/AFR Charges, Validity (End Date) */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                        {/* Select ACD/ENS/AFR Charges */}
+
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
                             Select ACD/ENS/AFR Charges
@@ -2041,8 +2254,7 @@ const Add_rates = () => {
                             />
                           </div>
                         </div>
-
-                        {/* Validity */}
+                        {/* Validity (End Date) */}
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
                             Validity (End Date){" "}
@@ -2050,10 +2262,9 @@ const Add_rates = () => {
                           </label>
                           <div className="grid grid-cols-2 gap-2 ">
                             <div className="relative pl-10 sm:pl-0">
-                              {/* Calendar Icon */}
                               <div
                                 className="absolute inset-y-0 left-0 pl-3 flex items-center cursor-pointer z-10"
-                                onClick={() => datePickerRef.current.setFocus()} // Focus input when clicking the icon
+                                onClick={() => datePickerRef.current.setFocus()}
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -2070,8 +2281,6 @@ const Add_rates = () => {
                                   />
                                 </svg>
                               </div>
-
-                              {/* Native Date Picker Input */}
                               <DatePicker
                                 selected={validity || ""}
                                 onChange={(date) => setValidity(date)}
@@ -2082,8 +2291,6 @@ const Add_rates = () => {
                                 required
                               />
                             </div>
-
-                            {/* Validity Type Dropdowns */}
                             <div className="relative shadow-sm rounded-md border border-blue-300 ">
                               <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                                 <FaRegBookmark className="text-gray-400" />
@@ -2106,25 +2313,6 @@ const Add_rates = () => {
                               </div>
                             </div>
                           </div>
-                        </div>
-                      </div>
-
-                      {/* Remarks */}
-                      <div className="mt-4">
-                        <label className="block text-sm font-medium text-black mb-1">
-                          Remarks (Optional)
-                        </label>
-                        <div className="relative rounded-md border border-blue-300 shadow-sm">
-                          <div className="absolute inset-y-0 left-0 pl-2 pt-2 flex items-start pointer-events-none">
-                            <LuMessageSquareMore className="text-gray-400" />
-                          </div>
-                          <textarea
-                            value={remarks}
-                            onChange={(e) => setRemarks(e.target.value)}
-                            className="block w-full pl-8 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md transition-shadow duration-150 ease-in-out"
-                            rows="2"
-                            placeholder="Add any special instructions related to this shippment"
-                          />
                         </div>
                       </div>
                     </div>
@@ -2867,13 +3055,13 @@ const Add_rates = () => {
                                 {isEditable ? (
                                   <button
                                     onClick={() => handleEdit(item)}
-                                    className="inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-transparent text-[10px] sm:text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    className="inline-flex items-center justify-center px-1.5 sm:px-2 py-1 sm:py-1.5 border border-transparent text-[10px] sm:text-xs font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                   >
                                     <GoPencil className="mr-1" />
                                     Edit
                                   </button>
                                 ) : (
-                                  <span className="inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-gray-200 text-[10px] sm:text-xs font-medium rounded text-gray-400 bg-gray-50">
+                                  <span className="inline-flex items-center justify-center px-1.5 sm:px-2 py-1 sm:py-1.5 border border-gray-200 text-[10px] sm:text-xs font-medium rounded text-gray-400 bg-gray-50">
                                     <GoPencil className="mr-1" />
 
                                     <span className="hidden sm:inline">
@@ -2884,7 +3072,7 @@ const Add_rates = () => {
                                 )}
                                 <button
                                   onClick={() => toggleRowExpansion(item._id)}
-                                  className={`inline-flex items-center justify-center px-1.5 sm:px-2.5 py-1 sm:py-1.5 border border-transparent text-[10px] sm:text-xs font-medium rounded ${
+                                  className={`inline-flex items-center justify-center px-1.5 sm:px-2 py-1 sm:py-1.5 border border-transparent text-[10px] sm:text-xs font-medium rounded ${
                                     isExpanded
                                       ? "text-white bg-blue-600 hover:bg-blue-700"
                                       : "text-blue-700 bg-blue-100 hover:bg-blue-200"
@@ -2901,6 +3089,12 @@ const Add_rates = () => {
                                       <span>Details</span>
                                     </>
                                   )}
+                                </button>
+                                <button
+                                  onClick={() => handleCopy(item)}
+                                  className="font-semibold text-xs text-gray-600 border border-gray-700 rounded-md px-2 py-1"
+                                >
+                                  Copy
                                 </button>
                               </div>
                               {isEditable && (
