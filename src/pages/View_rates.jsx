@@ -965,14 +965,14 @@ const View_rates = () => {
 
                             {/* Other columns */}
                             <td className="px-2 py-2 whitespace-nowrap border-r border-gray-200">
-                              <span className="text-xs sm:text-sm font-medium text-gray-900">
+                              <span className="text-[10px] sm:text-xs font-medium text-gray-900">
                                 {item.shipping_lines}
                               </span>
                             </td>
                             <td className="px-2  py-2 border-r border-gray-200">
                               <div className="flex items-center text-[8px] sm:text-xs">
                                 <div className="">
-                                  <span className="text-xs sm:text-sm font-medium text-gray-800">
+                                  <span className="text-[10px] sm:text-xs font-medium text-gray-900">
                                     {item.pol}
                                   </span>
                                 </div>
@@ -981,19 +981,19 @@ const View_rates = () => {
                             <td className="px-2  py-2 border-r border-gray-200">
                               <div className="flex items-center text-[8px] sm:text-xs">
                                 <div className="">
-                                  <span className="text-xs sm:text-sm font-medium text-gray-900">
+                                  <span className="text-[10px] sm:text-xs font-medium text-gray-900">
                                     {item.pod}
                                   </span>
                                 </div>
                               </div>
                             </td>
                             <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                              <span className="text-sm text-gray-900 font-medium">
+                              <span className="text-[10px] sm:text-xs font-medium text-gray-900">
                                 {item.container_type}
                               </span>
                             </td>
                             <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                              <div className="text-sm font-medium text-gray-900">
+                              <div className="text-[10px] sm:text-xs font-medium text-gray-900">
                                 {item.ocean_freight}
                               </div>
                               <div className="text-xs text-gray-500">
@@ -1151,6 +1151,9 @@ const View_rates = () => {
                                         <p className=" text-xs ">
                                           Contact No:{" "}
                                           {item.shipping_number || "N/A"}
+                                        </p>
+                                        <p className=" text-xs ">
+                                          Email: {item.shipping_email || "N/A"}
                                         </p>
                                         <p className=" text-xs ">
                                           Address:{" "}

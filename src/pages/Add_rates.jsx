@@ -2317,6 +2317,24 @@ const Add_rates = () => {
                       </div>
                     </div>
 
+                    {/* Remarks (Optional) - move this just above the submit button */}
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-black mb-1">
+                        Remarks (Optional)
+                      </label>
+                      <div className="relative rounded-md border border-blue-300 shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-2 pt-2 flex items-start pointer-events-none">
+                          <LuMessageSquareMore className="text-gray-400" />
+                        </div>
+                        <textarea
+                          value={remarks}
+                          onChange={(e) => setRemarks(e.target.value)}
+                          className="block w-full pl-8 py-2 text-sm border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 rounded-md transition-shadow duration-150 ease-in-out"
+                          rows="2"
+                          placeholder="Add any special instructions related to this shippment"
+                        />
+                      </div>
+                    </div>
                     {/* Submit Button */}
                     <button
                       type="submit"
@@ -3005,7 +3023,7 @@ const Add_rates = () => {
                               </div>
                             </td>
                             <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
-                              <span className="text-[10px] sm:text-sm font-medium text-gray-900">
+                              <span className="text-[10px] sm:text-xs font-medium text-gray-900">
                                 {item.shipping_lines || "N/A"}
                               </span>
                               {hasRemarks && (
@@ -3028,12 +3046,12 @@ const Add_rates = () => {
                               )}
                             </td>
                             <td className="px-2 py-2 border-r border-gray-300">
-                              <span className="text-[10px] sm:text-sm font-medium text-gray-900">
+                              <span className="text-[10px] sm:text-xs font-medium text-gray-900">
                                 {item.container_type || "N/A"}
                               </span>
                             </td>
                             <td className="px-2 py-2 border-r border-gray-300">
-                              <div className="text-[10px] sm:text-sm font-medium text-gray-900">
+                              <div className="text-[10px] sm:text-xs font-medium text-gray-900">
                                 {item.ocean_freight || "N/A"}
                               </div>
                               <div className="text-xs text-gray-500">
@@ -3280,9 +3298,9 @@ const Add_rates = () => {
                                       )}
 
                                     {/* For backward compatibility with old format */}
-                                    {!item.customCharges &&
+                                    {((!item.customCharges || item.customCharges.length === 0) &&
                                       item.customLabel &&
-                                      item.customValue && (
+                                      item.customValue) && (
                                         <div className="mt-2 border-t border-gray-200 pt-2">
                                           <span className="text-xs font-medium text-gray-500">
                                             Other Charges:
@@ -3304,7 +3322,7 @@ const Add_rates = () => {
                                                       )
                                                     : [];
                                                   const unit =
-                                                    units[index] || ""; // Default to /BL if no unit is found
+                                                    units[index] || "";
 
                                                   return label &&
                                                     values[index] ? (
@@ -3321,10 +3339,9 @@ const Add_rates = () => {
                                                 })}
                                             </div>
                                           ) : (
-                                            // Display single charge (legacy format)
+                                            // Always display single charge (legacy format) in a <p> inside the <div>
                                             <p className="text-xs font-medium">
-                                              {item.customLabel}:{" "}
-                                              {item.customValue}{" "}
+                                              {item.customLabel}: {item.customValue} {" "}
                                               <span className="text-gray-500">
                                                 {item.customUnit}
                                               </span>
