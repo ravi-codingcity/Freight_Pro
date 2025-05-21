@@ -1729,7 +1729,7 @@ const Add_rates = () => {
                         </div>
                       </div>
                       {/* Shipping Line */}
-                      <div className="mb-1">
+                      <div className="mb-1 sm:block hidden">
                         <label className="block text-sm font-medium text-black mb-1">
                           Shipping Line <span className="text-red-500 ">*</span>
                         </label>
@@ -1787,7 +1787,7 @@ const Add_rates = () => {
                       </div>
 
                       {/* Container Type */}
-                      <div className="mb-1">
+                      <div className="mb-1 sm:block hidden">
                         <label className="block text-sm font-medium text-black mb-1">
                           Container Type{" "}
                           <span className="text-red-500 ">*</span>
@@ -1819,8 +1819,8 @@ const Add_rates = () => {
                     </div>
 
                     {/*  POD */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                      <div className="mb-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 order-2">
+                      <div className="mb-1 ">
                         <label className="block text-sm font-medium text-black mb-1">
                           POD (Port of Discharge){" "}
                           <span className="text-red-500 ">*</span>
@@ -1852,7 +1852,7 @@ const Add_rates = () => {
                         </div>
                       </div>
                       {/* Commodity Type */}
-                      <div className="mb-1">
+                      <div className="mb-1 sm:block hidden">
                         <label className="block text-sm font-medium text-black mb-1">
                           Commodity Type{" "}
                           <span className="text-red-500 ">*</span>
@@ -1959,6 +1959,123 @@ const Add_rates = () => {
                               )}
                           </div>
                         </div>
+                      </div>{" "}
+                      {/* Shipping Line for mobile*/}
+                      <div className="mb-1 block sm:hidden">
+                        <label className="block text-sm font-medium text-black mb-1">
+                          Shipping Line <span className="text-red-500 ">*</span>
+                        </label>
+                        <div className="relative  shadow-sm rounded-md border border-blue-300">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <LiaShipSolid />
+                          </div>
+                          <select
+                            value={shipping_lines}
+                            onChange={(e) => setshipping_lines(e.target.value)}
+                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            required
+                          >
+                            <option value="" disabled>
+                              Select Shipping Line
+                            </option>
+                            {renderShippingLinesOptions()}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <IoIosArrowDown />
+                          </div>
+                        </div>
+                      </div>
+                      {/* Container Type for mobile*/}
+                      <div className="mb-1 block sm:hidden">
+                        <label className="block text-sm font-medium text-black mb-1">
+                          Container Type{" "}
+                          <span className="text-red-500 ">*</span>
+                        </label>
+                        <div className="relative rounded-md shadow-sm  border border-blue-300">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <PiShippingContainer />
+                          </div>
+                          <select
+                            value={container_type}
+                            onChange={handleContainerTypeChange}
+                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            required
+                          >
+                            <option value="" disabled>
+                              Select Container Type
+                            </option>
+                            {containerSizeOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <IoIosArrowDown />
+                          </div>
+                        </div>
+                      </div>
+                      {/* Commodity Type for mobile*/}
+                      <div className="mb-1 block sm:hidden">
+                        <label className="block text-sm font-medium text-black mb-1">
+                          Commodity Type{" "}
+                          <span className="text-red-500 ">*</span>
+                        </label>
+                        {showDescription ? (
+                          <div>
+                            <div className="relative rounded-md shadow-sm">
+                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FiBox />
+                              </div>
+                              <input
+                                type="text"
+                                placeholder="Enter commodity specific description"
+                                value={commodity}
+                                onChange={(e) => setCommodity(e.target.value)}
+                                className=" block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-700"
+                                required
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setShowDescription(false)}
+                              className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 inline-flex items-center"
+                            >
+                              <FaArrowLeft />
+                              Back to selection
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="relative rounded-md shadow-sm border border-blue-300">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <FiBox />
+                            </div>
+                            <select
+                              value={commodity}
+                              onChange={(e) => {
+                                if (e.target.value === "Commodity Specific") {
+                                  setShowDescription(true);
+                                  setCommodity("");
+                                } else {
+                                  setCommodity(e.target.value);
+                                }
+                              }}
+                              className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                              required
+                            >
+                              <option value="" disabled>
+                                Select Commodity Type
+                              </option>
+                              <option value="FAK">FAK</option>
+                              <option value="Commodity Specific">
+                                Commodity Specific
+                              </option>
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                              <IoIosArrowDown />
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
 
