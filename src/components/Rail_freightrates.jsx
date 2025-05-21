@@ -45,7 +45,6 @@ export const getRailFreightRates = async (por, pol, shippingLine, containerType)
       };
     } else if (containerType && (containerType.startsWith('40') || containerType.startsWith('45'))) {
       return {
-        "(0-10 ton)": "₹0",
         "(10-20 ton)": "₹0",
         "(20+ ton)": "₹0"
       };

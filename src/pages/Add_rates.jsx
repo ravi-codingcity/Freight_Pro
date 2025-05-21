@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import { TbRoute } from "react-icons/tb";
+import { TbCircleLetterR } from "react-icons/tb";
+import { LuRefreshCcw } from "react-icons/lu";
+import { RiShip2Line } from "react-icons/ri";
 import { IoLocationOutline } from "react-icons/io5";
 import { LuTruck } from "react-icons/lu";
 import { TbReceiptTax } from "react-icons/tb";
@@ -7,15 +11,9 @@ import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { GoPencil } from "react-icons/go";
 import { FaRegBookmark } from "react-icons/fa";
 import { AiOutlineControl } from "react-icons/ai";
-import { BsTrainFreightFront } from "react-icons/bs";
-import { LuContact } from "react-icons/lu";
-import { LuFileSpreadsheet } from "react-icons/lu";
+import { LuContact, LuFileSpreadsheet, LuShip } from "react-icons/lu";
 import { PiNewspaper } from "react-icons/pi";
-import {
-  LiaTruckLoadingSolid,
-  LiaShippingFastSolid,
-  LiaShipSolid,
-} from "react-icons/lia";
+import { LiaShipSolid } from "react-icons/lia";
 import { MdDeleteForever } from "react-icons/md";
 import { IoMailOutline } from "react-icons/io5";
 import { FiHome } from "react-icons/fi";
@@ -93,6 +91,7 @@ const Add_rates = () => {
   const [remainingTimes, setRemainingTimes] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false); // Add this new state variable
 
   // OPTIONS STATE - DEFINE THESE ONLY ONCE!
   const [porOptions, setPorOptions] = useState([]);
@@ -1398,7 +1397,9 @@ const Add_rates = () => {
       setContactSuggestions([]);
       setContactSuggestionsLoading(false);
     }
-    return () => { isMounted = false; };
+    return () => {
+      isMounted = false;
+    };
   }, [shipping_lines]);
 
   const handleContactSelect = (suggestion) => {
@@ -1449,12 +1450,23 @@ const Add_rates = () => {
       if (match) {
         const symbol = match[0];
         switch (symbol) {
-          case "$": setAcdCurrency("USD"); break;
-          case "€": setAcdCurrency("EUR"); break;
-          case "£": setAcdCurrency("GBP"); break;
-          case "¥": setAcdCurrency("JPY"); break;
-          case "₹": setAcdCurrency("INR"); break;
-          default: setAcdCurrency("USD");
+          case "$":
+            setAcdCurrency("USD");
+            break;
+          case "€":
+            setAcdCurrency("EUR");
+            break;
+          case "£":
+            setAcdCurrency("GBP");
+            break;
+          case "¥":
+            setAcdCurrency("JPY");
+            break;
+          case "₹":
+            setAcdCurrency("INR");
+            break;
+          default:
+            setAcdCurrency("USD");
         }
       } else {
         setAcdCurrency("USD");
@@ -1462,7 +1474,11 @@ const Add_rates = () => {
     }
 
     // Handle custom charges
-    if (item.customCharges && Array.isArray(item.customCharges) && item.customCharges.length > 0) {
+    if (
+      item.customCharges &&
+      Array.isArray(item.customCharges) &&
+      item.customCharges.length > 0
+    ) {
       setCustomCharges(
         item.customCharges.map((charge) => ({
           label: charge.label || "",
@@ -1472,7 +1488,10 @@ const Add_rates = () => {
         }))
       );
     } else if (item.customLabel && item.customValue) {
-      if (item.customLabel.includes("|||") && item.customValue.includes("|||")) {
+      if (
+        item.customLabel.includes("|||") &&
+        item.customValue.includes("|||")
+      ) {
         const labels = item.customLabel.split("|||");
         const values = item.customValue.split("|||");
         const units = item.customUnit ? item.customUnit.split("|||") : [];
@@ -1487,7 +1506,9 @@ const Add_rates = () => {
         setCustomCharges([
           {
             label: item.customLabel || "",
-            value: item.customValue ? item.customValue.replace(/[₹$€£¥]/g, "") : "",
+            value: item.customValue
+              ? item.customValue.replace(/[₹$€£¥]/g, "")
+              : "",
             currency: getCurrencyFromSymbol(item.customValue) || "USD",
             unit: item.customUnit || "",
           },
@@ -1535,6 +1556,16 @@ const Add_rates = () => {
     setEditFormId(null);
     // Scroll to the top of the form for better UX
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Add this new function to handle refresh
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    // Use setTimeout to simulate a small delay for better UX
+    setTimeout(() => {
+      clearFormFields();
+      setIsRefreshing(false);
+    }, 500);
   };
 
   return (
@@ -1618,13 +1649,36 @@ const Add_rates = () => {
                   {/* Form Sections with visual separation */}
                   {/* SECTION: Route Information */}
                   <div className="bg-gray-50 px-4 py-3 rounded-lg border border-gray-200 mt-0">
-                    <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
-                      <FaArrowLeft className="mr-2" />
-                      Route Information
-                    </h3>
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
+                        <TbRoute className="mr-2" />
+                        Route Information
+                      </h3>
+                      <button 
+                        onClick={handleRefresh}
+                        disabled={isRefreshing}
+                        className={`bg-blue-500 text-white px-2 py-1 rounded-md text-sm flex items-center transition-all duration-200 ${
+                          isRefreshing ? 'opacity-75 cursor-not-allowed' : 'hover:bg-blue-600'
+                        }`}
+                      >
+                        {isRefreshing ? (
+                          <>
+                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Refreshing...
+                          </>
+                        ) : (
+                          <>
+                           <LuRefreshCcw className="mr-2" /> Refresh 
+                          </>
+                        )}
+                      </button>
+                    </div>
 
                     {/* POR + POL */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {/* POR */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
@@ -1656,7 +1710,32 @@ const Add_rates = () => {
                           </div>
                         </div>
                       </div>
-
+                      {/* Shipping Lines */}
+                      <div className="mb-1">
+                        <label className="block text-sm font-medium text-black mb-1">
+                          Shipping Lines{" "}
+                          <span className="text-red-500 ">*</span>
+                        </label>
+                        <div className="relative  shadow-sm rounded-md border border-blue-300">
+                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <LiaShipSolid />
+                          </div>
+                          <select
+                            value={shipping_lines}
+                            onChange={(e) => setshipping_lines(e.target.value)}
+                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            required
+                          >
+                            <option value="" disabled>
+                              Select Shipping Line
+                            </option>
+                            {renderShippingLinesOptions()}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <IoIosArrowDown />
+                          </div>
+                        </div>
+                      </div>
                       {/* POL */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
@@ -1665,7 +1744,7 @@ const Add_rates = () => {
                         </label>
                         <div className="relative rounded-md shadow-sm  border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <LiaTruckLoadingSolid />
+                            <LuShip />
                           </div>
                           <select
                             value={pol}
@@ -1690,42 +1769,6 @@ const Add_rates = () => {
                         </div>
                       </div>
 
-                      {/* POD */}
-                      <div className="mb-1">
-                        <label className="block text-sm font-medium text-black mb-1">
-                          POD (Port of Discharge){" "}
-                          <span className="text-red-500 ">*</span>
-                        </label>
-                        <div className="relative rounded-md shadow-sm border border-blue-300">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <LiaShippingFastSolid />
-                          </div>
-                          <select
-                            value={pod}
-                            onChange={(e) => setpod(e.target.value)}
-                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
-                            required
-                          >
-                            <option value="" disabled>
-                              Select POD
-                            </option>
-                            {podOptions && podOptions.length > 0
-                              ? podOptions.map((option) => (
-                                  <option key={option} value={option}>
-                                    {option}
-                                  </option>
-                                ))
-                              : null}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <IoIosArrowDown />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Container Type & POD */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                       {/* Container Type */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
@@ -1756,305 +1799,154 @@ const Add_rates = () => {
                           </div>
                         </div>
                       </div>
+                    </div>
 
-                      {/* Final Destination (Rail Ramps) */}
+                    {/*  POD */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          Final Destination (Rail Ramps)
+                          POD (Port of Discharge){" "}
+                          <span className="text-red-500 ">*</span>
                         </label>
                         <div className="relative rounded-md shadow-sm border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <HiOutlineBuildingOffice />
+                            <RiShip2Line />
                           </div>
-                          <input
-                            value={fdrr}
-                            type="text"
-                            placeholder="Type or select Final Destination (Rail Ramps)"
-                            onChange={handleRailRampInputChange}
-                            onFocus={handleRailRampFocus}
-                            onBlur={() =>
-                              setTimeout(
-                                () => setShowRailRampDropdown(false),
-                                200
-                              )
-                            }
+                          <select
+                            value={pod}
+                            onChange={(e) => setpod(e.target.value)}
                             className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
-                          />
-                          {showRailRampDropdown &&
-                            filteredRailRamps.length > 0 && (
-                              <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                {filteredRailRamps.map((ramp, index) => (
-                                  <div
-                                    key={index}
-                                    className="cursor-pointer hover:bg-indigo-50 py-2 px-3 text-gray-900"
-                                    onMouseDown={() =>
-                                      handleRailRampSelect(ramp)
-                                    }
-                                  >
-                                    {ramp}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
+                            required
+                          >
+                            <option value="" disabled>
+                              Select POD
+                            </option>
+                            {podOptions && podOptions.length > 0
+                              ? podOptions.map((option) => (
+                                  <option key={option} value={option}>
+                                    {option}
+                                  </option>
+                                ))
+                              : null}
+                          </select>
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <IoIosArrowDown />
+                          </div>
                         </div>
                       </div>
-                    </div>
-
-                    {/* SECTION: Shipping Line & Commodity */}
-                    <div className="bg-gray-50 py-3">
-                      <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
-                        <BsTrainFreightFront className="mr-2" />
-                        Shipping Line & Commodity Details
-                      </h3>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
-                        {/* Shipping Lines */}
-                        <div className="mb-1">
-                          <label className="block text-sm font-medium text-black mb-1">
-                            Shipping Lines{" "}
-                            <span className="text-red-500 ">*</span>
-                          </label>
-                          <div className="relative  shadow-sm rounded-md border border-blue-300">
+                      {/* Commodity Type */}
+                      <div className="mb-1">
+                        <label className="block text-sm font-medium text-black mb-1">
+                          Commodity Type{" "}
+                          <span className="text-red-500 ">*</span>
+                        </label>
+                        {showDescription ? (
+                          <div>
+                            <div className="relative rounded-md shadow-sm">
+                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <FiBox />
+                              </div>
+                              <input
+                                type="text"
+                                placeholder="Enter commodity specific description"
+                                value={commodity}
+                                onChange={(e) => setCommodity(e.target.value)}
+                                className=" block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-700"
+                                required
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setShowDescription(false)}
+                              className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 inline-flex items-center"
+                            >
+                              <FaArrowLeft />
+                              Back to selection
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="relative rounded-md shadow-sm border border-blue-300">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <LiaShipSolid />
+                              <FiBox />
                             </div>
                             <select
-                              value={shipping_lines}
-                              onChange={(e) =>
-                                setshipping_lines(e.target.value)
-                              }
+                              value={commodity}
+                              onChange={(e) => {
+                                if (e.target.value === "Commodity Specific") {
+                                  setShowDescription(true);
+                                  setCommodity("");
+                                } else {
+                                  setCommodity(e.target.value);
+                                }
+                              }}
                               className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                               required
                             >
                               <option value="" disabled>
-                                Select Shipping Line
+                                Select Commodity Type
                               </option>
-                              {renderShippingLinesOptions()}
+                              <option value="FAK">FAK</option>
+                              <option value="Commodity Specific">
+                                Commodity Specific
+                              </option>
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
                               <IoIosArrowDown />
                             </div>
                           </div>
-                        </div>
-
-                        {/* Commodity Type */}
-                        <div className="mb-1">
-                          <label className="block text-sm font-medium text-black mb-1">
-                            Commodity Type{" "}
-                            <span className="text-red-500 ">*</span>
-                          </label>
-                          {showDescription ? (
-                            <div>
-                              <div className="relative rounded-md shadow-sm">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                  <FiBox />
-                                </div>
-                                <input
-                                  type="text"
-                                  placeholder="Enter commodity specific description"
-                                  value={commodity}
-                                  onChange={(e) => setCommodity(e.target.value)}
-                                  className=" block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-700"
-                                  required
-                                />
-                              </div>
-                              <button
-                                type="button"
-                                onClick={() => setShowDescription(false)}
-                                className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 inline-flex items-center"
-                              >
-                                <FaArrowLeft />
-                                Back to selection
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="relative rounded-md shadow-sm border border-blue-300">
-                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FiBox />
-                              </div>
-                              <select
-                                value={commodity}
-                                onChange={(e) => {
-                                  if (e.target.value === "Commodity Specific") {
-                                    setShowDescription(true);
-                                    setCommodity("");
-                                  } else {
-                                    setCommodity(e.target.value);
-                                  }
-                                }}
-                                className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
-                                required
-                              >
-                                <option value="" disabled>
-                                  Select Commodity Type
-                                </option>
-                                <option value="FAK">FAK</option>
-                                <option value="Commodity Specific">
-                                  Commodity Specific
-                                </option>
-                              </select>
-                              <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                                <IoIosArrowDown />
-                              </div>
-                            </div>
-                          )}
-                        </div>
+                        )}
                       </div>
                     </div>
 
-                    {/* Shipping Line Contact Details Card */}
-                    <div className="mt-2 bg-white py-3 px-2 rounded-lg border border-blue-300 shadow-sm hover:shadow-md transition-shadow duration-150 ease-in-out">
-                      <h4 className="text-sm font-medium text-blue-700 mb-3 flex items-center">
-                        <LuContact className="mr-2" />
-                        Shipping Line Contact Person Details{" "}
-                        <span className="text-red-500 ">*</span>
-                      </h4>
-
-                      <div className="sm:grid grid-cols-1 sm:grid-cols-3 gap-3  ">
-                        {/* Person Name */}
-                        <div className="mb-1 sm:mb-0 relative">
-                          <div className="relative rounded-md shadow-sm">
+                    {/* SECTION: Shipping Line & Commodity */}
+                    <div className="bg-gray-50 py-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 ">
+                        {/* Final Destination (Rail Ramps) */}
+                        <div className="mb-1">
+                          <label className="block text-sm font-medium text-black mb-1">
+                            Final Destination (Rail Ramps)
+                          </label>
+                          <div className="relative rounded-md shadow-sm border border-blue-300">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <IoIosContact className="text-gray-500 text-lg" />
+                              <HiOutlineBuildingOffice />
                             </div>
                             <input
-                              value={shipping_name}
-                              placeholder="Enter Name *"
-                              onChange={(e) => setshipping_name(e.target.value)}
-                              onFocus={handleContactNameFocus}
+                              value={fdrr}
+                              type="text"
+                              placeholder="Type or select Final Destination (Rail Ramps)"
+                              onChange={handleRailRampInputChange}
+                              onFocus={handleRailRampFocus}
                               onBlur={() =>
                                 setTimeout(
-                                  () => setShowContactSuggestions(false),
+                                  () => setShowRailRampDropdown(false),
                                   200
                                 )
                               }
-                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
-                              required
+                              className=" appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                             />
-                          </div>
-
-                          {/* Enhanced Contact suggestions dropdown */}
-                          {showContactSuggestions && (
-                            <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                              <div className="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-50 border-b flex justify-between items-center">
-                                <span>Contacts for {shipping_lines}</span>
-                                {contactSuggestionsLoading && (
-                                  <span className="text-blue-500 flex items-center">
-                                    <svg
-                                      className="animate-spin h-3 w-3 mr-1"
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
+                            {showRailRampDropdown &&
+                              filteredRailRamps.length > 0 && (
+                                <div className="absolute z-20 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                  {filteredRailRamps.map((ramp, index) => (
+                                    <div
+                                      key={index}
+                                      className=" cursor-pointer hover:bg-indigo-50 py-2 px-3 text-gray-900"
+                                      onMouseDown={() =>
+                                        handleRailRampSelect(ramp)
+                                      }
                                     >
-                                      <circle
-                                        className="opacity-25"
-                                        cx="12"
-                                        cy="12"
-                                        r="10"
-                                        stroke="currentColor"
-                                        strokeWidth="4"
-                                      ></circle>
-                                      <path
-                                        className="opacity-75"
-                                        fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                      ></path>
-                                    </svg>
-                                    Loading...
-                                  </span>
-                                )}
-                              </div>
-
-                              {contactSuggestionsLoading ? (
-                                <div className="py-2 px-3 text-gray-900 italic text-center">
-                                  Loading contact suggestions...
-                                </div>
-                              ) : contactSuggestions.length > 0 ? (
-                                contactSuggestions.map((suggestion, index) => (
-                                  <div
-                                    key={index}
-                                    className="cursor-pointer hover:bg-indigo-50 py-2 px-3 text-gray-900"
-                                    onMouseDown={() =>
-                                      handleContactSelect(suggestion)
-                                    }
-                                  >
-                                    <div className="font-medium">
-                                      {suggestion.name || "N/A"}
+                                      {ramp}
                                     </div>
-                                    <div className="text-xs text-gray-500 flex flex-col sm:flex-row sm:gap-2">
-                                      <span>{suggestion.number}</span>
-                                      <span>{suggestion.email}</span>
-                                    </div>
-                                  </div>
-                                ))
-                              ) : (
-                                <div className="py-2 px-3 text-gray-500 italic text-center">
-                                  No contact suggestions found for this shipping
-                                  line
+                                  ))}
                                 </div>
                               )}
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Contact Number */}
-                        <div className="mb-1 sm:mb-0">
-                          <div className="relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <IoCallOutline className="text-gray-400 text-lg" />
-                            </div>
-                            <input
-                              value={shipping_number}
-                              placeholder="Enter Number *"
-                              onChange={(e) =>
-                                setshipping_number(e.target.value)
-                              }
-                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        {/* Person Email */}
-                        <div className="mb-1 sm:mb-0">
-                          <div className="relative rounded-md shadow-sm">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <IoMailOutline className="text-gray-400 text-lg" />
-                            </div>
-                            <input
-                              value={shipping_email}
-                              placeholder="Enter Email *"
-                              onChange={(e) =>
-                                setshipping_email(e.target.value)
-                              }
-                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        {/* Person Address */}
-                        <div className="mb-1 sm:mb-0 col-span-3">
-                          <div className="relative rounded-md shadow-sm w-full">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <FiHome className="text-gray-400 text-lg" />
-                            </div>
-                            <input
-                              value={shipping_address}
-                              placeholder="Enter Address *"
-                              onChange={(e) =>
-                                setshipping_address(e.target.value)
-                              }
-                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
-                              required
-                            />
                           </div>
                         </div>
                       </div>
                     </div>
 
                     {/* SECTION: Freight & Routing */}
-                    <div className="bg-gray-50 sm:py-3 sm:px-3 py-2 px-2 rounded-lg border border-gray-200">
+                    <div className="bg-gray-50 sm:py-3 sm:px-2 py-2 px-2 rounded-lg border border-gray-200">
                       <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider mb-3 flex items-center">
                         <HiOutlineCurrencyDollar className="mr-2 text-lg" />
                         Freight Details & Routing
@@ -2286,7 +2178,7 @@ const Add_rates = () => {
                                 onChange={(date) => setValidity(date)}
                                 dateFormat="dd-MM-yyyy"
                                 placeholderText="Select a date"
-                                className="pl-3 sm:pl-10 pr-5 py-2 border border-gray-300 rounded-md shadow-sm text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 "
+                                className=" pl-3 sm:pl-10 pr-5 py-2 border border-gray-300 rounded-md shadow-sm text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 "
                                 min={new Date().toISOString().split("T")[0]}
                                 required
                               />
@@ -2317,12 +2209,163 @@ const Add_rates = () => {
                       </div>
                     </div>
 
+                    {/* Shipping Line Contact Details Card */}
+                    <div className="mt-2 bg-white py-3 px-2 rounded-lg border border-blue-300 shadow-sm hover:shadow-md transition-shadow duration-150 ease-in-out">
+                      <h4 className="text-sm font-medium text-blue-700 mb-3 flex items-center">
+                        <LuContact className="mr-2" />
+                        Shipping Line Contact Person Details{" "}
+                        <span className="text-red-500 ">*</span>
+                      </h4>
+
+                      <div className="sm:grid grid-cols-1 sm:grid-cols-3 gap-3  ">
+                        {/* Person Name */}
+                        <div className="mb-1 sm:mb-0 relative">
+                          <div className="relative rounded-md shadow-sm">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <IoIosContact className="text-gray-500 text-lg" />
+                            </div>
+                            <input
+                              value={shipping_name}
+                              placeholder="Enter Name *"
+                              onChange={(e) => setshipping_name(e.target.value)}
+                              onFocus={handleContactNameFocus}
+                              onBlur={() =>
+                                setTimeout(
+                                  () => setShowContactSuggestions(false),
+                                  200
+                                )
+                              }
+                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
+                              required
+                            />
+                          </div>
+
+                          {/* Enhanced Contact suggestions dropdown */}
+                          {showContactSuggestions && (
+                            <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                              <div className="px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-50 border-b flex justify-between items-center">
+                                <span>Contacts for {shipping_lines}</span>
+                                {contactSuggestionsLoading && (
+                                  <span className="text-blue-500 flex items-center">
+                                    <svg
+                                      className="animate-spin h-3 w-3 mr-1"
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                      ></circle>
+                                      <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                      ></path>
+                                    </svg>
+                                    Loading...
+                                  </span>
+                                )}
+                              </div>
+
+                              {contactSuggestionsLoading ? (
+                                <div className="py-2 px-3 text-gray-900 italic text-center">
+                                  Loading contact suggestions...
+                                </div>
+                              ) : contactSuggestions.length > 0 ? (
+                                contactSuggestions.map((suggestion, index) => (
+                                  <div
+                                    key={index}
+                                    className="cursor-pointer hover:bg-indigo-50 py-2 px-3 text-gray-900"
+                                    onMouseDown={() =>
+                                      handleContactSelect(suggestion)
+                                    }
+                                  >
+                                    <div className="font-medium">
+                                      {suggestion.name || "N/A"}
+                                    </div>
+                                    <div className="text-xs text-gray-500 flex flex-col sm:flex-row sm:gap-2">
+                                      <span>{suggestion.number}</span>
+                                      <span>{suggestion.email}</span>
+                                    </div>
+                                  </div>
+                                ))
+                              ) : (
+                                <div className="py-2 px-3 text-gray-500 italic text-center">
+                                  No contact suggestions found for this shipping
+                                  line
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Contact Number */}
+                        <div className="mb-1 sm:mb-0">
+                          <div className="relative rounded-md shadow-sm">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <IoCallOutline className="text-gray-400 text-lg" />
+                            </div>
+                            <input
+                              value={shipping_number}
+                              placeholder="Enter Number *"
+                              onChange={(e) =>
+                                setshipping_number(e.target.value)
+                              }
+                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Person Email */}
+                        <div className="mb-1 sm:mb-0">
+                          <div className="relative rounded-md shadow-sm">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <IoMailOutline className="text-gray-400 text-lg" />
+                            </div>
+                            <input
+                              value={shipping_email}
+                              placeholder="Enter Email *"
+                              onChange={(e) =>
+                                setshipping_email(e.target.value)
+                              }
+                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Person Address */}
+                        <div className="mb-1 sm:mb-0 col-span-3">
+                          <div className="relative rounded-md shadow-sm w-full">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <FiHome className="text-gray-400 text-lg" />
+                            </div>
+                            <input
+                              value={shipping_address}
+                              placeholder="Enter Address *"
+                              onChange={(e) =>
+                                setshipping_address(e.target.value)
+                              }
+                              className="block w-full pl-10 py-2 text-base border-red-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out border"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Remarks (Optional) - move this just above the submit button */}
                     <div className="mt-4">
                       <label className="block text-sm font-medium text-black mb-1">
                         Remarks (Optional)
                       </label>
-                      <div className="relative rounded-md border border-blue-300 shadow-sm">
+                      <div className="relative rounded-md border border-blue-300 shadow-sm mb-3">
                         <div className="absolute inset-y-0 left-0 pl-2 pt-2 flex items-start pointer-events-none">
                           <LuMessageSquareMore className="text-gray-400" />
                         </div>
@@ -2920,62 +2963,62 @@ const Add_rates = () => {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto shadow-md rounded-lg border border-gray-300 sm:mx-4 mx-1">
+          <div className="overflow-x-auto shadow-md rounded-lg border border-gray-400 sm:mx-4 mx-1">
             <div className="inline-block min-w-full align-middle">
               <table className="min-w-full divide-y divide-gray-200 table-fixed border-collapse">
                 <thead className="bg-gray-50">
                   <tr>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-400"
                     >
                       POR
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-400"
                     >
                       POL
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 uppercase tracking-wider border-b border-r border-gray-400"
                     >
                       POD
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold  text-red-500 tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold  text-red-500 tracking-wider border-b border-r border-gray-400"
                     >
                       Shipping Line
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-400"
                     >
                       Container
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-400"
                     >
                       Freight
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-400"
                     >
                       Validity
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-center sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-gray-300"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-center sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-gray-400"
                     >
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-300">
                   {forms
                     .sort(
                       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -2997,7 +3040,7 @@ const Add_rates = () => {
                                 : "hover:bg-gray-50"
                             } transition-colors duration-150`}
                           >
-                            <td className="px-2  py-2 border-r border-gray-200">
+                            <td className="px-2  py-2 border-r border-gray-300">
                               <div className="flex items-center text-[10px] sm:text-xs">
                                 <div className="">
                                   <span className="font-medium text-black">
@@ -3006,7 +3049,7 @@ const Add_rates = () => {
                                 </div>
                               </div>
                             </td>
-                            <td className="px-2  py-2 border-r border-gray-200">
+                            <td className="px-2  py-2 border-r border-gray-300">
                               <div className="flex items-center text-[10px] sm:text-xs">
                                 <div className="">
                                   <span className="font-medium text-black">
@@ -3015,35 +3058,25 @@ const Add_rates = () => {
                                 </div>
                               </div>
                             </td>
-                            <td className="px-2  py-2 border-r border-gray-200">
+                            <td className="px-2  py-2 border-r border-gray-300">
                               <div className="flex items-center text-[10px] sm:text-xs">
                                 <span className="font-medium text-black">
                                   {item.pod}
                                 </span>
                               </div>
                             </td>
-                            <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
+                            <td className="px-2 sm:px-3 py-2 border-r border-gray-300">
+                              <div className="flex items-center justify-center">
                               <span className="text-[10px] sm:text-xs font-medium text-gray-900">
                                 {item.shipping_lines || "N/A"}
                               </span>
                               {hasRemarks && (
-                                <span
-                                  className="sm:inline-flex hidden items-center mt-1 sm:mt-0 sm:ml-2 px-1.5 sm:px-1 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-blue-50 text-orange-800 border border-orange-300 animate-pulse"
-                                  title="Contain important remarks"
-                                >
-                                  <svg
-                                    className="w-2 h-2 sm:w-3 sm:h-3 mr-0.5 sm:mr-1"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 100-2 1 1 012 0zm1 9a1 1 100-2 1 1 000 2z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </span>
+                                <div
+                                title="Important Remark">
+                                  <TbCircleLetterR className="text-orange-800 font-bold text-lg animate-pulse ml-2"/>
+                                </div>
                               )}
+                              </div>
                             </td>
                             <td className="px-2 py-2 border-r border-gray-300">
                               <span className="text-[10px] sm:text-xs font-medium text-gray-900">
@@ -3110,7 +3143,7 @@ const Add_rates = () => {
                                 </button>
                                 <button
                                   onClick={() => handleCopy(item)}
-                                  className="font-semibold text-xs text-gray-600 border border-gray-700 rounded-md px-2 py-1"
+                                  className="font-semibold text-xs text-white rounded-md px-2 py-1 font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 "
                                 >
                                   Copy
                                 </button>
@@ -3298,9 +3331,10 @@ const Add_rates = () => {
                                       )}
 
                                     {/* For backward compatibility with old format */}
-                                    {((!item.customCharges || item.customCharges.length === 0) &&
+                                    {(!item.customCharges ||
+                                      item.customCharges.length === 0) &&
                                       item.customLabel &&
-                                      item.customValue) && (
+                                      item.customValue && (
                                         <div className="mt-2 border-t border-gray-200 pt-2">
                                           <span className="text-xs font-medium text-gray-500">
                                             Other Charges:
@@ -3341,7 +3375,8 @@ const Add_rates = () => {
                                           ) : (
                                             // Always display single charge (legacy format) in a <p> inside the <div>
                                             <p className="text-xs font-medium">
-                                              {item.customLabel}: {item.customValue} {" "}
+                                              {item.customLabel}:{" "}
+                                              {item.customValue}{" "}
                                               <span className="text-gray-500">
                                                 {item.customUnit}
                                               </span>
