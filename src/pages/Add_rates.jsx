@@ -1654,24 +1654,42 @@ const Add_rates = () => {
                         <TbRoute className="mr-2" />
                         Route Information
                       </h3>
-                      <button 
+                      <button
                         onClick={handleRefresh}
                         disabled={isRefreshing}
                         className={`bg-blue-500 text-white px-2 py-1 rounded-md text-sm flex items-center transition-all duration-200 ${
-                          isRefreshing ? 'opacity-75 cursor-not-allowed' : 'hover:bg-blue-600'
+                          isRefreshing
+                            ? "opacity-75 cursor-not-allowed"
+                            : "hover:bg-blue-600"
                         }`}
                       >
                         {isRefreshing ? (
                           <>
-                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            <svg
+                              className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
                             </svg>
                             Refreshing...
                           </>
                         ) : (
                           <>
-                           <LuRefreshCcw className="mr-2" /> Refresh 
+                            <LuRefreshCcw className="mr-2" /> Refresh
                           </>
                         )}
                       </button>
@@ -1710,11 +1728,10 @@ const Add_rates = () => {
                           </div>
                         </div>
                       </div>
-                      {/* Shipping Lines */}
+                      {/* Shipping Line */}
                       <div className="mb-1">
                         <label className="block text-sm font-medium text-black mb-1">
-                          Shipping Lines{" "}
-                          <span className="text-red-500 ">*</span>
+                          Shipping Line <span className="text-red-500 ">*</span>
                         </label>
                         <div className="relative  shadow-sm rounded-md border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1898,13 +1915,13 @@ const Add_rates = () => {
                       </div>
                     </div>
 
-                    {/* SECTION: Shipping Line & Commodity */}
+                    {/* Final Destination (Rail Ramp) */}
                     <div className="bg-gray-50 py-3">
                       <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 ">
-                        {/* Final Destination (Rail Ramps) */}
+                        {/* Final Destination (Rail Ramp) */}
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
-                            Final Destination (Rail Ramps)
+                            Final Destination (Rail Ramp)
                           </label>
                           <div className="relative rounded-md shadow-sm border border-blue-300">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -1913,7 +1930,7 @@ const Add_rates = () => {
                             <input
                               value={fdrr}
                               type="text"
-                              placeholder="Type or select Final Destination (Rail Ramps)"
+                              placeholder="Type or select Final Destination (Rail Ramp)"
                               onChange={handleRailRampInputChange}
                               onFocus={handleRailRampFocus}
                               onBlur={() =>
@@ -3067,15 +3084,14 @@ const Add_rates = () => {
                             </td>
                             <td className="px-2 sm:px-3 py-2 border-r border-gray-300">
                               <div className="flex items-center justify-center">
-                              <span className="text-[10px] sm:text-xs font-medium text-gray-900">
-                                {item.shipping_lines || "N/A"}
-                              </span>
-                              {hasRemarks && (
-                                <div
-                                title="Important Remark">
-                                  <TbCircleLetterR className="text-orange-800 font-bold text-lg animate-pulse ml-2"/>
-                                </div>
-                              )}
+                                <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                                  {item.shipping_lines || "N/A"}
+                                </span>
+                                {hasRemarks && (
+                                  <div title="Important Remark">
+                                    <TbCircleLetterR className="text-orange-800 font-bold text-lg animate-pulse ml-2" />
+                                  </div>
+                                )}
                               </div>
                             </td>
                             <td className="px-2 py-2 border-r border-gray-300">
