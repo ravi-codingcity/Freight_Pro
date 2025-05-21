@@ -1919,7 +1919,7 @@ const Add_rates = () => {
                     <div className="bg-gray-50 py-3">
                       <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 ">
                         {/* Final Destination (Rail Ramp) */}
-                        <div className="mb-1">
+                        <div className="mb-2">
                           <label className="block text-sm font-medium text-black mb-1">
                             Final Destination (Rail Ramp)
                           </label>
@@ -1961,7 +1961,7 @@ const Add_rates = () => {
                         </div>
                       </div>{" "}
                       {/* Shipping Line for mobile*/}
-                      <div className="mb-1 block sm:hidden">
+                      <div className="mb-2 block sm:hidden">
                         <label className="block text-sm font-medium text-black mb-1">
                           Shipping Line <span className="text-red-500 ">*</span>
                         </label>
@@ -1986,7 +1986,7 @@ const Add_rates = () => {
                         </div>
                       </div>
                       {/* Container Type for mobile*/}
-                      <div className="mb-1 block sm:hidden">
+                      <div className="mb-2 block sm:hidden">
                         <label className="block text-sm font-medium text-black mb-1">
                           Container Type{" "}
                           <span className="text-red-500 ">*</span>
@@ -2016,7 +2016,7 @@ const Add_rates = () => {
                         </div>
                       </div>
                       {/* Commodity Type for mobile*/}
-                      <div className="mb-1 block sm:hidden">
+                      <div className="mb-2 block sm:hidden">
                         <label className="block text-sm font-medium text-black mb-1">
                           Commodity Type{" "}
                           <span className="text-red-500 ">*</span>
