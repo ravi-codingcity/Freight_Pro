@@ -971,7 +971,7 @@ const View_rates = () => {
                               <div className="flex items-center text-[8px] sm:text-xs">
                                 <div className="">
                                   <span className="text-[10px] sm:text-xs font-medium text-gray-900">
-                                    {item.pod}
+                                    {item.fdrr ? item.fdrr : item.pod}
                                   </span>
                                 </div>
                               </div>
@@ -1099,13 +1099,20 @@ const View_rates = () => {
                                       </div>
                                       <div>
                                         <span className="text-gray-500">
+                                          FDRR:
+                                        </span>
+                                        <p className="font-medium">
+                                          {item.fdrr || "N/A"}
+                                        </p>
+                                      </div>
+                                      <div>
+                                        <span className="text-gray-500">
                                           Commodity Type:
                                         </span>
                                         <p className="font-medium">
                                           {item.commodity || "N/A"}
                                         </p>
                                       </div>
-
                                       <div>
                                         <span className="text-gray-500">
                                           Transit Time:

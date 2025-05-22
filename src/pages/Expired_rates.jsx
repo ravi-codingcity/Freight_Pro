@@ -1032,7 +1032,7 @@ function Expired_rates() {
                             <td className="px-2  py-2 border-r border-gray-300">
                               <div className="flex items-center text-[10px] sm:text-xs">
                                 <span className="font-medium text-black">
-                                  {item.pod}
+                                  {item.fdrr ? item.fdrr : item.pod}
                                 </span>
                               </div>
                             </td>
@@ -1146,13 +1146,20 @@ function Expired_rates() {
                                     </div>
                                     <div>
                                       <span className="text-gray-500">
-                                        Commodity:
+                                        FDRR:
+                                      </span>
+                                      <p className="font-medium">
+                                        {item.fdrr || "N/A"}
+                                      </p>
+                                    </div>
+                                    <div>
+                                      <span className="text-gray-500">
+                                        Commodity Type:
                                       </span>
                                       <p className="font-medium">
                                         {item.commodity || "N/A"}
                                       </p>
                                     </div>
-
                                     <div>
                                       <span className="text-gray-500">
                                         Transit Time:

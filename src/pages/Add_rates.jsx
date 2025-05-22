@@ -178,7 +178,13 @@ const Add_rates = () => {
     setCommodity(item.commodity || "");
     setRoute(item.route || "");
     setOcean_freight(item.ocean_freight || "");
-    setacd_ens_afr(item.acd_ens_afr || "");
+    setacd_ens_afr(() => {
+      if (!item.acd_ens_afr) return "";
+      // Split and strip currency symbol from amount
+      const [type, amountRaw] = item.acd_ens_afr.split(" ");
+      const amount = amountRaw ? amountRaw.replace(/[₹$€£¥]/g, "") : "";
+      return `${type || "ACD"} ${amount}`.trim();
+    });
     setValidity(item.validity || "");
     setValidity_for(item.validity_for || "");
     setRemarks(item.remarks || "");
@@ -918,9 +924,15 @@ const Add_rates = () => {
       }`;
     }
     let acd_ens_afr_with_symbol = "";
-    const chargeType = acd_ens_afr.split(" ")[0] || "ACD";
-    const chargeAmount = acd_ens_afr.split(" ")[1] || "";
-    acd_ens_afr_with_symbol = `${chargeType} ${acdCurrencySymbol}${chargeAmount}`;
+    if (acd_ens_afr && acd_ens_afr.split(" ")[1]) {
+      const chargeType = acd_ens_afr.split(" ")[0] || "ACD";
+      let chargeAmount = acd_ens_afr.split(" ")[1] || "";
+      // Only add symbol if not present
+      if (!/^[₹$€£¥]/.test(chargeAmount)) {
+        chargeAmount = `${acdCurrencySymbol}${chargeAmount}`;
+      }
+      acd_ens_afr_with_symbol = `${chargeType} ${chargeAmount}`;
+    }
 
     // Format custom charges with currency symbols and combine for backend
     const formattedCustomCharges = customCharges.map((charge) => ({
@@ -1434,7 +1446,13 @@ const Add_rates = () => {
     setCommodity(item.commodity || "");
     setRoute(item.route || "");
     setOcean_freight(item.ocean_freight || "");
-    setacd_ens_afr(item.acd_ens_afr || "");
+    setacd_ens_afr(() => {
+      if (!item.acd_ens_afr) return "";
+      // Split and strip currency symbol from amount
+      const [type, amountRaw] = item.acd_ens_afr.split(" ");
+      const amount = amountRaw ? amountRaw.replace(/[₹$€£¥]/g, "") : "";
+      return `${type || "ACD"} ${amount}`.trim();
+    });
     setValidity(item.validity || "");
     setValidity_for(item.validity_for || "");
     setRemarks(item.remarks || "");
@@ -3195,7 +3213,7 @@ const Add_rates = () => {
                             <td className="px-2  py-2 border-r border-gray-300">
                               <div className="flex items-center text-[10px] sm:text-xs">
                                 <span className="font-medium text-black">
-                                  {item.pod}
+                                  {item.fdrr ? item.fdrr : item.pod}
                                 </span>
                               </div>
                             </td>
@@ -3221,7 +3239,12 @@ const Add_rates = () => {
                                 {item.ocean_freight || "N/A"}
                               </div>
                               <div className="text-xs text-gray-500">
-                                {item.acd_ens_afr || "N/A"}
+                                {!item.acd_ens_afr ||
+                                /^(ACD|ENS|AFR)? ?[₹$€£¥]?$/.test(
+                                  item.acd_ens_afr
+                                )
+                                  ? ""
+                                  : item.acd_ens_afr}
                               </div>
                             </td>
                             <td className="px-2 py-2 border-r border-gray-300">
@@ -3301,7 +3324,7 @@ const Add_rates = () => {
                                     <h4 className="font-medium text-sm text-red-500 mb-2">
                                       Route & Commodity Details
                                     </h4>
-                                    <div className="grid grid-cols-3 gap-2 text-xs">
+                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px] sm:text-xs">
                                       <div>
                                         <span className="text-gray-500">
                                           POR:
