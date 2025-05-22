@@ -3,70 +3,65 @@ import { useState, useEffect } from "react";
 // Function that returns the POR options as a flat array
 export const getPOROptions = () => {
   const data = {
-    ICDs: [
+    POR: [
       "ACTL Faridabad (HR)",
       "Ahmedabad ICD (AMD)",
       "Ankleshwar ICD (AKV)",
       "Bangalore ICD (WFD)",
       "Bhiwadi ICD (BWD)",
+      "Chennai Port (TN)",
       "Coimbatore ICD (CBE)",
+      "Cochin Port (KL)",
       "Dadri ICD (UP)",
+      "Dhamra Port (OD)",
       "Dighi ICD (MH)",
       "Durgapur ICD (DGP)",
+      "Ennore Port (TN)",
+      "Gangavaram Port (AP)",
       "Garhi Harsaru ICD (HR)",
+      "Haldia Port (WB)",
+      "Hazira Port (GJ)",
       "Hyderabad ICD (HYD)",
       "Irugur ICD (IRUGUR)",
       "Jaipur ICD (JPR)",
       "Jattipur / Panipat ICD (HR)",
       "Jodhpur ICD (RJ)",
+      "Kakinada Port (AP)",
       "Kanpur ICD (KNP)",
+      "Kandla Port (GJ)",
       "Khodiyar ICD (KHODIYAR)",
+      "Kolkata Port (WB)",
+      "Krishnapatnam Port (AP)",
       "KSH ICD (MH)",
       "Loni ICD (LON)",
       "Ludhiana ICD (LDH)",
       "Madurai ICD (MDU)",
       "Modinagar ICD (UP)",
       "Moradabad ICD (MBQ)",
-      "Nagpur ICD (NGP)",
-      "Palwal ICD (HR)",
-      "Pali ICD (HR)",
-      "Patli ICD (HR)",
-      "Patparganj ICD (DL)",
-      "Piyala ICD (HR)",
-      "Sonepat ICD (HR)",
-      "Tughlakabad ICD (DL)"
-    ],
-    
-    Seaports: [
-      "Chennai Port (TN)",
-      "Cochin Port (KL)",
-      "Dhamra Port (OD)",
-      "Ennore Port (TN)",
-      "Gangavaram Port (AP)",
-      "Haldia Port (WB)",
-      "Hazira Port (GJ)",
-      "Kakinada Port (AP)",
-      "Kandla Port (GJ)",
-      "Kolkata Port (WB)",
-      "Krishnapatnam Port (AP)",
       "Mormugao Port (GA)",
       "Mumbai Port (MH)",
       "Mundra Port (GJ)",
+      "Nagpur ICD (NGP)",
       "New Mangalore Port (KA)",
       "Nhava Sheva (MH)",
+      "Palwal ICD (HR)",
+      "Pali ICD (HR)",
       "Paradip Port (OD)",
+      "Patli ICD (HR)",
+      "Patparganj ICD (DL)",
       "Pipavav Port (GJ)",
+      "Piyala ICD (HR)",
       "Port Blair Port (AN)",
+      "Sonepat ICD (HR)",
+      "Tughlakabad ICD (DL)",
       "Tuticorin Port (TN)",
       "Visakhapatnam Port (AP)",
-      "Vizhinjam International Seaport (KL)"
+      "Vizhinjam International Seaport (KL)",
     ],
   };
 
-  // Return a flat array combining ICDs and Seaports
-  const combinedOptions = [...data.ICDs, ...data.Seaports];
-  console.log("POR options generated:", combinedOptions.length);
-  return combinedOptions;
+  // Return the POR array directly
+  return data.POR;
 };
 
 // Function to fetch POR options from API if needed in the future

@@ -1935,7 +1935,7 @@ const Add_rates = () => {
 
                     {/* Final Destination (Rail Ramp) */}
                     <div className="bg-gray-50 py-3">
-                      <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 ">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 ">
                         {/* Final Destination (Rail Ramp) */}
                         <div className="mb-2">
                           <label className="block text-sm font-medium text-black mb-1">
