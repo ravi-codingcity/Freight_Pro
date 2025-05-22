@@ -37,6 +37,11 @@ export const getShippingLinesOptions = () => {
     "Transworld Group",
     "SCI ",
     "Sarjak Container Lines",
+    "Allcargo Logistics",
+    "TLPL",
+    "TGLS",
+    "TASS",
+    "OOCL",
   ];
 };
 
