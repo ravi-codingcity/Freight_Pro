@@ -1015,34 +1015,32 @@ function Expired_rates() {
                               </div>
                             </div>
                           </td>
-                          <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                            <span className="text-xs sm:text-sm font-medium text-gray-900">
-                              {item.shipping_lines || "N/A"}
-                            </span>
-                          </td>
-                          <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
-                            <div className="flex items-center text-[10px] sm:text-xs">
-                              <div className="bg-blue-50 px-1.5 sm:px-2 py-1 rounded-l border border-blue-200 flex items-center">
-                                <span className="font-medium text-gray-700 truncate max-w-[60px] sm:max-w-full">
-                                  {item.pol || "N/A"}
+                          <td className="px-2 py-2 whitespace-nowrap border-r border-gray-200">
+                              <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                                {item.shipping_lines}
+                              </span>
+                            </td>
+                          <td className="px-2  py-2 border-r border-gray-200">
+                              <div className="flex items-center text-[8px] sm:text-xs">
+                                <div className="">
+                                  <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                                    {item.pol}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+                            <td className="px-2  py-2 border-r border-gray-300">
+                              <div className="flex items-center text-[10px] sm:text-xs">
+                                <span className="font-medium text-black">
+                                  {item.pod}
                                 </span>
                               </div>
-                            </div>
-                          </td>
-                          <td className="px-2 sm:px-3 py-2 border-r border-gray-200">
-                            <div className="flex items-center text-[10px] sm:text-xs">
-                              <div className="bg-indigo-50 px-1.5 sm:px-2 py-1 rounded-r border border-indigo-200 flex items-center">
-                                <span className="font-medium text-gray-700 truncate max-w-[60px] sm:max-w-full">
-                                  {item.pod || "N/A"}
-                                </span>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                            <span className="text-xs sm:text-sm text-gray-900">
-                              {item.container_type || "N/A"}
-                            </span>
-                          </td>
+                            </td>
+                            <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
+                              <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                                {item.container_type}
+                              </span>
+                            </td>
                           <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
                             <div className="text-xs sm:text-sm font-medium text-red-600">
                               {item.ocean_freight || "N/A"}
