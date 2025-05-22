@@ -173,7 +173,9 @@ function Expired_rates() {
 
         sortedData.forEach((form) => {
           if (form.pol) polSet.add(form.pol);
-          if (form.pod) podSet.add(form.pod);
+          // Use fdrr if present, otherwise pod
+          const podValue = form.fdrr ? form.fdrr : form.pod;
+          if (podValue) podSet.add(podValue);
         });
 
         setUniquePOLs([...polSet].sort());
@@ -233,7 +235,7 @@ function Expired_rates() {
       }
 
       // POD filter
-      if (selectedPOD && item.pod !== selectedPOD) {
+      if (selectedPOD && (item.fdrr ? item.fdrr : item.pod) !== selectedPOD) {
         return false;
       }
 
@@ -1141,7 +1143,7 @@ function Expired_rates() {
                                         POD:
                                       </span>
                                       <p className="font-medium">
-                                        {item.pod || "N/A"}
+                                        {item.fdrr ? item.fdrr : item.pod}
                                       </p>
                                     </div>
                                     <div>

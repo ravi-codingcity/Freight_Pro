@@ -131,7 +131,7 @@ const View_rates = () => {
           ...new Set(processedForms.map((form) => form.pol).filter(Boolean)),
         ].sort();
         const pods = [
-          ...new Set(processedForms.map((form) => form.pod).filter(Boolean)),
+          ...new Set(processedForms.map((form) => (form.fdrr ? form.fdrr : form.pod)).filter(Boolean)),
         ].sort();
         setUniquePOLs(pols);
         setUniquePODs(pods);
@@ -276,7 +276,7 @@ const View_rates = () => {
         }
 
         // POD filter
-        if (selectedPOD && item.pod !== selectedPOD) {
+        if (selectedPOD && (item.fdrr ? item.fdrr : item.pod) !== selectedPOD) {
           return false;
         }
 
