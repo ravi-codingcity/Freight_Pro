@@ -153,14 +153,14 @@ const Add_rates = () => {
 
   // Currency symbol helper function
   const getCurrencySymbol = (currency) => {
-    switch (currency) {
-      case "USD": return "$";
-      case "INR": return "₹";
-      case "EUR": return "€";
-      case "GBP": return "£";
-      case "JPY": return "¥";
-      default: return "$";
-    }
+    const symbols = {
+      USD: "$",
+      INR: "₹",
+      EUR: "€",
+      GBP: "£",
+      JPY: "¥",
+    };
+    return symbols[currency] || "$";
   };
 
   // Define the missing handleEdit function to populate the form with existing data
@@ -186,20 +186,26 @@ const Add_rates = () => {
     setCommodity(item.commodity || "");
     setRoute(item.route || "");
 
-    // Handle Ocean Freight with currency name
+    // Handle Ocean Freight with currency name - Fixed parsing
     if (item.ocean_freight) {
-      // Try to extract currency, symbol, and amount
-      const match = item.ocean_freight.match(/(USD|INR|EUR|GBP|JPY) ([₹$€£¥])([0-9.]*)/);
+      // Try to extract currency code, symbol, and amount from formats like "USD $1030" or "$100"
+      const match = item.ocean_freight.match(/(USD|INR|EUR|GBP|JPY)\s*([₹$€£¥])\s*([0-9.]*)/);
       if (match) {
-        setSelectedCurrency(match[1]);
-        setOcean_freight(`${match[1]} ${match[2]}${match[3]}`);
+        const [, currencyCode, symbol, amount] = match;
+        setSelectedCurrency(currencyCode);
+        setOcean_freight(`${currencyCode} ${symbol}${amount}`);
       } else {
-        // fallback: try to parse symbol and amount
-        const symbol = item.ocean_freight.match(/[₹$€£¥]/)?.[0] || "$";
-        const amount = item.ocean_freight.replace(/[^0-9.]/g, "");
-        const currency = getCurrencyFromSymbol(symbol);
-        setSelectedCurrency(currency);
-        setOcean_freight(`${currency} ${symbol}${amount}`);
+        // Fallback: try to parse symbol and amount only
+        const symbolMatch = item.ocean_freight.match(/([₹$€£¥])\s*([0-9.]*)/);
+        if (symbolMatch) {
+          const [, symbol, amount] = symbolMatch;
+          const currency = getCurrencyFromSymbol(symbol);
+          setSelectedCurrency(currency);
+          setOcean_freight(`${currency} ${symbol}${amount}`);
+        } else {
+          setOcean_freight('');
+          setSelectedCurrency('USD');
+        }
       }
     } else {
       setOcean_freight('');
@@ -225,11 +231,9 @@ const Add_rates = () => {
     setSelectedContainerSize(sizeCategory);
 
     // Handle ACD currency separately
-    // Extract currency from acd_ens_afr if possible
     if (item.acd_ens_afr) {
       const match = item.acd_ens_afr.match(/[₹$€£¥]/);
       if (match) {
-        // Set currency based on symbol
         const symbol = match[0];
         switch (symbol) {
           case "$":
@@ -566,7 +570,7 @@ const Add_rates = () => {
       "(20-26 ton)": "₹0",
       "(26+ ton)": "₹0",
     });
-    setCustomCharges([{ label: "", value: "", currency: "INR", unit: "" }]);
+    setCustomCharges([{ label: "", value: "", currency: "USD", unit: "" }]);
     setShowCustomCharges(true);
     setSubmitError(null);
 
@@ -856,13 +860,16 @@ const Add_rates = () => {
       const formattedMuc = currentCalculatorRates.muc.replace(/[₹$€£¥]/g, "") || "0";
       const formattedToll = currentCalculatorRates.toll.replace(/[₹$€£¥]/g, "") || "0";
 
-      // Format Ocean Freight with currency symbol
-      const oceanFreightCurrency = getCurrencySymbol(selectedCurrency);
-      const formattedOceanFreight = `${oceanFreightCurrency}${ocean_freight.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0"}`;
+      // Format Ocean Freight with currency code and symbol - FIXED
+      const oceanFreightValue = ocean_freight.split(" ").slice(1).join(" ") || "0"; // Get everything after currency code
+      const oceanFreightAmount = oceanFreightValue.replace(/[₹$€£¥]/g, "") || "0"; // Remove any symbols
+      const oceanFreightSymbol = getCurrencySymbol(selectedCurrency);
+      const formattedOceanFreight = `${selectedCurrency} ${oceanFreightSymbol}${oceanFreightAmount}`;
 
       // Format ACD/ENS/AFR with currency symbol
       const acdCurrencySymbol = getCurrencySymbol(acdCurrency);
-      const formattedAcdEnsAfr = acd_ens_afr ? `${acd_ens_afr.split(" ")[0]} ${acdCurrencySymbol}${acd_ens_afr.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0"}` : "";
+      const acdAmount = acd_ens_afr.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedAcdEnsAfr = acd_ens_afr ? `${acd_ens_afr.split(" ")[0]} ${acdCurrencySymbol}${acdAmount}` : "";
 
       // Format custom charges with currency symbols
       const formattedCustomCharges = customCharges.map(charge => ({
@@ -877,13 +884,8 @@ const Add_rates = () => {
         return;
       }
 
-      // Log the rates being submitted for debugging
-      console.log("Submitting rates:", {
-        bl_fees: formattedBlFees,
-        thc: formattedThc,
-        muc: formattedMuc,
-        toll: formattedToll
-      });
+      // Log the ocean freight being submitted for debugging
+      console.log("Submitting ocean freight:", formattedOceanFreight);
 
       if (editFormId) {
         // Editing existing form - Pass editFormId as the first parameter
@@ -1345,20 +1347,26 @@ const Add_rates = () => {
     setCommodity(item.commodity || "");
     setRoute(item.route || "");
 
-    // Handle Ocean Freight with currency name
+    // Handle Ocean Freight with currency name - Fixed parsing for copy
     if (item.ocean_freight) {
-      // Try to extract currency, symbol, and amount
-      const match = item.ocean_freight.match(/(USD|INR|EUR|GBP|JPY) ([₹$€£¥])([0-9.]*)/);
+      // Try to extract currency code, symbol, and amount from formats like "USD $1030" or "$100"
+      const match = item.ocean_freight.match(/(USD|INR|EUR|GBP|JPY)\s*([₹$€£¥])\s*([0-9.]*)/);
       if (match) {
-        setSelectedCurrency(match[1]);
-        setOcean_freight(`${match[1]} ${match[2]}${match[3]}`);
+        const [, currencyCode, symbol, amount] = match;
+        setSelectedCurrency(currencyCode);
+        setOcean_freight(`${currencyCode} ${symbol}${amount}`);
       } else {
-        // fallback: try to parse symbol and amount
-        const symbol = item.ocean_freight.match(/[₹$€£¥]/)?.[0] || "$";
-        const amount = item.ocean_freight.replace(/[^0-9.]/g, "");
-        const currency = getCurrencyFromSymbol(symbol);
-        setSelectedCurrency(currency);
-        setOcean_freight(`${currency} ${symbol}${amount}`);
+        // Fallback: try to parse symbol and amount only
+        const symbolMatch = item.ocean_freight.match(/([₹$€£¥])\s*([0-9.]*)/);
+        if (symbolMatch) {
+          const [, symbol, amount] = symbolMatch;
+          const currency = getCurrencyFromSymbol(symbol);
+          setSelectedCurrency(currency);
+          setOcean_freight(`${currency} ${symbol}${amount}`);
+        } else {
+          setOcean_freight('');
+          setSelectedCurrency('USD');
+        }
       }
     } else {
       setOcean_freight('');
@@ -1408,7 +1416,7 @@ const Add_rates = () => {
             setAcdCurrency("USD");
         }
       } else {
-        setAcdCurrency("USD");
+        setAcdCurrency("USD"); // Default if no currency symbol found
       }
     }
 
@@ -1994,7 +2002,7 @@ const Add_rates = () => {
                               )}
                           </div>
                         </div>
-                      </div>{" "}
+                                           </div>{" "}
                     </div>
 
                     {/* SECTION: Freight & Routing */}
@@ -2016,13 +2024,12 @@ const Add_rates = () => {
                                 className="appearance-none h-full px-3 border-0 bg-transparent focus:ring-0 focus:outline-none text-gray-700"
                                 value={selectedCurrency}
                                 onChange={(e) => {
-                                  setSelectedCurrency(e.target.value);
-                                  const amount = (() => {
-                                    const match = ocean_freight.match(/^[A-Z]{3} [₹$€£¥]([0-9.]*)$/);
-                                    return match ? match[1] : '';
-                                  })();
-                                  const symbol = getCurrencySymbol(e.target.value);
-                                  setOcean_freight(`${e.target.value} ${symbol}${amount}`);
+                                  const newCurrency = e.target.value;
+                                  setSelectedCurrency(newCurrency);
+                                  // Update ocean freight value with new currency
+                                  const currentAmount = ocean_freight.split(" ").slice(1).join(" ").replace(/[₹$€£¥]/g, "") || "";
+                                  const newSymbol = getCurrencySymbol(newCurrency);
+                                  setOcean_freight(`${newCurrency} ${newSymbol}${currentAmount}`);
                                 }}
                               >
                                 <option value="USD">USD $</option>
@@ -2037,12 +2044,15 @@ const Add_rates = () => {
                             </span>
                             <input
                               value={(() => {
-                                // Extract amount from 'USD $340'
-                                const match = ocean_freight.match(/^[A-Z]{3} [₹$€£¥]([0-9.]*)$/);
-                                return match ? match[1] : '';
+                                // Extract just the amount part for display
+                                const parts = ocean_freight.split(" ");
+                                if (parts.length > 1) {
+                                  return parts.slice(1).join(" ").replace(/[₹$€£¥]/g, "");
+                                }
+                                return "";
                               })()}
                               onChange={(e) => {
-                                const amount = e.target.value.replace(/[^0-9.]/g, '');
+                                const amount = e.target.value;
                                 const symbol = getCurrencySymbol(selectedCurrency);
                                 setOcean_freight(`${selectedCurrency} ${symbol}${amount}`);
                               }}
@@ -2240,7 +2250,7 @@ const Add_rates = () => {
                               />
                             </div>
                             <div className="relative shadow-sm rounded-md border border-blue-300 ">
-                              <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                              <div className="absolute inset-y-0 left-0 pl-2 pt-2 flex items-start pointer-events-none">
                                 <FaRegBookmark className="text-gray-400" />
                               </div>
                               <select
@@ -3062,7 +3072,7 @@ const Add_rates = () => {
                     </th>
                     <th
                       scope="col"
-                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-400"
+                      className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-gray-400"
                     >
                       Validity
                     </th>
