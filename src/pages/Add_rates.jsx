@@ -189,7 +189,9 @@ const Add_rates = () => {
     // Handle Ocean Freight with currency name - Fixed parsing
     if (item.ocean_freight) {
       // Try to extract currency code, symbol, and amount from formats like "USD $1030" or "$100"
-      const match = item.ocean_freight.match(/(USD|INR|EUR|GBP|JPY)\s*([₹$€£¥])\s*([0-9.]*)/);
+      const match = item.ocean_freight.match(
+        /(USD|INR|EUR|GBP|JPY)\s*([₹$€£¥])\s*([0-9.]*)/
+      );
       if (match) {
         const [, currencyCode, symbol, amount] = match;
         setSelectedCurrency(currencyCode);
@@ -203,13 +205,13 @@ const Add_rates = () => {
           setSelectedCurrency(currency);
           setOcean_freight(`${currency} ${symbol}${amount}`);
         } else {
-          setOcean_freight('');
-          setSelectedCurrency('USD');
+          setOcean_freight("");
+          setSelectedCurrency("USD");
         }
       }
     } else {
-      setOcean_freight('');
-      setSelectedCurrency('USD');
+      setOcean_freight("");
+      setSelectedCurrency("USD");
     }
 
     // Handle ACD/ENS/AFR
@@ -841,7 +843,14 @@ const Add_rates = () => {
     e.preventDefault();
     try {
       // Validate required fields
-      if (!por || !pol || !pod || !shipping_lines || !container_type || !ocean_freight) {
+      if (
+        !por ||
+        !pol ||
+        !pod ||
+        !shipping_lines ||
+        !container_type ||
+        !ocean_freight
+      ) {
         toast.error("Please fill in all required fields");
         return;
       }
@@ -851,30 +860,44 @@ const Add_rates = () => {
         bl_fees: currentRates.bl_fees || "0",
         thc: currentRates.thc || "0",
         muc: currentRates.muc || "0",
-        toll: currentRates.toll || "0"
+        toll: currentRates.toll || "0",
       };
 
       // Format monetary values by removing currency symbols and using calculator values
-      const formattedBlFees = currentCalculatorRates.bl_fees.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedThc = currentCalculatorRates.thc.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedMuc = currentCalculatorRates.muc.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedToll = currentCalculatorRates.toll.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedBlFees =
+        currentCalculatorRates.bl_fees.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedThc =
+        currentCalculatorRates.thc.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedMuc =
+        currentCalculatorRates.muc.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedToll =
+        currentCalculatorRates.toll.replace(/[₹$€£¥]/g, "") || "0";
 
       // Format Ocean Freight with currency code and symbol - FIXED
-      const oceanFreightValue = ocean_freight.split(" ").slice(1).join(" ") || "0"; // Get everything after currency code
-      const oceanFreightAmount = oceanFreightValue.replace(/[₹$€£¥]/g, "") || "0"; // Remove any symbols
+      const oceanFreightValue =
+        ocean_freight.split(" ").slice(1).join(" ") || "0"; // Get everything after currency code
+      const oceanFreightAmount =
+        oceanFreightValue.replace(/[₹$€£¥]/g, "") || "0"; // Remove any symbols
       const oceanFreightSymbol = getCurrencySymbol(selectedCurrency);
       const formattedOceanFreight = `${selectedCurrency} ${oceanFreightSymbol}${oceanFreightAmount}`;
 
       // Format ACD/ENS/AFR with currency symbol
       const acdCurrencySymbol = getCurrencySymbol(acdCurrency);
-      const acdAmount = acd_ens_afr.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedAcdEnsAfr = acd_ens_afr ? `${acd_ens_afr.split(" ")[0]} ${acdCurrencySymbol}${acdAmount}` : "";
+      const acdAmount =
+        acd_ens_afr.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedAcdEnsAfr = acd_ens_afr
+        ? `${acd_ens_afr.split(" ")[0]} ${acdCurrencySymbol}${acdAmount}`
+        : "";
 
       // Format custom charges with currency symbols
-      const formattedCustomCharges = customCharges.map(charge => ({
+      const formattedCustomCharges = customCharges.map((charge) => ({
         ...charge,
-        value: charge.value ? `${getCurrencySymbol(charge.currency)}${charge.value.replace(/[₹$€£¥]/g, "")}` : "0"
+        value: charge.value
+          ? `${getCurrencySymbol(charge.currency)}${charge.value.replace(
+              /[₹$€£¥]/g,
+              ""
+            )}`
+          : "0",
       }));
 
       // Get name from localStorage - Updated to use username instead of name
@@ -891,7 +914,7 @@ const Add_rates = () => {
         // Editing existing form - Pass editFormId as the first parameter
         await editForm(
           editFormId, // Pass the form ID first
-          username,   // Then pass the username
+          username, // Then pass the username
           formattedBlFees,
           formattedThc,
           formattedMuc,
@@ -958,7 +981,7 @@ const Add_rates = () => {
 
       // Clear form fields after successful submission
       clearFormFields();
-      
+
       // Refresh the rates list
       getUserForms();
     } catch (error) {
@@ -1350,7 +1373,9 @@ const Add_rates = () => {
     // Handle Ocean Freight with currency name - Fixed parsing for copy
     if (item.ocean_freight) {
       // Try to extract currency code, symbol, and amount from formats like "USD $1030" or "$100"
-      const match = item.ocean_freight.match(/(USD|INR|EUR|GBP|JPY)\s*([₹$€£¥])\s*([0-9.]*)/);
+      const match = item.ocean_freight.match(
+        /(USD|INR|EUR|GBP|JPY)\s*([₹$€£¥])\s*([0-9.]*)/
+      );
       if (match) {
         const [, currencyCode, symbol, amount] = match;
         setSelectedCurrency(currencyCode);
@@ -1364,13 +1389,13 @@ const Add_rates = () => {
           setSelectedCurrency(currency);
           setOcean_freight(`${currency} ${symbol}${amount}`);
         } else {
-          setOcean_freight('');
-          setSelectedCurrency('USD');
+          setOcean_freight("");
+          setSelectedCurrency("USD");
         }
       }
     } else {
-      setOcean_freight('');
-      setSelectedCurrency('USD');
+      setOcean_freight("");
+      setSelectedCurrency("USD");
     }
 
     // Handle ACD/ENS/AFR
@@ -1559,7 +1584,7 @@ const Add_rates = () => {
         // Add the new POD to the local state immediately
         addPOD(podInput);
         toast.success("New POD added successfully!");
-        
+
         // Force refresh the options
         refreshOptions();
       } catch (error) {
@@ -2002,7 +2027,7 @@ const Add_rates = () => {
                               )}
                           </div>
                         </div>
-                                           </div>{" "}
+                      </div>{" "}
                     </div>
 
                     {/* SECTION: Freight & Routing */}
@@ -2016,7 +2041,8 @@ const Add_rates = () => {
                         {/* Ocean Freight */}
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
-                            Ocean Freight <span className="text-red-500">*</span>
+                            Ocean Freight{" "}
+                            <span className="text-red-500">*</span>
                           </label>
                           <div className="mt-1 flex h-8 rounded-md border border-blue-300">
                             <span className="relative inline-flex items-center px-1 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
@@ -2027,9 +2053,17 @@ const Add_rates = () => {
                                   const newCurrency = e.target.value;
                                   setSelectedCurrency(newCurrency);
                                   // Update ocean freight value with new currency
-                                  const currentAmount = ocean_freight.split(" ").slice(1).join(" ").replace(/[₹$€£¥]/g, "") || "";
-                                  const newSymbol = getCurrencySymbol(newCurrency);
-                                  setOcean_freight(`${newCurrency} ${newSymbol}${currentAmount}`);
+                                  const currentAmount =
+                                    ocean_freight
+                                      .split(" ")
+                                      .slice(1)
+                                      .join(" ")
+                                      .replace(/[₹$€£¥]/g, "") || "";
+                                  const newSymbol =
+                                    getCurrencySymbol(newCurrency);
+                                  setOcean_freight(
+                                    `${newCurrency} ${newSymbol}${currentAmount}`
+                                  );
                                 }}
                               >
                                 <option value="USD">USD $</option>
@@ -2047,14 +2081,20 @@ const Add_rates = () => {
                                 // Extract just the amount part for display
                                 const parts = ocean_freight.split(" ");
                                 if (parts.length > 1) {
-                                  return parts.slice(1).join(" ").replace(/[₹$€£¥]/g, "");
+                                  return parts
+                                    .slice(1)
+                                    .join(" ")
+                                    .replace(/[₹$€£¥]/g, "");
                                 }
                                 return "";
                               })()}
                               onChange={(e) => {
                                 const amount = e.target.value;
-                                const symbol = getCurrencySymbol(selectedCurrency);
-                                setOcean_freight(`${selectedCurrency} ${symbol}${amount}`);
+                                const symbol =
+                                  getCurrencySymbol(selectedCurrency);
+                                setOcean_freight(
+                                  `${selectedCurrency} ${symbol}${amount}`
+                                );
                               }}
                               className="flex-1 min-w-0 block w-full rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-1"
                               placeholder="Enter Amount"
@@ -3068,7 +3108,7 @@ const Add_rates = () => {
                       scope="col"
                       className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-400"
                     >
-                     Ocean Freight
+                      Ocean Freight
                     </th>
                     <th
                       scope="col"
@@ -3153,13 +3193,14 @@ const Add_rates = () => {
                                   item.acd_ens_afr
                                 )
                                   ? ""
-                                  : item.acd_ens_afr}   {hasRemarks && (
-                                    <div title="Important Remark">
-                                      <span className="text-[10px] text-red-600 animate-pulse">
-                                        Please Read Remark
-                                      </span>
-                                    </div>
-                                  )}
+                                  : item.acd_ens_afr}{" "}
+                                {hasRemarks && (
+                                  <div title="Important Remark">
+                                    <span className="text-[10px] text-red-600 animate-pulse">
+                                      Please Read Remark
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             </td>
                             <td className="px-2 sm:px-2 py-2 whitespace-nowrap border-r border-gray-200">
@@ -3176,7 +3217,6 @@ const Add_rates = () => {
                                   {item.validity_for ? (
                                     <div className="text-center">
                                       {" "}
-                                      
                                       {item.validity_for}
                                     </div>
                                   ) : (
@@ -3227,7 +3267,7 @@ const Add_rates = () => {
                                 </button>
                                 <button
                                   onClick={() => handleCopy(item)}
-                                  className="font-semibold text-xs text-white rounded-md px-2 py-1 font-medium rounded text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 "
+                                  className=" text-xs  rounded-md px-2 py-1 font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 "
                                 >
                                   Copy
                                 </button>
@@ -3398,23 +3438,42 @@ const Add_rates = () => {
                                         <div className="mt-1 grid grid-cols-2 gap-2">
                                           {(() => {
                                             try {
-                                              const charges = typeof item.customCharges === 'string' 
-                                                ? JSON.parse(item.customCharges) 
-                                                : item.customCharges;
-                                              
-                                              if (Array.isArray(charges) && charges.length > 0) {
-                                                return charges.map((charge, index) => (
-                                                  <p key={index} className="text-xs font-medium">
-                                                    {charge.label}: {charge.value}
-                                                    {charge.unit && (
-                                                      <span className="text-gray-500"> {charge.unit}</span>
-                                                    )}
-                                                  </p>
-                                                ));
+                                              const charges =
+                                                typeof item.customCharges ===
+                                                "string"
+                                                  ? JSON.parse(
+                                                      item.customCharges
+                                                    )
+                                                  : item.customCharges;
+
+                                              if (
+                                                Array.isArray(charges) &&
+                                                charges.length > 0
+                                              ) {
+                                                return charges.map(
+                                                  (charge, index) => (
+                                                    <p
+                                                      key={index}
+                                                      className="text-xs font-medium"
+                                                    >
+                                                      {charge.label}:{" "}
+                                                      {charge.value}
+                                                      {charge.unit && (
+                                                        <span className="text-gray-500">
+                                                          {" "}
+                                                          {charge.unit}
+                                                        </span>
+                                                      )}
+                                                    </p>
+                                                  )
+                                                );
                                               }
                                               return null;
                                             } catch (error) {
-                                              console.error("Error parsing custom charges:", error);
+                                              console.error(
+                                                "Error parsing custom charges:",
+                                                error
+                                              );
                                               return null;
                                             }
                                           })()}
