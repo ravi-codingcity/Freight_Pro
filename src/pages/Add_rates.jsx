@@ -654,18 +654,18 @@ const Add_rates = () => {
         validity_for: validity_for || "",
         remarks: remarks || "",
         transit: transit || "",
-        customCharges: customCharges || [], // Save the array of custom charges
-        customLabel: customLabel || "", // Add old format
-        customValue: customValue || "", // Add old format
-        customUnit: customUnit || "", // Add unit for custom charges
+        customCharges: customCharges || "[]", // Save the array of custom charges
+        customLabel: customLabel || "", // Save old format for compatibility
+        customValue: customValue || "", // Save old format for compatibility
+        customUnit: customUnit || "", // Save unit for custom charges
         railFreightRates: safeRailFreightRates, // Ensure this is included in the payload
       };
 
       console.log("Full payload being submitted:", JSON.stringify(payload));
-      console.log(
-        "railFreightRates in payload:",
-        JSON.stringify(safeRailFreightRates)
-      );
+      console.log("customCharges in payload:", customCharges);
+      console.log("customLabel in payload:", customLabel);
+      console.log("customValue in payload:", customValue);
+      console.log("customUnit in payload:", customUnit);
 
       const response = await fetch(
         "https://freightpro-4kjlzqm0.b4a.run/api/forms/create",
@@ -804,12 +804,14 @@ const Add_rates = () => {
         validity_for: validity_for || "30",
         remarks: remarks || "",
         transit: transit || "",
-        customCharges: customCharges || "[]",
-        customLabel: customLabel || "",
-        customValue: customValue || "",
-        customUnit: customUnit || "",
+        customCharges: customCharges || "[]", // Store new format
+        customLabel: customLabel || "", // Store old format for compatibility
+        customValue: customValue || "", // Store old format for compatibility
+        customUnit: customUnit || "", // Store old format for compatibility
         railFreightRates: railFreightRates || {},
       };
+
+      console.log("Edit form data being submitted:", formattedData);
 
       const response = await fetch(
         `https://freightpro-4kjlzqm0.b4a.run/api/forms/${formId}`,
@@ -843,14 +845,7 @@ const Add_rates = () => {
     e.preventDefault();
     try {
       // Validate required fields
-      if (
-        !por ||
-        !pol ||
-        !pod ||
-        !shipping_lines ||
-        !container_type ||
-        !ocean_freight
-      ) {
+      if (!por || !pol || !pod || !shipping_lines || !container_type || !ocean_freight) {
         toast.error("Please fill in all required fields");
         return;
       }
@@ -860,45 +855,49 @@ const Add_rates = () => {
         bl_fees: currentRates.bl_fees || "0",
         thc: currentRates.thc || "0",
         muc: currentRates.muc || "0",
-        toll: currentRates.toll || "0",
+        toll: currentRates.toll || "0"
       };
 
       // Format monetary values by removing currency symbols and using calculator values
-      const formattedBlFees =
-        currentCalculatorRates.bl_fees.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedThc =
-        currentCalculatorRates.thc.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedMuc =
-        currentCalculatorRates.muc.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedToll =
-        currentCalculatorRates.toll.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedBlFees = currentCalculatorRates.bl_fees.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedThc = currentCalculatorRates.thc.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedMuc = currentCalculatorRates.muc.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedToll = currentCalculatorRates.toll.replace(/[₹$€£¥]/g, "") || "0";
 
       // Format Ocean Freight with currency code and symbol - FIXED
-      const oceanFreightValue =
-        ocean_freight.split(" ").slice(1).join(" ") || "0"; // Get everything after currency code
-      const oceanFreightAmount =
-        oceanFreightValue.replace(/[₹$€£¥]/g, "") || "0"; // Remove any symbols
+      const oceanFreightValue = ocean_freight.split(" ").slice(1).join(" ") || "0"; // Get everything after currency code
+      const oceanFreightAmount = oceanFreightValue.replace(/[₹$€£¥]/g, "") || "0"; // Remove any symbols
       const oceanFreightSymbol = getCurrencySymbol(selectedCurrency);
       const formattedOceanFreight = `${selectedCurrency} ${oceanFreightSymbol}${oceanFreightAmount}`;
 
       // Format ACD/ENS/AFR with currency symbol
       const acdCurrencySymbol = getCurrencySymbol(acdCurrency);
-      const acdAmount =
-        acd_ens_afr.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedAcdEnsAfr = acd_ens_afr
-        ? `${acd_ens_afr.split(" ")[0]} ${acdCurrencySymbol}${acdAmount}`
-        : "";
+      const acdAmount = acd_ens_afr.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedAcdEnsAfr = acd_ens_afr ? `${acd_ens_afr.split(" ")[0]} ${acdCurrencySymbol}${acdAmount}` : "";
 
-      // Format custom charges with currency symbols
-      const formattedCustomCharges = customCharges.map((charge) => ({
-        ...charge,
-        value: charge.value
-          ? `${getCurrencySymbol(charge.currency)}${charge.value.replace(
-              /[₹$€£¥]/g,
-              ""
-            )}`
-          : "0",
-      }));
+      // Format custom charges with currency symbols for new format
+      const formattedCustomCharges = customCharges
+        .filter(charge => charge.label && charge.value) // Only include charges with both label and value
+        .map(charge => ({
+          ...charge,
+          value: charge.value ? `${getCurrencySymbol(charge.currency)}${charge.value.replace(/[₹$€£¥]/g, "")}` : "0"
+        }));
+
+      // Format custom charges for old format (backward compatibility)
+      const customLabels = customCharges
+        .filter(charge => charge.label && charge.value)
+        .map(charge => charge.label);
+      const customValues = customCharges
+        .filter(charge => charge.label && charge.value)
+        .map(charge => `${getCurrencySymbol(charge.currency)}${charge.value.replace(/[₹$€£¥]/g, "")}`);
+      const customUnits = customCharges
+        .filter(charge => charge.label && charge.value)
+        .map(charge => charge.unit || "");
+
+      // Join with delimiter for old format
+      const formattedCustomLabel = customLabels.join("|||");
+      const formattedCustomValue = customValues.join("|||");
+      const formattedCustomUnit = customUnits.join("|||");
 
       // Get name from localStorage - Updated to use username instead of name
       const username = localStorage.getItem("username");
@@ -907,14 +906,21 @@ const Add_rates = () => {
         return;
       }
 
-      // Log the ocean freight being submitted for debugging
-      console.log("Submitting ocean freight:", formattedOceanFreight);
+      // Log the custom charges being submitted for debugging
+      console.log("Submitting custom charges:", {
+        newFormat: formattedCustomCharges,
+        oldFormat: {
+          label: formattedCustomLabel,
+          value: formattedCustomValue,
+          unit: formattedCustomUnit
+        }
+      });
 
       if (editFormId) {
         // Editing existing form - Pass editFormId as the first parameter
         await editForm(
           editFormId, // Pass the form ID first
-          username, // Then pass the username
+          username,   // Then pass the username
           formattedBlFees,
           formattedThc,
           formattedMuc,
@@ -937,10 +943,10 @@ const Add_rates = () => {
           validity_for,
           remarks,
           transit,
-          JSON.stringify(formattedCustomCharges), // Store only the new format
-          "", // Remove old format fields
-          "",
-          "",
+          JSON.stringify(formattedCustomCharges), // Store the new format
+          formattedCustomLabel, // Store old format for compatibility
+          formattedCustomValue,
+          formattedCustomUnit,
           JSON.stringify(railFreightRates)
         );
         toast.success("Rate filing updated successfully!");
@@ -970,10 +976,10 @@ const Add_rates = () => {
           validity_for,
           remarks,
           transit,
-          JSON.stringify(formattedCustomCharges), // Store only the new format
-          "", // Remove old format fields
-          "",
-          "",
+          JSON.stringify(formattedCustomCharges), // Store the new format
+          formattedCustomLabel, // Store old format for compatibility
+          formattedCustomValue,
+          formattedCustomUnit,
           JSON.stringify(railFreightRates)
         );
         toast.success("Rate filing created successfully!");
@@ -981,7 +987,7 @@ const Add_rates = () => {
 
       // Clear form fields after successful submission
       clearFormFields();
-
+      
       // Refresh the rates list
       getUserForms();
     } catch (error) {
@@ -1445,12 +1451,13 @@ const Add_rates = () => {
       }
     }
 
-    // Handle custom charges
+    // Handle custom charges - different formats possible
     if (
       item.customCharges &&
       Array.isArray(item.customCharges) &&
       item.customCharges.length > 0
     ) {
+      // New format: array of objects
       setCustomCharges(
         item.customCharges.map((charge) => ({
           label: charge.label || "",
@@ -1460,21 +1467,23 @@ const Add_rates = () => {
         }))
       );
     } else if (item.customLabel && item.customValue) {
-      if (
-        item.customLabel.includes("|||") &&
-        item.customValue.includes("|||")
-      ) {
+      // Old format: delimited strings
+      if (item.customLabel.includes("|||")) {
+        // Multiple custom charges
         const labels = item.customLabel.split("|||");
         const values = item.customValue.split("|||");
         const units = item.customUnit ? item.customUnit.split("|||") : [];
+
         const charges = labels.map((label, i) => ({
           label: label || "",
           value: values[i] ? values[i].replace(/[₹$€£¥]/g, "") : "",
           currency: getCurrencyFromSymbol(values[i]) || "USD",
           unit: units[i] || "",
         }));
+
         setCustomCharges(charges);
       } else {
+        // Single custom charge
         setCustomCharges([
           {
             label: item.customLabel || "",
@@ -1487,6 +1496,7 @@ const Add_rates = () => {
         ]);
       }
     } else {
+      // No custom charges found, set default
       setCustomCharges([{ label: "", value: "", currency: "USD", unit: "" }]);
     }
 
