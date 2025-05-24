@@ -229,40 +229,103 @@ export const getPODOptions = () => {
   ];
 };
 
-// Function to fetch POD options from API if needed in the future
+// Function to fetch POD options from API
 export const fetchPODOptions = async () => {
   try {
-    // This function can be expanded later to fetch from an API
-    // For now, returning the static list
-    return getPODOptions();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No authentication token found");
+      return getPODOptions(); // Fallback to static list
+    }
+
+    const response = await fetch(
+      "https://freightpro-4kjlzqm0.b4a.run/api/forms/all",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch POD options");
+    }
+
+    const forms = await response.json();
+    
+    // Extract unique PODs from forms
+    const dynamicPODs = [...new Set(forms.map(form => form.pod).filter(Boolean))];
+    
+    // Combine with static options and remove duplicates
+    const allPODs = [...new Set([...getPODOptions(), ...dynamicPODs])].sort();
+    
+    return allPODs;
   } catch (error) {
     console.error("Error fetching POD options:", error);
     return getPODOptions(); // Fallback to static list
   }
 };
 
+// Function to add a new POD to the existing list
+export const addNewPOD = (currentOptions, newPOD) => {
+  if (!newPOD || currentOptions.includes(newPOD)) {
+    return currentOptions;
+  }
+  return [...currentOptions, newPOD].sort();
+};
+
 // React hook for consuming POD options in components
 export const usePODOptions = () => {
-  const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState(getPODOptions()); // Initialize with static options
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [lastFetchTime, setLastFetchTime] = useState(0);
+
+  const fetchOptions = async (forceRefresh = false) => {
+    // Only fetch if it's been more than 5 seconds since last fetch or if force refresh
+    const now = Date.now();
+    if (!forceRefresh && now - lastFetchTime < 5000) {
+      return;
+    }
+
+    try {
+      const result = await fetchPODOptions();
+      if (Array.isArray(result)) {
+        setOptions(result);
+        setLastFetchTime(now);
+      }
+    } catch (err) {
+      setError(err.message);
+      // Keep the static options if there's an error
+      setOptions(getPODOptions());
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const getOptions = async () => {
-      try {
-        const result = await fetchPODOptions();
-        setOptions(result);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getOptions();
+    fetchOptions(true); // Initial fetch
   }, []);
 
-  return { options, loading, error };
+  const addPOD = (newPOD) => {
+    if (!newPOD || options.includes(newPOD)) {
+      return;
+    }
+    
+    // Immediately update local state
+    setOptions(prevOptions => [...prevOptions, newPOD].sort());
+    
+    // Force refresh from server
+    fetchOptions(true);
+  };
+
+  const refreshOptions = () => {
+    fetchOptions(true);
+  };
+
+  return { options, loading, error, addPOD, refreshOptions };
 };
 
 export default getPODOptions;

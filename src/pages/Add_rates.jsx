@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { TbRoute } from "react-icons/tb";
 import { TbCircleLetterR } from "react-icons/tb";
 import { LuRefreshCcw } from "react-icons/lu";
-import { RiShip2Line } from "react-icons/ri";
 import { IoLocationOutline } from "react-icons/io5";
 import { LuTruck } from "react-icons/lu";
 import { TbReceiptTax } from "react-icons/tb";
@@ -30,7 +29,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Navbar from "../components/Navbar";
 import { getPOROptions } from "../components/POR";
 import { getPOLOptions } from "../components/POL";
-import { getPODOptions } from "../components/POD";
+import { fetchPODOptions, usePODOptions } from "../components/POD";
 import { getShippingLinesOptions } from "../components/Shipping_lines";
 import { getRatesByPortAndLine } from "../components/Origin_rates";
 import { getRailFreightRates } from "../components/Rail_freightrates";
@@ -46,6 +45,7 @@ import {
   prefetchShippingLineContactDetails,
   clearShippingLineContactCache, // <-- Add this import
 } from "../components/ShippingLine_PersonDetails";
+import { toast } from "react-toastify";
 
 const Add_rates = () => {
   // Basic form state variables
@@ -55,6 +55,9 @@ const Add_rates = () => {
   const [por, setpor] = useState("");
   const [pol, setpol] = useState("");
   const [pod, setpod] = useState("");
+  const [podInput, setPodInput] = useState(""); // Add this line
+  const [podSuggestions, setPodSuggestions] = useState([]); // Add this line
+  const [showPodSuggestions, setShowPodSuggestions] = useState(false); // Add this line
   const [fdrr, setfdrr] = useState("");
   const [shipping_lines, setshipping_lines] = useState("");
   const [shipping_name, setshipping_name] = useState("");
@@ -96,7 +99,13 @@ const Add_rates = () => {
   // OPTIONS STATE - DEFINE THESE ONLY ONCE!
   const [porOptions, setPorOptions] = useState([]);
   const [polOptions, setPolOptions] = useState([]);
-  const [podOptions, setPodOptions] = useState([]);
+  const {
+    options: podOptions,
+    loading: podLoading,
+    error: podError,
+    addPOD,
+    refreshOptions,
+  } = usePODOptions();
   const [shippingLinesOptions, setShippingLinesOptions] = useState([]);
   const [optionsLoaded, setOptionsLoaded] = useState(false);
 
@@ -131,6 +140,9 @@ const Add_rates = () => {
   const [contactSuggestionsLoading, setContactSuggestionsLoading] =
     useState(false);
 
+  // Add this with other state declarations at the top
+  const [selectedCurrency, setSelectedCurrency] = useState("USD");
+
   // Define toggle row expansion function
   const toggleRowExpansion = (id) => {
     setExpandedRows((prev) => ({
@@ -140,34 +152,30 @@ const Add_rates = () => {
   };
 
   // Currency symbol helper function
-  const getCurrencySymbol = (currencyCode) => {
-    switch (currencyCode) {
-      case "USD":
-        return "$";
-      case "EUR":
-        return "€";
-      case "GBP":
-        return "£";
-      case "JPY":
-        return "¥";
-      case "INR":
-        return "₹";
-      default:
-        return "$";
+  const getCurrencySymbol = (currency) => {
+    switch (currency) {
+      case "USD": return "$";
+      case "INR": return "₹";
+      case "EUR": return "€";
+      case "GBP": return "£";
+      case "JPY": return "¥";
+      default: return "$";
     }
   };
 
   // Define the missing handleEdit function to populate the form with existing data
   const handleEdit = (item) => {
     console.log("Editing item:", item);
-
-    // Set the editFormId first so we know we're in edit mode
     setEditFormId(item._id);
-
-    // Populate basic fields
+    setName(item.name || "");
+    setbl_fees(item.bl_fees || "");
+    setthc(item.thc || "");
+    setmuc(item.muc || "");
+    settoll(item.toll || "");
     setpor(item.por || "");
     setpol(item.pol || "");
     setpod(item.pod || "");
+    setPodInput(item.pod || "");
     setfdrr(item.fdrr || "");
     setshipping_lines(item.shipping_lines || "");
     setshipping_name(item.shipping_name || "");
@@ -177,7 +185,28 @@ const Add_rates = () => {
     setContainer_type(item.container_type || "");
     setCommodity(item.commodity || "");
     setRoute(item.route || "");
-    setOcean_freight(item.ocean_freight || "");
+
+    // Handle Ocean Freight with currency name
+    if (item.ocean_freight) {
+      // Try to extract currency, symbol, and amount
+      const match = item.ocean_freight.match(/(USD|INR|EUR|GBP|JPY) ([₹$€£¥])([0-9.]*)/);
+      if (match) {
+        setSelectedCurrency(match[1]);
+        setOcean_freight(`${match[1]} ${match[2]}${match[3]}`);
+      } else {
+        // fallback: try to parse symbol and amount
+        const symbol = item.ocean_freight.match(/[₹$€£¥]/)?.[0] || "$";
+        const amount = item.ocean_freight.replace(/[^0-9.]/g, "");
+        const currency = getCurrencyFromSymbol(symbol);
+        setSelectedCurrency(currency);
+        setOcean_freight(`${currency} ${symbol}${amount}`);
+      }
+    } else {
+      setOcean_freight('');
+      setSelectedCurrency('USD');
+    }
+
+    // Handle ACD/ENS/AFR
     setacd_ens_afr(() => {
       if (!item.acd_ens_afr) return "";
       // Split and strip currency symbol from amount
@@ -185,6 +214,7 @@ const Add_rates = () => {
       const amount = amountRaw ? amountRaw.replace(/[₹$€£¥]/g, "") : "";
       return `${type || "ACD"} ${amount}`.trim();
     });
+
     setValidity(item.validity || "");
     setValidity_for(item.validity_for || "");
     setRemarks(item.remarks || "");
@@ -333,39 +363,40 @@ const Add_rates = () => {
   useEffect(() => {
     console.log("Loading dropdown options...");
 
-    try {
-      // Load options
-      const porData = getPOROptions();
-      const polData = getPOLOptions();
-      const podData = getPODOptions();
-      const shippingLines = getShippingLinesOptions();
+    const loadOptions = async () => {
+      try {
+        // Load options
+        const porData = getPOROptions();
+        const polData = getPOLOptions();
+        const shippingLines = getShippingLinesOptions();
 
-      console.log("Raw POR data:", porData);
+        console.log("Raw POR data:", porData);
 
-      // Set state with proper handling - PROPERLY HANDLE ARRAYS!
-      if (Array.isArray(porData)) {
-        setPorOptions(porData);
-        console.log("POR options set:", porData.length, "items");
-      } else {
-        console.error("POR data is not an array:", porData);
+        // Set state with proper handling - PROPERLY HANDLE ARRAYS!
+        if (Array.isArray(porData)) {
+          setPorOptions(porData);
+          console.log("POR options set:", porData.length, "items");
+        } else {
+          console.error("POR data is not an array:", porData);
+          setPorOptions([]);
+        }
+
+        setPolOptions(Array.isArray(polData) ? polData : []);
+        setShippingLinesOptions(
+          Array.isArray(shippingLines) ? shippingLines : []
+        );
+
+        setOptionsLoaded(true);
+      } catch (error) {
+        console.error("Error loading dropdown options:", error);
+        // Set empty arrays as fallback
         setPorOptions([]);
+        setPolOptions([]);
+        setShippingLinesOptions([]);
       }
+    };
 
-      setPodOptions(Array.isArray(podData) ? podData : []);
-      setPolOptions(Array.isArray(polData) ? polData : []);
-      setShippingLinesOptions(
-        Array.isArray(shippingLines) ? shippingLines : []
-      );
-
-      setOptionsLoaded(true);
-    } catch (error) {
-      console.error("Error loading dropdown options:", error);
-      // Set empty arrays as fallback
-      setPorOptions([]);
-      setPolOptions([]);
-      setPodOptions([]);
-      setShippingLinesOptions([]);
-    }
+    loadOptions();
   }, []); // Empty dependency array - run once on mount
 
   // useEffect for user data and forms
@@ -499,13 +530,16 @@ const Add_rates = () => {
 
   // Enhance clearFormFields to reset everything completely
   const clearFormFields = () => {
-    // Keep the user's name but clear everything else
-    const currentName = name;
-
-    // Reset all form fields
+    setEditFormId(null);
+    setShowDescription(false);
+    setShowRouteDescription(false);
+    setName("");
     setpor("");
     setpol("");
     setpod("");
+    setPodInput(""); // Add this line to reset podInput
+    setPodSuggestions([]); // Add this line to reset suggestions
+    setShowPodSuggestions(false); // Add this line to hide suggestions
     setfdrr("");
     setshipping_lines("");
     setshipping_name("");
@@ -514,42 +548,26 @@ const Add_rates = () => {
     setshipping_email("");
     setContainer_type("");
     setCommodity("");
+    setRoute("");
     setOcean_freight("");
     setacd_ens_afr("");
-    setAcdCurrency("USD"); // Also reset ACD currency
+    setAcdCurrency("USD");
     setValidity("");
     setValidity_for("");
     setRemarks("");
-    setRoute("");
     setTransittime("");
     setbl_fees("");
     setthc("");
     setmuc("");
     settoll("");
-
-    setSelectedContainerSize(null);
-
-    // Reset UI state
-    setShowDescription(false);
-    setShowRouteDescription(false);
-    setShowCustomCharges(true);
-    setCustomCharges([{ label: "", value: "", currency: "USD", unit: "" }]);
-
-    // Reset weight rates (optional, as it's static now, but good practice)
     setRailFreightRates({
       "(0-10 ton)": "₹0",
       "(10-20 ton)": "₹0",
       "(20-26 ton)": "₹0",
       "(26+ ton)": "₹0",
     });
-
-    // Reset edit mode
-    setEditFormId(null);
-
-    // Restore the user's name
-    setName(currentName);
-
-    // Clear any error messages
+    setCustomCharges([{ label: "", value: "", currency: "INR", unit: "" }]);
+    setShowCustomCharges(true);
     setSubmitError(null);
 
     console.log("Form fields have been cleared");
@@ -730,66 +748,62 @@ const Add_rates = () => {
     remarks,
     transit,
     customCharges,
-    customLabel, // Add parameter
-    customValue, // Add parameter
-    customUnit, // Add parameter
-    railFreightRates // Make sure this parameter is included
+    customLabel,
+    customValue,
+    customUnit,
+    railFreightRates
   ) {
-    setIsSubmitting(true);
-    setSubmitError(null);
-
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        // If no token, treat as an auth error
         handleAuthError({ message: "token not found" });
         return false;
       }
 
-      // Use railFreightRates as-is, with currency symbols included
-      const safeRailFreightRates = railFreightRates || {
-        "(0-10 ton)": "₹0",
-        "(10-20 ton)": "₹0",
-        "(20-26 ton)": "₹0",
-        "(26+ ton)": "₹0",
+      // Ensure all required fields are present
+      if (
+        !name ||
+        !por ||
+        !pol ||
+        !pod ||
+        !shipping_lines ||
+        !container_type ||
+        !ocean_freight
+      ) {
+        throw new Error("Please fill in all required fields");
+      }
+
+      // Format the data for submission
+      const formattedData = {
+        name,
+        bl_fees: bl_fees || "0",
+        thc: thc || "0",
+        muc: muc || "0",
+        toll: toll || "0",
+        por,
+        pol,
+        pod,
+        fdrr: fdrr || "",
+        shipping_lines,
+        shipping_name: shipping_name || "",
+        shipping_number: shipping_number || "",
+        shipping_address: shipping_address || "",
+        shipping_email: shipping_email || "",
+        container_type,
+        commodity: commodity || "",
+        route: route || "",
+        ocean_freight,
+        acd_ens_afr: acd_ens_afr || "",
+        validity: validity || new Date().toISOString(),
+        validity_for: validity_for || "30",
+        remarks: remarks || "",
+        transit: transit || "",
+        customCharges: customCharges || "[]",
+        customLabel: customLabel || "",
+        customValue: customValue || "",
+        customUnit: customUnit || "",
+        railFreightRates: railFreightRates || {},
       };
-
-      // Convert customCharges array to string as expected by the backend
-      const stringifiedCustomCharges = JSON.stringify(customCharges);
-
-      console.log(
-        "Edit payload with railFreightRates:",
-        JSON.stringify({
-          name,
-          bl_fees,
-          thc,
-          muc,
-          toll,
-          por,
-          pol,
-          pod,
-          fdrr, // Include fdrr in the payload
-          shipping_lines,
-          shipping_name,
-          shipping_number,
-          shipping_address,
-          shipping_email,
-          container_type,
-          commodity,
-          route,
-          ocean_freight,
-          acd_ens_afr,
-          validity,
-          validity_for,
-          remarks,
-          transit,
-          customCharges: stringifiedCustomCharges, // Send as string instead of array
-          customLabel, // For backward compatibility
-          customValue, // For backward compatibility
-          customUnit, // For backward compatibility
-          railFreightRates: safeRailFreightRates, // Include rail freight rates with currency
-        })
-      );
 
       const response = await fetch(
         `https://freightpro-4kjlzqm0.b4a.run/api/forms/${formId}`,
@@ -798,275 +812,156 @@ const Add_rates = () => {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            Pragma: "no-cache",
           },
-          body: JSON.stringify({
-            name,
-            bl_fees,
-            thc,
-            muc,
-            toll,
-            por,
-            pol,
-            pod,
-            fdrr, // Include fdrr in the payload
-            shipping_lines,
-            shipping_name,
-            shipping_number,
-            shipping_address,
-            shipping_email,
-            container_type,
-            commodity,
-            route,
-            ocean_freight,
-            acd_ens_afr,
-            validity,
-            validity_for,
-            remarks,
-            transit,
-            customCharges: stringifiedCustomCharges, // Send as string instead of array
-            customLabel, // For backward compatibility
-            customValue, // For backward compatibility
-            customUnit, // For backward compatibility
-            railFreightRates: safeRailFreightRates, // Include rail freight rates with currency
-          }),
+          body: JSON.stringify(formattedData),
         }
       );
-
-      // Check for authentication errors
-      if (response.status === 401) {
-        handleAuthError({ response: { status: 401 } });
-        return false;
-      }
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Failed to update form");
       }
 
-      const data = await response.json();
-      console.log("Form updated successfully:", data);
-
-      // Clear form fields immediately after successful update
-      clearFormFields();
-
-      // Reset edit mode immediately after successful update
-      setEditFormId(null);
-
-      // Delay fetching the updated forms list to ensure the server has processed the change
-      setTimeout(() => {
-        getUserForms();
-        setIsSubmitting(false);
-      }, 800); // Increase delay to 800ms to give server more time
-
       return true;
     } catch (error) {
       console.error("Error updating form:", error);
-      // Check if this is an auth error
-      if (!handleAuthError(error)) {
-        // Only set other errors if not an auth error
-        setSubmitError(
-          error.message || "Failed to update form. Please try again."
-        );
-      }
-      setIsSubmitting(false);
+      setSubmitError(
+        error.message || "Failed to update form. Please try again."
+      );
       return false;
     }
   }
 
-  // Update the handleSubmit function to combine multiple custom charges
+  // Update the handleSubmit function to properly format the charges
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Prevent multiple submissions
-    if (isSubmitting) {
-      return;
-    }
-
-    // Basic form validation
-    if (
-      !por ||
-      !pol ||
-      !pod ||
-      !shipping_lines ||
-      !shipping_name ||
-      !shipping_number ||
-      !shipping_address ||
-      !shipping_email ||
-      !container_type ||
-      !ocean_freight ||
-      !validity ||
-      !validity_for
-    ) {
-      setSubmitError("Please fill in all required fields");
-      return;
-    }
-
-    // Get BL fees from the currentRates (Origin Rate Calculator)
-    const bl_fees_value = currentRates.bl_fees;
-    const thc_value = currentRates.thc;
-    const muc_value = currentRates.muc;
-    const toll_value = currentRates.toll;
-
-    // Format the ocean freight and acd_ens_afr with currency symbols
-    const oceanCurrency = ocean_freight.split(" ")[0] || "USD";
-    const oceanCurrencySymbol = getCurrencySymbol(oceanCurrency);
-    const acdCurrencySymbol = getCurrencySymbol(acdCurrency);
-
-    let ocean_freight_with_symbol = ocean_freight;
-    if (
-      ocean_freight.indexOf(oceanCurrencySymbol) === -1 &&
-      ocean_freight.split(" ").length > 1
-    ) {
-      ocean_freight_with_symbol = `${oceanCurrency} ${oceanCurrencySymbol}${
-        ocean_freight.split(" ")[1]
-      }`;
-    }
-    let acd_ens_afr_with_symbol = "";
-    if (acd_ens_afr && acd_ens_afr.split(" ")[1]) {
-      const chargeType = acd_ens_afr.split(" ")[0] || "ACD";
-      let chargeAmount = acd_ens_afr.split(" ")[1] || "";
-      // Only add symbol if not present
-      if (!/^[₹$€£¥]/.test(chargeAmount)) {
-        chargeAmount = `${acdCurrencySymbol}${chargeAmount}`;
-      }
-      acd_ens_afr_with_symbol = `${chargeType} ${chargeAmount}`;
-    }
-
-    // Format custom charges with currency symbols and combine for backend
-    const formattedCustomCharges = customCharges.map((charge) => ({
-      ...charge,
-      value: `${getCurrencySymbol(charge.currency)}${charge.value}`,
-      // unit is already present and will be sent to backend
-    }));
-
-    // We need to stringify customCharges for both create and edit operations
-    const stringifiedCustomCharges = JSON.stringify(formattedCustomCharges);
-
-    // For backend compatibility, combine all custom charges into single strings
-    // Use a special delimiter "|||" to separate multiple charges
-    let customLabel = "";
-    let customValue = "";
-    let customUnit = "";
-
-    if (
-      customCharges.length > 0 &&
-      (customCharges[0].label || customCharges[0].value)
-    ) {
-      customLabel = formattedCustomCharges.map((c) => c.label).join("|||");
-      customValue = formattedCustomCharges.map((c) => c.value).join("|||");
-      customUnit = formattedCustomCharges.map((c) => c.unit || "").join("|||");
-    }
-
-    // Instead of removing currency symbols from rail freight rates,
-    // let's preserve them by just making a copy without modifications
-    const formattedRailFreightRates = { ...railFreightRates };
-
-    console.log("Original Rail Freight Rates:", railFreightRates);
-    console.log(
-      "Formatted Rail Freight Rates for submission:",
-      formattedRailFreightRates
-    );
-
-    // Create a unique submission ID to prevent duplicate submissions
-    const submissionId = Date.now().toString();
-    const lastSubmission = localStorage.getItem("lastFormSubmission");
-
-    // Check if this is a duplicate submission within 2 seconds
-    if (lastSubmission && Date.now() - parseInt(lastSubmission) < 2000) {
-      console.log("Preventing duplicate submission");
-      setSubmitError("Please wait a moment before submitting again");
-      return;
-    }
-
-    // Record this submission timestamp
-    localStorage.setItem("lastFormSubmission", Date.now().toString());
-
-    let success;
     try {
-      if (editFormId) {
-        success = await editForm(
-          editFormId,
-          name,
-          bl_fees_value,
-          thc_value,
-          muc_value,
-          toll_value,
-          por,
-          pol,
-          pod,
-          fdrr, // Include fdrr in the payload
-          shipping_lines,
-          shipping_name,
-          shipping_number,
-          shipping_address,
-          shipping_email,
-          container_type,
-          commodity,
-          route,
-          ocean_freight_with_symbol,
-          acd_ens_afr_with_symbol,
-          validity,
-          validity_for,
-          remarks,
-          transit,
-          stringifiedCustomCharges, // Pass the stringified version
-          customLabel,
-          customValue,
-          customUnit,
-          formattedRailFreightRates // Pass the rail freight rates with currency
-        );
-      } else {
-        success = await createForm(
-          name,
-          bl_fees_value,
-          thc_value,
-          muc_value,
-          toll_value,
-          por,
-          pol,
-          pod,
-          fdrr, // Include fdrr in the payload
-          shipping_lines,
-          shipping_name,
-          shipping_number,
-          shipping_address,
-          shipping_email,
-          container_type,
-          commodity,
-          route,
-          ocean_freight_with_symbol,
-          acd_ens_afr_with_symbol,
-          validity,
-          validity_for,
-          remarks,
-          transit,
-          formattedCustomCharges, // Send formatted array
-          customLabel, // Send combined string
-          customValue, // Send combined string
-          customUnit, // Send unit for custom charges
-          formattedRailFreightRates // Pass the rail freight rates with currency
-        );
+      // Validate required fields
+      if (!por || !pol || !pod || !shipping_lines || !container_type || !ocean_freight) {
+        toast.error("Please fill in all required fields");
+        return;
       }
 
-      // If the submission was successful but for some reason the fields weren't cleared
-      // (belt and suspenders approach), clear them again here
-      if (success) {
-        clearFormFields();
-        // Clear the contact cache and refresh suggestions for the selected shipping line
-        clearShippingLineContactCache();
-        if (shipping_lines) {
-          setContactSuggestionsLoading(true);
-          getContactSuggestions(shipping_lines).then((suggestions) => {
-            setContactSuggestions(suggestions);
-            setContactSuggestionsLoading(false);
-          });
-        }
+      // Get the current rates from the calculator
+      const currentCalculatorRates = {
+        bl_fees: currentRates.bl_fees || "0",
+        thc: currentRates.thc || "0",
+        muc: currentRates.muc || "0",
+        toll: currentRates.toll || "0"
+      };
+
+      // Format monetary values by removing currency symbols and using calculator values
+      const formattedBlFees = currentCalculatorRates.bl_fees.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedThc = currentCalculatorRates.thc.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedMuc = currentCalculatorRates.muc.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedToll = currentCalculatorRates.toll.replace(/[₹$€£¥]/g, "") || "0";
+
+      // Format Ocean Freight with currency symbol
+      const oceanFreightCurrency = getCurrencySymbol(selectedCurrency);
+      const formattedOceanFreight = `${oceanFreightCurrency}${ocean_freight.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0"}`;
+
+      // Format ACD/ENS/AFR with currency symbol
+      const acdCurrencySymbol = getCurrencySymbol(acdCurrency);
+      const formattedAcdEnsAfr = acd_ens_afr ? `${acd_ens_afr.split(" ")[0]} ${acdCurrencySymbol}${acd_ens_afr.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0"}` : "";
+
+      // Format custom charges with currency symbols
+      const formattedCustomCharges = customCharges.map(charge => ({
+        ...charge,
+        value: charge.value ? `${getCurrencySymbol(charge.currency)}${charge.value.replace(/[₹$€£¥]/g, "")}` : "0"
+      }));
+
+      // Get name from localStorage - Updated to use username instead of name
+      const username = localStorage.getItem("username");
+      if (!username) {
+        toast.error("User session expired. Please login again.");
+        return;
       }
+
+      // Log the rates being submitted for debugging
+      console.log("Submitting rates:", {
+        bl_fees: formattedBlFees,
+        thc: formattedThc,
+        muc: formattedMuc,
+        toll: formattedToll
+      });
+
+      if (editFormId) {
+        // Editing existing form - Pass editFormId as the first parameter
+        await editForm(
+          editFormId, // Pass the form ID first
+          username,   // Then pass the username
+          formattedBlFees,
+          formattedThc,
+          formattedMuc,
+          formattedToll,
+          por,
+          pol,
+          pod,
+          fdrr,
+          shipping_lines,
+          shipping_name,
+          shipping_number,
+          shipping_address,
+          shipping_email,
+          container_type,
+          commodity,
+          route,
+          formattedOceanFreight,
+          formattedAcdEnsAfr,
+          validity,
+          validity_for,
+          remarks,
+          transit,
+          JSON.stringify(formattedCustomCharges), // Store only the new format
+          "", // Remove old format fields
+          "",
+          "",
+          JSON.stringify(railFreightRates)
+        );
+        toast.success("Rate filing updated successfully!");
+      } else {
+        // Creating new form
+        await createForm(
+          username,
+          formattedBlFees,
+          formattedThc,
+          formattedMuc,
+          formattedToll,
+          por,
+          pol,
+          pod,
+          fdrr,
+          shipping_lines,
+          shipping_name,
+          shipping_number,
+          shipping_address,
+          shipping_email,
+          container_type,
+          commodity,
+          route,
+          formattedOceanFreight,
+          formattedAcdEnsAfr,
+          validity,
+          validity_for,
+          remarks,
+          transit,
+          JSON.stringify(formattedCustomCharges), // Store only the new format
+          "", // Remove old format fields
+          "",
+          "",
+          JSON.stringify(railFreightRates)
+        );
+        toast.success("Rate filing created successfully!");
+      }
+
+      // Clear form fields after successful submission
+      clearFormFields();
+      
+      // Refresh the rates list
+      getUserForms();
     } catch (error) {
-      console.error("Error during form submission:", error);
-      setSubmitError("An unexpected error occurred. Please try again.");
+      console.error("Error submitting form:", error);
+      toast.error("Failed to submit rate filing. Please try again.");
     }
   };
 
@@ -1171,7 +1066,7 @@ const Add_rates = () => {
     // The useEffect hook will handle updating rates based on POR and container size
   };
 
-  // Improve the rail freight rates display formatting function to handle different data formats
+  // Update the formatRailFreightRatesForDisplay function to handle currency symbols
   const formatRailFreightRatesForDisplay = (railFreightRates) => {
     if (!railFreightRates) return "No rail freight rates available";
 
@@ -1187,8 +1082,6 @@ const Add_rates = () => {
       if (Object.keys(ratesObj).length === 0) {
         return "No rail freight rates available";
       }
-
-      console.log("Formatting rail freight rates:", ratesObj);
 
       return (
         <div className="grid gap-1 mt-1">
@@ -1432,10 +1325,16 @@ const Add_rates = () => {
 
   // Add a function to copy a row's data into the form for new submission
   const handleCopy = (item) => {
-    // Populate basic fields (same as handleEdit, but do NOT set editFormId)
+    setEditFormId(null); // Clear edit form ID for copy
+    setName(item.name || "");
+    setbl_fees(item.bl_fees || "");
+    setthc(item.thc || "");
+    setmuc(item.muc || "");
+    settoll(item.toll || "");
     setpor(item.por || "");
     setpol(item.pol || "");
     setpod(item.pod || "");
+    setPodInput(item.pod || "");
     setfdrr(item.fdrr || "");
     setshipping_lines(item.shipping_lines || "");
     setshipping_name(item.shipping_name || "");
@@ -1445,7 +1344,28 @@ const Add_rates = () => {
     setContainer_type(item.container_type || "");
     setCommodity(item.commodity || "");
     setRoute(item.route || "");
-    setOcean_freight(item.ocean_freight || "");
+
+    // Handle Ocean Freight with currency name
+    if (item.ocean_freight) {
+      // Try to extract currency, symbol, and amount
+      const match = item.ocean_freight.match(/(USD|INR|EUR|GBP|JPY) ([₹$€£¥])([0-9.]*)/);
+      if (match) {
+        setSelectedCurrency(match[1]);
+        setOcean_freight(`${match[1]} ${match[2]}${match[3]}`);
+      } else {
+        // fallback: try to parse symbol and amount
+        const symbol = item.ocean_freight.match(/[₹$€£¥]/)?.[0] || "$";
+        const amount = item.ocean_freight.replace(/[^0-9.]/g, "");
+        const currency = getCurrencyFromSymbol(symbol);
+        setSelectedCurrency(currency);
+        setOcean_freight(`${currency} ${symbol}${amount}`);
+      }
+    } else {
+      setOcean_freight('');
+      setSelectedCurrency('USD');
+    }
+
+    // Handle ACD/ENS/AFR
     setacd_ens_afr(() => {
       if (!item.acd_ens_afr) return "";
       // Split and strip currency symbol from amount
@@ -1453,6 +1373,7 @@ const Add_rates = () => {
       const amount = amountRaw ? amountRaw.replace(/[₹$€£¥]/g, "") : "";
       return `${type || "ACD"} ${amount}`.trim();
     });
+
     setValidity(item.validity || "");
     setValidity_for(item.validity_for || "");
     setRemarks(item.remarks || "");
@@ -1584,6 +1505,99 @@ const Add_rates = () => {
       clearFormFields();
       setIsRefreshing(false);
     }, 500);
+  };
+
+  // Add this new function to handle POD input changes
+  const handlePodInputChange = (e) => {
+    const value = e.target.value;
+    setPodInput(value);
+    setpod(value);
+
+    if (value) {
+      const filtered = podOptions.filter((option) =>
+        option.toLowerCase().includes(value.toLowerCase())
+      );
+      setPodSuggestions(filtered);
+      setShowPodSuggestions(true);
+    } else {
+      setPodSuggestions([]);
+      setShowPodSuggestions(false);
+    }
+  };
+
+  // Add this new function to handle POD selection
+  const handlePodSelect = (selectedPod) => {
+    setPodInput(selectedPod);
+    setpod(selectedPod);
+    setShowPodSuggestions(false);
+    addPOD(selectedPod);
+    refreshOptions();
+  };
+
+  // Add this new function to handle POD input blur
+  const handlePodInputBlur = async () => {
+    setTimeout(() => {
+      setShowPodSuggestions(false);
+    }, 200);
+
+    if (podInput && !podOptions.includes(podInput)) {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          toast.error("Authentication required. Please login again.");
+          return;
+        }
+
+        // Add the new POD to the local state immediately
+        addPOD(podInput);
+        toast.success("New POD added successfully!");
+        
+        // Force refresh the options
+        refreshOptions();
+      } catch (error) {
+        console.error("Error handling POD input blur:", error);
+        toast.error("Failed to process POD. Please try again.");
+      }
+    }
+  };
+
+  // Add a function to format custom charges for display
+  const formatCustomChargesForDisplay = (customCharges) => {
+    if (!customCharges) return null;
+
+    try {
+      let charges;
+      if (typeof customCharges === "string") {
+        charges = JSON.parse(customCharges);
+      } else {
+        charges = customCharges;
+      }
+
+      if (!Array.isArray(charges) || charges.length === 0) {
+        return null;
+      }
+
+      return (
+        <div className="mt-2 border-t border-gray-200 pt-2">
+          <span className="text-xs font-medium text-gray-500">
+            Other Charges:
+          </span>
+          <div className="mt-1 grid grid-cols-2 gap-2">
+            {charges.map((charge, index) => (
+              <p key={index} className="text-xs font-medium">
+                {charge.label}: {charge.value}
+                {charge.unit && (
+                  <span className="text-gray-500"> {charge.unit}</span>
+                )}
+              </p>
+            ))}
+          </div>
+        </div>
+      );
+    } catch (error) {
+      console.error("Error formatting custom charges:", error);
+      return null;
+    }
   };
 
   return (
@@ -1841,32 +1855,35 @@ const Add_rates = () => {
                       <div className="mb-1 ">
                         <label className="block text-sm font-medium text-black mb-1">
                           POD (Port of Discharge){" "}
-                          <span className="text-red-500 ">*</span>
+                          <span className="text-red-500">*</span>
                         </label>
                         <div className="relative rounded-md shadow-sm border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <RiShip2Line />
+                            <LuShip />
                           </div>
-                          <select
-                            value={pod}
-                            onChange={(e) => setpod(e.target.value)}
-                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                          <input
+                            type="text"
+                            value={podInput}
+                            onChange={handlePodInputChange}
+                            onBlur={handlePodInputBlur}
+                            onFocus={() => setShowPodSuggestions(true)}
+                            className="appearance-none block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            placeholder="Type or Select POD"
                             required
-                          >
-                            <option value="" disabled>
-                              Select POD
-                            </option>
-                            {podOptions && podOptions.length > 0
-                              ? podOptions.map((option) => (
-                                  <option key={option} value={option}>
-                                    {option}
-                                  </option>
-                                ))
-                              : null}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <IoIosArrowDown />
-                          </div>
+                          />
+                          {showPodSuggestions && podSuggestions.length > 0 && (
+                            <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-auto">
+                              {podSuggestions.map((suggestion) => (
+                                <div
+                                  key={suggestion}
+                                  className="px-4 py-2 hover:bg-indigo-50 cursor-pointer text-sm"
+                                  onClick={() => handlePodSelect(suggestion)}
+                                >
+                                  {suggestion}
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
                       {/* Commodity Type */}
@@ -1978,123 +1995,6 @@ const Add_rates = () => {
                           </div>
                         </div>
                       </div>{" "}
-                      {/* Shipping Line for mobile*/}
-                      <div className="mb-2 block sm:hidden">
-                        <label className="block text-sm font-medium text-black mb-1">
-                          Shipping Line <span className="text-red-500 ">*</span>
-                        </label>
-                        <div className="relative  shadow-sm rounded-md border border-blue-300">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <LiaShipSolid />
-                          </div>
-                          <select
-                            value={shipping_lines}
-                            onChange={(e) => setshipping_lines(e.target.value)}
-                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
-                            required
-                          >
-                            <option value="" disabled>
-                              Select Shipping Line
-                            </option>
-                            {renderShippingLinesOptions()}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <IoIosArrowDown />
-                          </div>
-                        </div>
-                      </div>
-                      {/* Container Type for mobile*/}
-                      <div className="mb-2 block sm:hidden">
-                        <label className="block text-sm font-medium text-black mb-1">
-                          Container Type{" "}
-                          <span className="text-red-500 ">*</span>
-                        </label>
-                        <div className="relative rounded-md shadow-sm  border border-blue-300">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <PiShippingContainer />
-                          </div>
-                          <select
-                            value={container_type}
-                            onChange={handleContainerTypeChange}
-                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
-                            required
-                          >
-                            <option value="" disabled>
-                              Select Container Type
-                            </option>
-                            {containerSizeOptions.map((option) => (
-                              <option key={option.value} value={option.value}>
-                                {option.label}
-                              </option>
-                            ))}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <IoIosArrowDown />
-                          </div>
-                        </div>
-                      </div>
-                      {/* Commodity Type for mobile*/}
-                      <div className="mb-2 block sm:hidden">
-                        <label className="block text-sm font-medium text-black mb-1">
-                          Commodity Type{" "}
-                          <span className="text-red-500 ">*</span>
-                        </label>
-                        {showDescription ? (
-                          <div>
-                            <div className="relative rounded-md shadow-sm">
-                              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <FiBox />
-                              </div>
-                              <input
-                                type="text"
-                                placeholder="Enter commodity specific description"
-                                value={commodity}
-                                onChange={(e) => setCommodity(e.target.value)}
-                                className=" block w-full pl-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out text-gray-700"
-                                required
-                              />
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => setShowDescription(false)}
-                              className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 inline-flex items-center"
-                            >
-                              <FaArrowLeft />
-                              Back to selection
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="relative rounded-md shadow-sm border border-blue-300">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                              <FiBox />
-                            </div>
-                            <select
-                              value={commodity}
-                              onChange={(e) => {
-                                if (e.target.value === "Commodity Specific") {
-                                  setShowDescription(true);
-                                  setCommodity("");
-                                } else {
-                                  setCommodity(e.target.value);
-                                }
-                              }}
-                              className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
-                              required
-                            >
-                              <option value="" disabled>
-                                Select Commodity Type
-                              </option>
-                              <option value="FAK">FAK</option>
-                              <option value="Commodity Specific">
-                                Commodity Specific
-                              </option>
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                              <IoIosArrowDown />
-                            </div>
-                          </div>
-                        )}
-                      </div>
                     </div>
 
                     {/* SECTION: Freight & Routing */}
@@ -2108,19 +2008,21 @@ const Add_rates = () => {
                         {/* Ocean Freight */}
                         <div className="mb-1">
                           <label className="block text-sm font-medium text-black mb-1">
-                            Ocean Freight{" "}
-                            <span className="text-red-500 ">*</span>
+                            Ocean Freight <span className="text-red-500">*</span>
                           </label>
                           <div className="mt-1 flex h-8 rounded-md border border-blue-300">
                             <span className="relative inline-flex items-center px-1 rounded-l-md border-r border bg-gray-50 text-gray-500 sm:text-sm">
                               <select
                                 className="appearance-none h-full px-3 border-0 bg-transparent focus:ring-0 focus:outline-none text-gray-700"
-                                value={ocean_freight.split(" ")[0] || "USD"}
+                                value={selectedCurrency}
                                 onChange={(e) => {
-                                  const currency = e.target.value;
-                                  const amount =
-                                    ocean_freight.split(" ")[1] || "";
-                                  setOcean_freight(`${currency} ${amount}`);
+                                  setSelectedCurrency(e.target.value);
+                                  const amount = (() => {
+                                    const match = ocean_freight.match(/^[A-Z]{3} [₹$€£¥]([0-9.]*)$/);
+                                    return match ? match[1] : '';
+                                  })();
+                                  const symbol = getCurrencySymbol(e.target.value);
+                                  setOcean_freight(`${e.target.value} ${symbol}${amount}`);
                                 }}
                               >
                                 <option value="USD">USD $</option>
@@ -2134,13 +2036,15 @@ const Add_rates = () => {
                               </div>
                             </span>
                             <input
-                              value={ocean_freight.split(" ")[1] || ""}
+                              value={(() => {
+                                // Extract amount from 'USD $340'
+                                const match = ocean_freight.match(/^[A-Z]{3} [₹$€£¥]([0-9.]*)$/);
+                                return match ? match[1] : '';
+                              })()}
                               onChange={(e) => {
-                                const currency =
-                                  ocean_freight.split(" ")[0] || "USD";
-                                setOcean_freight(
-                                  `${currency} ${e.target.value}`
-                                );
+                                const amount = e.target.value.replace(/[^0-9.]/g, '');
+                                const symbol = getCurrencySymbol(selectedCurrency);
+                                setOcean_freight(`${selectedCurrency} ${symbol}${amount}`);
                               }}
                               className="flex-1 min-w-0 block w-full rounded-none rounded-r-md focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-1"
                               placeholder="Enter Amount"
@@ -3154,7 +3058,7 @@ const Add_rates = () => {
                       scope="col"
                       className="px-2 sm:px-2 py-2 sm:py-3 text-left sm:text-sm text-xs font-bold text-red-500 tracking-wider border-b border-r border-gray-400"
                     >
-                      Freight
+                     Ocean Freight
                     </th>
                     <th
                       scope="col"
@@ -3222,11 +3126,6 @@ const Add_rates = () => {
                                 <span className="text-[10px] sm:text-xs font-medium text-gray-900">
                                   {item.shipping_lines || "N/A"}
                                 </span>
-                                {hasRemarks && (
-                                  <div title="Important Remark">
-                                    <TbCircleLetterR className="text-orange-800 font-bold text-lg animate-pulse ml-2" />
-                                  </div>
-                                )}
                               </div>
                             </td>
                             <td className="px-2 py-2 border-r border-gray-300">
@@ -3244,18 +3143,37 @@ const Add_rates = () => {
                                   item.acd_ens_afr
                                 )
                                   ? ""
-                                  : item.acd_ens_afr}
+                                  : item.acd_ens_afr}   {hasRemarks && (
+                                    <div title="Important Remark">
+                                      <span className="text-[10px] text-red-600 animate-pulse">
+                                        Please Read Remark
+                                      </span>
+                                    </div>
+                                  )}
                               </div>
                             </td>
-                            <td className="px-2 py-2 border-r border-gray-300">
-                              <span
-                                className={`px-1.5 sm:px-2 py-0.5 inline-flex text-[8px] sm:text-xs leading-5 font-semibold sm:rounded-md rounded-sm ${"bg-green-100 text-green-800"}`}
-                              >
-                                {formatDate(item.validity)}{" "}
-                                {item.validity_for
-                                  ? `(${item.validity_for})`
-                                  : ""}
-                              </span>
+                            <td className="px-2 sm:px-2 py-2 whitespace-nowrap border-r border-gray-200">
+                              <div className="flex flex-row items-center">
+                                {" "}
+                                <div
+                                  className={`px-2 py-1  text-[8px] sm:text-xs leading-5 font-semibold rounded-md ${
+                                    isValidityExpired(item.validity)
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-green-100 text-green-800"
+                                  }`}
+                                >
+                                  {formatDate(item.validity)}{" "}
+                                  {item.validity_for ? (
+                                    <div className="text-center">
+                                      {" "}
+                                      
+                                      {item.validity_for}
+                                    </div>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
                             </td>
                             <td className="px-2 py-2 text-center">
                               <div className="flex flex-col sm:flex-row justify-center sm:space-x-2 space-y-1 sm:space-y-0">
@@ -3319,7 +3237,8 @@ const Add_rates = () => {
                                 colSpan="8"
                                 className="px-3 sm:px-6 py-4 border-b border-gray-300 bg-slate-100"
                               >
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                  {/*  Route & Commodity Details */}
                                   <div className="bg-white p-4 rounded-lg shadow-sm border-[1px] border-gray-400">
                                     <h4 className="font-medium text-sm text-red-500 mb-2">
                                       Route & Commodity Details
@@ -3461,30 +3380,37 @@ const Add_rates = () => {
                                     </div>
 
                                     {/* Custom Charges Section */}
-                                    {item.customCharges &&
-                                      Array.isArray(item.customCharges) &&
-                                      item.customCharges.length > 0 && (
-                                        <div className="mt-2 border-t border-gray-200 pt-2">
-                                          <span className="text-xs font-medium text-gray-500">
-                                            Other Charges:
-                                          </span>
-                                          <div className="mt-1 grid grid-cols-2 gap-2">
-                                            {item.customCharges.map(
-                                              (charge, index) => (
-                                                <p
-                                                  key={index}
-                                                  className="text-xs font-medium"
-                                                >
-                                                  {charge.label}: {charge.value}{" "}
-                                                  <span className="text-gray-500">
-                                                    {charge.unit || ""}
-                                                  </span>
-                                                </p>
-                                              )
-                                            )}
-                                          </div>
+                                    {item.customCharges && (
+                                      <div className="mt-2 border-t border-gray-200 pt-2">
+                                        <span className="text-xs font-medium text-gray-500">
+                                          Other Charges:
+                                        </span>
+                                        <div className="mt-1 grid grid-cols-2 gap-2">
+                                          {(() => {
+                                            try {
+                                              const charges = typeof item.customCharges === 'string' 
+                                                ? JSON.parse(item.customCharges) 
+                                                : item.customCharges;
+                                              
+                                              if (Array.isArray(charges) && charges.length > 0) {
+                                                return charges.map((charge, index) => (
+                                                  <p key={index} className="text-xs font-medium">
+                                                    {charge.label}: {charge.value}
+                                                    {charge.unit && (
+                                                      <span className="text-gray-500"> {charge.unit}</span>
+                                                    )}
+                                                  </p>
+                                                ));
+                                              }
+                                              return null;
+                                            } catch (error) {
+                                              console.error("Error parsing custom charges:", error);
+                                              return null;
+                                            }
+                                          })()}
                                         </div>
-                                      )}
+                                      </div>
+                                    )}
 
                                     {/* For backward compatibility with old format */}
                                     {(!item.customCharges ||
@@ -3542,6 +3468,7 @@ const Add_rates = () => {
                                       )}
                                   </div>
 
+                                  {/* Additional Information */}
                                   <div className="bg-white p-3 rounded-lg shadow-sm border-[1px] border-gray-400">
                                     <h4 className="font-medium text-sm text-red-500 mb-2">
                                       Additional Information
@@ -3556,8 +3483,8 @@ const Add_rates = () => {
                                         </p>
                                       </div>
                                     )}
-                                    <div className="grid grid-cols-3 gap-2 text-xs">
-                                      <div>
+                                    <div className="grid grid-cols-2 gap-2 text-xs">
+                                      <div className="grid grid-cols-1 gap-2">
                                         <span className="text-gray-500">
                                           Created:
                                         </span>
@@ -3573,8 +3500,7 @@ const Add_rates = () => {
                                             minute: "2-digit",
                                           })}
                                         </p>
-                                      </div>
-                                      <div>
+
                                         <span className="text-gray-500">
                                           Updated:
                                         </span>

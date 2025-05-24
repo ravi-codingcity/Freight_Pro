@@ -131,7 +131,11 @@ const View_rates = () => {
           ...new Set(processedForms.map((form) => form.pol).filter(Boolean)),
         ].sort();
         const pods = [
-          ...new Set(processedForms.map((form) => (form.fdrr ? form.fdrr : form.pod)).filter(Boolean)),
+          ...new Set(
+            processedForms
+              .map((form) => (form.fdrr ? form.fdrr : form.pod))
+              .filter(Boolean)
+          ),
         ].sort();
         setUniquePOLs(pols);
         setUniquePODs(pods);
@@ -873,6 +877,12 @@ const View_rates = () => {
                         scope="col"
                         className="px-3 py-3 text-left text-xs sm:text-sm font-bold text-red-500 tracking-wider border-r border-gray-300"
                       >
+                        POR
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-3 py-3 text-left text-xs sm:text-sm font-bold text-red-500 tracking-wider border-r border-gray-300"
+                      >
                         POL
                       </th>
                       <th
@@ -925,30 +935,24 @@ const View_rates = () => {
                           >
                             {/* User column */}
                             <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                              <div className="flex flex-col items-center sm:flex-row sm:items-center">
+                              <div className="flex flex-col items-center lg:flex-row lg:items-center">
                                 <img
                                   src={getUserProfileImage(item.name)}
                                   alt={item.name}
-                                  className="h-8 w-8 rounded-full object-cover border border-gray-200 mb-1 sm:mb-0 sm:mr-3"
+                                  className="h-8 w-8 rounded-full object-cover border border-gray-200 mb-1 sm:mb-0 sm:mr-0"
                                   onError={(e) => {
                                     e.target.onerror = null;
                                     e.target.src = defaultUserImg;
                                   }}
                                 />
-                                <div className="flex flex-col items-center sm:items-start">
-                                  <span className="text-xs sm:text-sm font-medium text-gray-900 text-center sm:text-left">
+                                <div className="flex flex-col items-center sm:items-start ml-1">
+                                  <span className="text-[8px] sm:text-xs font-medium text-gray-900 text-center sm:text-left">
                                     {item.name}
                                   </span>
-                                  <span className="text-[10px] sm:text-xs text-gray-500 text-center sm:text-left">
+                                  <span className="text-[8px] sm:text-xs text-gray-500 text-center sm:text-left">
                                     {userData.branch}
                                   </span>
                                 </div>
-                                {hasRemarks && (
-                                  <div
-                                  title="Important Remark">
-                                    <TbCircleLetterR className="text-orange-800 font-bold text-lg animate-pulse ml-2"/>
-                                  </div>
-                                )}
                               </div>
                             </td>
 
@@ -960,20 +964,23 @@ const View_rates = () => {
                             </td>
                             <td className="px-2  py-2 border-r border-gray-200">
                               <div className="flex items-center text-[8px] sm:text-xs">
-                                <div className="">
-                                  <span className="text-[10px] sm:text-xs font-medium text-gray-900">
-                                    {item.pol}
-                                  </span>
-                                </div>
+                                <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                                  {item.por}
+                                </span>
                               </div>
                             </td>
                             <td className="px-2  py-2 border-r border-gray-200">
                               <div className="flex items-center text-[8px] sm:text-xs">
-                                <div className="">
-                                  <span className="text-[10px] sm:text-xs font-medium text-gray-900">
-                                    {item.fdrr ? item.fdrr : item.pod}
-                                  </span>
-                                </div>
+                                <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                                  {item.pol}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="px-2  py-2 border-r border-gray-200">
+                              <div className="flex items-center text-[8px] sm:text-xs">
+                                <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                                  {item.fdrr ? item.fdrr : item.pod}
+                                </span>
                               </div>
                             </td>
                             <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
@@ -985,23 +992,39 @@ const View_rates = () => {
                               <div className="text-[10px] sm:text-xs font-medium text-gray-900">
                                 {item.ocean_freight}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-[8px] sm:text-xs text-gray-500">
                                 {item.acd_ens_afr}
                               </div>
+                              {hasRemarks && (
+                                <div title="Important Remark">
+                                  <span className="text-[10px] text-red-600 animate-pulse">
+                                    Please Read Remark
+                                  </span>
+                                </div>
+                              )}
                             </td>
-                            <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                              <span
-                                className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                  isValidityExpired(item.validity)
-                                    ? "bg-red-100 text-red-800"
-                                    : "bg-green-100 text-green-800"
-                                }`}
-                              >
-                                {formatDate(item.validity)}{" "}
-                                {item.validity_for
-                                  ? `(${item.validity_for})`
-                                  : ""}
-                              </span>
+                            <td className="px-2 sm:px-2 py-2 whitespace-nowrap border-r border-gray-200">
+                              <div className="flex flex-row items-center">
+                                {" "}
+                                <div
+                                  className={`px-2 py-1  text-[8px] sm:text-xs leading-5 font-semibold rounded-md ${
+                                    isValidityExpired(item.validity)
+                                      ? "bg-red-100 text-red-800"
+                                      : "bg-green-100 text-green-800"
+                                  }`}
+                                >
+                                  {formatDate(item.validity)}{" "}
+                                  {item.validity_for ? (
+                                    <div className="text-center">
+                                      {" "}
+                                      
+                                      {item.validity_for}
+                                    </div>
+                                  ) : (
+                                    ""
+                                  )}
+                                </div>
+                              </div>
                             </td>
                             <td className="px-2 sm:px-3 py-2 text-center">
                               <button
@@ -1065,7 +1088,7 @@ const View_rates = () => {
                                 hasRemarks ? "bg-yellow-50" : "bg-gray-100"
                               }`}
                             >
-                              <td colSpan="8" className="px-3 sm:px-6 py-4">
+                              <td colSpan="9" className="px-3 sm:px-6 py-4">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
                                   {/* First detail card */}
                                   <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border-[1px] border-gray-400">
@@ -1198,60 +1221,72 @@ const View_rates = () => {
                                         </p>
                                       </div>
                                     </div>
-                                    {/* Add custom field to display if it exists */}
-                                    {!item.customCharges &&
-                                      item.customLabel &&
+
+                                    {/* Custom Charges Section */}
+                                    {item.customCharges && (
+                                      <div className="mt-2 border-t border-gray-200 pt-2">
+                                        <span className="text-xs font-medium text-gray-500">
+                                          Other Charges:
+                                        </span>
+                                        <div className="mt-1 grid grid-cols-2 gap-2">
+                                          {(() => {
+                                            try {
+                                              const charges = typeof item.customCharges === 'string' 
+                                                ? JSON.parse(item.customCharges) 
+                                                : item.customCharges;
+                                              
+                                              if (Array.isArray(charges) && charges.length > 0) {
+                                                return charges.map((charge, index) => (
+                                                  <p key={index} className="text-xs font-medium">
+                                                    {charge.label}: {charge.value}
+                                                    {charge.unit && (
+                                                      <span className="text-gray-500"> {charge.unit}</span>
+                                                    )}
+                                                  </p>
+                                                ));
+                                              }
+                                              return null;
+                                            } catch (error) {
+                                              console.error("Error parsing custom charges:", error);
+                                              return null;
+                                            }
+                                          })()}
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* For backward compatibility with old format */}
+                                    {(!item.customCharges || 
+                                      (typeof item.customCharges === 'string' && item.customCharges === '[]')) && 
+                                      item.customLabel && 
                                       item.customValue && (
                                         <div className="mt-2 border-t border-gray-200 pt-2">
                                           <span className="text-xs font-medium text-gray-500">
                                             Other Charges:
                                           </span>
-                                          {/* Parse and display multiple charges if they use the delimiter */}
                                           {item.customLabel.includes("|||") ? (
-                                            <div className="mt-1 grid grid-cols-3 gap-2 ">
-                                              {item.customLabel
-                                                .split("|||")
-                                                .map((label, index) => {
-                                                  const values =
-                                                    item.customValue.split(
-                                                      "|||"
-                                                    );
+                                            <div className="mt-1 grid grid-cols-2 gap-2">
+                                              {item.customLabel.split("|||").map((label, index) => {
+                                                const values = item.customValue.split("|||");
+                                                const units = item.customUnit ? item.customUnit.split("|||") : [];
+                                                const unit = units[index] || "/BL";
 
-                                                  // Properly split the units string and get the corresponding unit for this charge
-                                                  const units = item.customUnit
-                                                    ? item.customUnit.split(
-                                                        "|||"
-                                                      )
-                                                    : [];
-                                                  const unit =
-                                                    units[index] || "/BL"; // Default to /BL if no unit is found
-
-                                                  return label &&
-                                                    values[index] ? (
-                                                    <p
-                                                      key={index}
-                                                      className="text-xs font-medium pr-2"
-                                                    >
-                                                      {label}: {values[index]}{" "}
-                                                      <span className="text-gray-500">
-                                                        {unit}
-                                                      </span>
-                                                    </p>
-                                                  ) : null;
-                                                })}
+                                                return label && values[index] ? (
+                                                  <p key={index} className="text-xs font-medium">
+                                                    {label}: {values[index]}
+                                                    <span className="text-gray-500"> {unit}</span>
+                                                  </p>
+                                                ) : null;
+                                              })}
                                             </div>
                                           ) : (
-                                            // Display single charge (legacy format)
-                                            <p className="text-xs font-medium">
-                                              {item.customLabel}:{" "}
-                                              {item.customValue}{" "}
-                                              <span className="text-gray-500">
-                                                {item.customUnit}
-                                              </span>
+                                            <p className="text-xs font-medium mt-1">
+                                              {item.customLabel}: {item.customValue}
+                                              <span className="text-gray-500"> {item.customUnit}</span>
                                             </p>
                                           )}
                                         </div>
-                                      )}
+                                    )}
                                   </div>
 
                                   {/* Third detail card */}
@@ -1269,8 +1304,8 @@ const View_rates = () => {
                                         </p>
                                       </div>
                                     )}
-                                    <div className=" grid grid-cols-2 sm:grid-cols-3 gap-2 text-[10px] sm:text-xs">
-                                      <div>
+                                    <div className=" grid grid-cols-2 sm:grid-cols-2 gap-2 text-[10px] sm:text-xs">
+                                      <div className="grid grid-cols-1 gap-2">
                                         <span className="text-gray-500">
                                           Created:
                                         </span>
@@ -1286,8 +1321,7 @@ const View_rates = () => {
                                             minute: "2-digit",
                                           })}
                                         </p>
-                                      </div>
-                                      <div>
+
                                         <span className="text-gray-500">
                                           Updated:
                                         </span>
