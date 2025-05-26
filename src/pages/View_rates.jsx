@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { TbCircleLetterR } from "react-icons/tb";
 import Navbar from "../components/Navbar";
 // Import all user profile images
 import harmeetImg from "../assets/harmeet.jpg";
@@ -7,6 +6,8 @@ import vikramImg from "../assets/vikram.jpg";
 import kapilImg from "../assets/kapil.jpg";
 // Default profile image for fallback
 import defaultUserImg from "../assets/omtrans.jpg";
+import { IoIosArrowDown } from "react-icons/io";
+import { LuShip } from "react-icons/lu";
 
 const View_rates = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -329,24 +330,12 @@ const View_rates = () => {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg
-                        className="h-4 w-4 text-blue-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
+                    <LuShip />
                     </div>
                     <select
                       value={selectedPOL}
                       onChange={(e) => setSelectedPOL(e.target.value)}
-                      className="appearance-none pl-10 pr-8 py-2 w-full bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="appearance-none pl-10 pr-8 py-2 w-full bg-white border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">POL - Any</option>
                       {uniquePOLs.map((pol) => (
@@ -356,18 +345,7 @@ const View_rates = () => {
                       ))}
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                    <IoIosArrowDown />
                     </div>
                   </div>
                 </div>
@@ -379,24 +357,12 @@ const View_rates = () => {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg
-                        className="h-4 w-4 text-indigo-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017a2 2 0 01-1.789-2.894l3.5-7A2 2 0 0114 10z"
-                        />
-                      </svg>
+                    <LuShip />
                     </div>
                     <select
                       value={selectedPOD}
                       onChange={(e) => setSelectedPOD(e.target.value)}
-                      className="appearance-none pl-10 pr-8 py-2 w-full bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="appearance-none pl-10 pr-8 py-2 w-full bg-white border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">POD - Any</option>
                       {uniquePODs.map((pod) => (
@@ -406,25 +372,14 @@ const View_rates = () => {
                       ))}
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                    <IoIosArrowDown />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Remarks Filter */}
-              <div className="w-full sm:max-w-60 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
+              <div className="w-full sm:max-w-60 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
                 <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
                   Remarks
                 </label>
@@ -452,7 +407,7 @@ const View_rates = () => {
                         clipRule="evenodd"
                       />
                     </svg>
-                    <span>Only With Remarks</span>
+                    <span className="text-xs">Only With Remarks</span>
                   </div>
                   <div
                     className={`w-4 h-4 rounded-full flex items-center justify-center ${
@@ -637,7 +592,7 @@ const View_rates = () => {
               <div className="bg-blue-100 p-2 rounded-lg mr-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 text-blue-600"
+                  className="h-4 w-4 text-blue-600"
                   viewBox="0 0 20 20"
                   fill="currentColor"
                 >
@@ -648,7 +603,7 @@ const View_rates = () => {
                   />
                 </svg>
               </div>
-              <h3 className="text-base font-medium text-gray-700">Filters</h3>
+              <h3 className="text-xs font-medium text-gray-700">Filters</h3>
               {(showOnlyWithRemarks ||
                 selectedPOL ||
                 selectedPOD ||
@@ -667,10 +622,10 @@ const View_rates = () => {
             </div>
 
             {/* Showing rates count */}
-            <div className="bg-blue-50 text-blue-700 rounded-lg px-2 py-2 font-medium inline-flex items-center text-center">
+            <div className="bg-blue-50 text-blue-700 rounded-lg px-2 py-2 text-xs font-medium inline-flex items-center text-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5 mr-2"
+                className="h-4 w-4 mr-2"
                 viewBox="0 0 20 20"
                 fill="currentColor"
               >
@@ -704,8 +659,8 @@ const View_rates = () => {
                 ) : (
                   <>
                     Showing{" "}
-                    <span className="font-bold">{currentItems.length}</span> of{" "}
-                    <span className="font-bold">{totalItems}</span> active rate
+                    <span className="text-xs font-semibold">{currentItems.length}</span> of{" "}
+                    <span className="text-xs font-semibold">{totalItems}</span> active rate
                     {totalItems !== 1 ? "s" : ""}
                     {showOnlyWithRemarks ||
                       selectedPOL ||
