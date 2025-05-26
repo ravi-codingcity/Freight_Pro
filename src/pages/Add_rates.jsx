@@ -3,6 +3,7 @@ import { TbRoute } from "react-icons/tb";
 import { LuRefreshCcw } from "react-icons/lu";
 import { LuTruck } from "react-icons/lu";
 import { TbReceiptTax } from "react-icons/tb";
+import { IoLocationOutline } from "react-icons/io5";
 import { LuMessageSquareMore } from "react-icons/lu";
 import { HiOutlineCurrencyDollar } from "react-icons/hi";
 import { GoPencil } from "react-icons/go";
@@ -1915,10 +1916,13 @@ const Add_rates = () => {
                           <span className="text-red-500 ">*</span>
                         </label>
                         <div className="relative shadow-sm rounded-md border border-blue-300">
+                        <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+                            <IoLocationOutline />
+                          </div>
                           <select
                             value={por}
                             onChange={(e) => setpor(e.target.value)}
-                            className="block w-full border-0 py-1.5 pl-3 pr-10 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            className="block w-full border-0 py-1.5 pl-7 pr-10 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                             required
                           >
                             <option value="">Select POR</option>
@@ -1928,6 +1932,7 @@ const Add_rates = () => {
                               </option>
                             ))}
                           </select>
+                           
                         </div>
                         {porError && (
                           <p className="mt-1 text-sm text-red-600">
@@ -1940,7 +1945,7 @@ const Add_rates = () => {
                         <label className="block text-sm font-medium text-black mb-1">
                           Shipping Line <span className="text-red-500 ">*</span>
                         </label>
-                        <div className="relative shadow-sm rounded-md border border-blue-300">
+                        <div className="relative shadow-sm rounded-md border border-blue-300"> 
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <LiaShipSolid />
                           </div>
