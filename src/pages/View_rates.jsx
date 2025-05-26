@@ -322,10 +322,10 @@ const View_rates = () => {
         <div className="mt-1 bg-white rounded-xl shadow-sm overflow-hidden px-2 sm:px-6 mb-4">
           <div className="p-2 ">
             <div className="flex flex-col sm:flex-row gap-3 flex-wrap justify-evenly">
-              <div className="flex justify-around items-center w-full sm:w-auto gap-2">
+              <div className="flex justify-around items-center gap-2 flex-col sm:flex-row">
                 {/* POL Filter */}
-                <div className="w-full sm:max-w-60 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
-                  <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
+                <div className="w-full sm:w-60 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
+                  <label className="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                     Port of Loading (POL)
                   </label>
                   <div className="relative">
@@ -351,8 +351,8 @@ const View_rates = () => {
                 </div>
 
                 {/* POD Filter */}
-                <div className="w-full sm:max-w-64 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1 min-w-[200px]">
-                  <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
+                <div className="w-full sm:w-60 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1 min-w-[200px]">
+                  <label className="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                     Port of Delivery (POD)
                   </label>
                   <div className="relative">
@@ -437,7 +437,7 @@ const View_rates = () => {
               selectedPOL ||
               selectedPOD ||
               searchTerm) && (
-              <div className="mt-4 pt-4 border-t border-gray-200 overflow-x-auto">
+              <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-gray-200 overflow-x-auto">
                 <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
                   Active Filters:
                 </h4>

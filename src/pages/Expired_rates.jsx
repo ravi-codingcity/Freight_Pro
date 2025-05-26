@@ -3,10 +3,11 @@ import Navbar from "../components/Navbar";
 // Import all user profile images
 import harmeetImg from "../assets/harmeet.jpg";
 import vikramImg from "../assets/vikram.jpg";
-import kapilImg from "../assets/kapil.jpg";
-import rajeevImg from "../assets/omtrans.jpg"; // Using default for Rajeev if no specific image
+import kapilImg from "../assets/kapil.jpg";// Using default for Rajeev if no specific image
 // Default profile image for fallback
 import defaultUserImg from "../assets/omtrans.jpg";
+import { LuShip } from "react-icons/lu";
+import { IoIosArrowDown } from "react-icons/io";
 
 function Expired_rates() {
   const [data, setData] = useState([]);
@@ -381,35 +382,23 @@ function Expired_rates() {
       <Navbar />
       <div className="container mx-auto p-2 sm:p-4 max-w-full">
         {/* Advanced Search Filters - Make responsive */}
-        <div className="mt-1 bg-white rounded-xl shadow-sm overflow-hidden px-2 sm:px-6 mb-4">
+        <div className="mt-1 bg-white rounded-xl shadow-sm overflow-hidden px-2 sm:px-6 mb-2 sm:mb-4">
           <div className="p-2 sm:p-3">
-            <div className="flex flex-col sm:flex-row gap-3 flex-wrap justify-evenly">
-              <div className="flex justify-around items-center w-full sm:w-auto gap-3">
+          <div className="flex flex-col sm:flex-row gap-3 flex-wrap justify-evenly">
+              <div className="flex justify-around items-center gap-2 flex-col sm:flex-row">
                 {/* POL Filter */}
-                <div className="w-full sm:max-w-64 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1 min-w-[200px]">
-                  <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
+                <div className="w-full sm:w-60 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
+                  <label className="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                     Port of Loading (POL)
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg
-                        className="h-4 w-4 text-blue-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                        />
-                      </svg>
+                    <LuShip />
                     </div>
                     <select
                       value={selectedPOL}
                       onChange={(e) => setSelectedPOL(e.target.value)}
-                      className="appearance-none pl-10 pr-8 py-2 w-full bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="appearance-none pl-10 pr-8 py-2 w-full bg-white border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">POL - Any</option>
                       {uniquePOLs.map((pol) => (
@@ -419,47 +408,24 @@ function Expired_rates() {
                       ))}
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                    <IoIosArrowDown />
                     </div>
                   </div>
                 </div>
 
                 {/* POD Filter */}
-                <div className="w-full sm:max-w-64 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1 min-w-[200px]">
-                  <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
+                <div className="w-full sm:w-60 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1 min-w-[200px]">
+                  <label className="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1">
                     Port of Delivery (POD)
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg
-                        className="h-4 w-4 text-indigo-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017a2 2 0 01-1.789-2.894l3.5-7A2 2 0 0114 10z"
-                        />
-                      </svg>
+                    <LuShip />
                     </div>
                     <select
                       value={selectedPOD}
                       onChange={(e) => setSelectedPOD(e.target.value)}
-                      className="appearance-none pl-10 pr-8 py-2 w-full bg-white border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="appearance-none pl-10 pr-8 py-2 w-full bg-white border border-gray-300 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">POD - Any</option>
                       {uniquePODs.map((pod) => (
@@ -469,25 +435,14 @@ function Expired_rates() {
                       ))}
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
+                    <IoIosArrowDown />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Remarks Filter */}
-              <div className="w-full sm:max-w-64 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
+              <div className="w-full sm:max-w-60 bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
                 <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
                   Remarks
                 </label>
@@ -511,11 +466,11 @@ function Expired_rates() {
                     >
                       <path
                         fillRule="evenodd"
-                        d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z"
+                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-1 9a1 1 0 100-2 1 1 0 000 2zm0 0v-2a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z"
                         clipRule="evenodd"
                       />
                     </svg>
-                    <span>Only With Remarks</span>
+                    <span className="text-xs">Only With Remarks</span>
                   </div>
                   <div
                     className={`w-4 h-4 rounded-full flex items-center justify-center ${
@@ -542,7 +497,7 @@ function Expired_rates() {
 
             {/* Active filters display */}
             {(showOnlyWithRemarks || selectedPOL || selectedPOD) && (
-              <div className="mt-4 pt-4 border-t border-gray-200 overflow-x-auto">
+              <div className="mt-2 sm:mt-4 pt-2 sm:pt-4 border-t border-gray-200 overflow-x-auto">
                 <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
                   Active Filters:
                 </h4>
@@ -761,7 +716,7 @@ function Expired_rates() {
 
         {/* Filter summary and action bar */}
         {!loading && !error && (
-          <div className="flex flex-col mb-3 bg-white p-3 rounded-xl shadow-sm mx-4">
+          <div className="flex flex-col mb-1 sm:mb-3 bg-white p-1 rounded-xl shadow-sm mx-1">
             {/* Top row container for mobile and desktop */}
             <div className="flex flex-col justify-between items-center w-full gap-2 sm:gap-3">
               {/* Filters label and rates count - stacked in column on mobile, row on desktop */}
@@ -771,7 +726,7 @@ function Expired_rates() {
                   <div className="bg-red-100 p-1.5 sm:p-2 rounded-lg mr-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
-                      className="h-4 w-4 sm:h-5 sm:w-5 text-red-600"
+                      className="h-3 w-3 sm:h-5 sm:w-5 text-red-600"
                       viewBox="0 0 20 20"
                       fill="currentColor"
                     >
@@ -782,7 +737,7 @@ function Expired_rates() {
                       />
                     </svg>
                   </div>
-                  <h3 className="text-sm sm:text-base font-medium text-gray-700">
+                  <h3 className="text-xs sm:text-base font-medium text-gray-700">
                     Filters
                   </h3>
                   {(showOnlyWithRemarks || selectedPOL || selectedPOD) && (
@@ -797,7 +752,7 @@ function Expired_rates() {
                 </div>
 
                 {/* Showing rates count - below filters on mobile, same row on desktop */}
-                <div className="bg-red-50 text-red-700 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2 font-medium inline-flex items-center justify-center w-full sm:w-auto text-xs sm:text-sm">
+                <div className="bg-red-50 text-red-700 rounded-lg px-1 py-1.5 sm:px-4 sm:py-2 font-medium inline-flex items-center justify-center w-full sm:w-auto text-xs sm:text-sm">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-3.5 w-3.5 sm:h-5 sm:w-5 mr-1 sm:mr-2 flex-shrink-0"

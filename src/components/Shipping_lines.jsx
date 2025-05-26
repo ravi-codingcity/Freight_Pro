@@ -3,58 +3,93 @@ import { useState, useEffect } from "react";
 // Function that returns the Shipping Lines options array
 export const getShippingLinesOptions = () => {
   return [
+    "Allcargo Logistics",
+    "Antong Holdings",
+    "Arkas Line",
+    "Bahri",
+    "Balaji Shipping",
+    "CMA CGM",
+    "COSCO",
+    "Emirates Shipping",
+    "Evergreen",
+    "Gold Star Line",
+    "Goodrich Maritime",
+    "HMM",
+    "Hapag-Lloyd",
+    "IRISL",
     "Maersk",
     "MSC",
-    "CMA CGM",
-    "Hapag-Lloyd",
-    "COSCO",
     "ONE",
-    "Evergreen",
-    "HMM",
-    "Unifeeder",
-    "TS Lines",
-    "ZIM",
-    "Yang Ming",
-    "Wan Hai",
-    "PIL",
-    "Goodrich Maritime",
-    "WINWIN Lines",
-    "SeaLead Shipping",
-    "X-Press Feeders",
-    "SITC Container",
-    "Sinokor Merchant",
-    "Emirates Shipping",
-    "IRISL",
-    "Bahri",
-    "Arkas Line",
-    "Antong Holdings",
-    "SM Line",
-    "Sealand",
-    "Gold Star Line",
-    "Samudera Shipping",
-    "Balaji Shipping",
-    "Shreyas",
-    "Transworld Group",
-    "SCI ",
-    "Sarjak Container Lines",
-    "Allcargo Logistics",
-    "TLPL",
-    "TGLS",
-    "TASS",
     "OOCL",
+    "PIL",
+    "SCI",
+    "SITC Container",
+    "SM Line",
+    "Samudera Shipping",
+    "Sarjak Container Lines",
+    "SeaLead Shipping",
+    "Sealand",
+    "Shreyas",
+    "Sinokor Merchant",
+    "TASS",
+    "TGLS",
+    "TLPL",
+    "TS Lines",
+    "Transworld Group",
+    "Unifeeder",
+    "WINWIN Lines",
+    "Wan Hai",
+    "X-Press Feeders",
+    "Yang Ming",
+    "ZIM"
   ];
 };
 
-// Function to fetch Shipping Lines options from API if needed in the future
+// Function to fetch Shipping Lines options from API
 export const fetchShippingLinesOptions = async () => {
   try {
-    // This function can be expanded later to fetch from an API
-    // For now, returning the static list
-    return getShippingLinesOptions();
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No authentication token found");
+      return getShippingLinesOptions(); // Fallback to static list
+    }
+
+    const response = await fetch(
+      "https://freightpro-4kjlzqm0.b4a.run/api/forms/all",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch Shipping Lines options");
+    }
+
+    const forms = await response.json();
+    
+    // Extract unique shipping lines from forms
+    const dynamicShippingLines = [...new Set(forms.map(form => form.shipping_lines).filter(Boolean))];
+    
+    // Combine with static options and remove duplicates
+    const allShippingLines = [...new Set([...getShippingLinesOptions(), ...dynamicShippingLines])].sort();
+    
+    return allShippingLines;
   } catch (error) {
     console.error("Error fetching Shipping Lines options:", error);
     return getShippingLinesOptions(); // Fallback to static list
   }
+};
+
+// Function to add a new shipping line to the existing list
+export const addNewShippingLine = (currentOptions, newShippingLine) => {
+  if (!newShippingLine || currentOptions.includes(newShippingLine)) {
+    return currentOptions;
+  }
+  return [...currentOptions, newShippingLine].sort();
 };
 
 // React hook for consuming Shipping Lines options in components
@@ -78,7 +113,19 @@ export const useShippingLinesOptions = () => {
     getOptions();
   }, []);
 
-  return { options, loading, error };
+  const refreshOptions = async () => {
+    setLoading(true);
+    try {
+      const result = await fetchShippingLinesOptions();
+      setOptions(result);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { options, loading, error, refreshOptions };
 };
 
 export default getShippingLinesOptions;

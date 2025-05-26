@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { TbRoute } from "react-icons/tb";
-import { TbCircleLetterR } from "react-icons/tb";
 import { LuRefreshCcw } from "react-icons/lu";
-import { IoLocationOutline } from "react-icons/io5";
 import { LuTruck } from "react-icons/lu";
 import { TbReceiptTax } from "react-icons/tb";
 import { LuMessageSquareMore } from "react-icons/lu";
@@ -27,10 +25,13 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoIosArrowDown } from "react-icons/io";
 import "react-datepicker/dist/react-datepicker.css";
 import Navbar from "../components/Navbar";
-import { getPOROptions } from "../components/POR";
-import { getPOLOptions } from "../components/POL";
+import { getPOROptions, usePOROptions } from "../components/POR";
+import { getPOLOptions, usePOLOptions } from "../components/POL";
 import { fetchPODOptions, usePODOptions } from "../components/POD";
-import { getShippingLinesOptions } from "../components/Shipping_lines";
+import {
+  getShippingLinesOptions,
+  useShippingLinesOptions,
+} from "../components/Shipping_lines";
 import { getRatesByPortAndLine } from "../components/Origin_rates";
 import { getRailFreightRates } from "../components/Rail_freightrates";
 import {
@@ -54,12 +55,19 @@ const Add_rates = () => {
   const [name, setName] = useState("");
   const [por, setpor] = useState("");
   const [pol, setpol] = useState("");
+  const [polInput, setPolInput] = useState("");
+  const [showPolSuggestions, setShowPolSuggestions] = useState(false);
+  const [polSuggestions, setPolSuggestions] = useState([]);
   const [pod, setpod] = useState("");
-  const [podInput, setPodInput] = useState(""); // Add this line
-  const [podSuggestions, setPodSuggestions] = useState([]); // Add this line
-  const [showPodSuggestions, setShowPodSuggestions] = useState(false); // Add this line
+  const [podInput, setPodInput] = useState("");
+  const [podSuggestions, setPodSuggestions] = useState([]);
+  const [showPodSuggestions, setShowPodSuggestions] = useState(false);
   const [fdrr, setfdrr] = useState("");
   const [shipping_lines, setshipping_lines] = useState("");
+  const [shippingLineInput, setShippingLineInput] = useState("");
+  const [showShippingLineSuggestions, setShowShippingLineSuggestions] =
+    useState(false);
+  const [shippingLineSuggestions, setShippingLineSuggestions] = useState([]);
   const [shipping_name, setshipping_name] = useState("");
   const [shipping_number, setshipping_number] = useState("");
   const [shipping_address, setshipping_address] = useState("");
@@ -97,16 +105,30 @@ const Add_rates = () => {
   const [isRefreshing, setIsRefreshing] = useState(false); // Add this new state variable
 
   // OPTIONS STATE - DEFINE THESE ONLY ONCE!
-  const [porOptions, setPorOptions] = useState([]);
-  const [polOptions, setPolOptions] = useState([]);
+  const {
+    options: porOptions,
+    loading: porLoading,
+    error: porError,
+  } = usePOROptions();
+  const {
+    options: polOptions,
+    loading: polLoading,
+    error: polError,
+    refreshOptions: refreshPOLOptions,
+  } = usePOLOptions();
   const {
     options: podOptions,
     loading: podLoading,
     error: podError,
     addPOD,
-    refreshOptions,
+    refreshOptions: refreshPODOptions,
   } = usePODOptions();
-  const [shippingLinesOptions, setShippingLinesOptions] = useState([]);
+  const {
+    options: shippingLinesOptions,
+    loading: shippingLinesLoading,
+    error: shippingLinesError,
+    refreshOptions: refreshShippingLinesOptions,
+  } = useShippingLinesOptions();
   const [optionsLoaded, setOptionsLoaded] = useState(false);
 
   // Calculator rates and related state
@@ -371,34 +393,28 @@ const Add_rates = () => {
 
     const loadOptions = async () => {
       try {
-        // Load options
-        const porData = getPOROptions();
-        const polData = getPOLOptions();
-        const shippingLines = getShippingLinesOptions();
-
-        console.log("Raw POR data:", porData);
-
-        // Set state with proper handling - PROPERLY HANDLE ARRAYS!
-        if (Array.isArray(porData)) {
-          setPorOptions(porData);
-          console.log("POR options set:", porData.length, "items");
-        } else {
-          console.error("POR data is not an array:", porData);
-          setPorOptions([]);
+        // Load POD options
+        const podData = await fetchPODOptions();
+        if (podData) {
+          podData.forEach((pod) => addPOD(pod));
         }
 
-        setPolOptions(Array.isArray(polData) ? polData : []);
-        setShippingLinesOptions(
-          Array.isArray(shippingLines) ? shippingLines : []
-        );
+        // Load POL options
+        const polData = await getPOLOptions();
+        if (polData) {
+          refreshPOLOptions();
+        }
+
+        // Load Shipping Lines options
+        const shippingLinesData = await getShippingLinesOptions();
+        if (shippingLinesData) {
+          console.log("Shipping lines options loaded:", shippingLinesData);
+          refreshShippingLinesOptions();
+        }
 
         setOptionsLoaded(true);
       } catch (error) {
-        console.error("Error loading dropdown options:", error);
-        // Set empty arrays as fallback
-        setPorOptions([]);
-        setPolOptions([]);
-        setShippingLinesOptions([]);
+        console.error("Error loading options:", error);
       }
     };
 
@@ -843,9 +859,19 @@ const Add_rates = () => {
   // Update the handleSubmit function to properly format the charges
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+
     try {
       // Validate required fields
-      if (!por || !pol || !pod || !shipping_lines || !container_type || !ocean_freight) {
+      if (
+        !por ||
+        !pol ||
+        !pod ||
+        !shipping_lines ||
+        !container_type ||
+        !ocean_freight
+      ) {
         toast.error("Please fill in all required fields");
         return;
       }
@@ -855,44 +881,64 @@ const Add_rates = () => {
         bl_fees: currentRates.bl_fees || "0",
         thc: currentRates.thc || "0",
         muc: currentRates.muc || "0",
-        toll: currentRates.toll || "0"
+        toll: currentRates.toll || "0",
       };
 
       // Format monetary values by removing currency symbols and using calculator values
-      const formattedBlFees = currentCalculatorRates.bl_fees.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedThc = currentCalculatorRates.thc.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedMuc = currentCalculatorRates.muc.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedToll = currentCalculatorRates.toll.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedBlFees =
+        currentCalculatorRates.bl_fees.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedThc =
+        currentCalculatorRates.thc.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedMuc =
+        currentCalculatorRates.muc.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedToll =
+        currentCalculatorRates.toll.replace(/[₹$€£¥]/g, "") || "0";
 
       // Format Ocean Freight with currency code and symbol - FIXED
-      const oceanFreightValue = ocean_freight.split(" ").slice(1).join(" ") || "0"; // Get everything after currency code
-      const oceanFreightAmount = oceanFreightValue.replace(/[₹$€£¥]/g, "") || "0"; // Remove any symbols
+      const oceanFreightValue =
+        ocean_freight.split(" ").slice(1).join(" ") || "0"; // Get everything after currency code
+      const oceanFreightAmount =
+        oceanFreightValue.replace(/[₹$€£¥]/g, "") || "0"; // Remove any symbols
       const oceanFreightSymbol = getCurrencySymbol(selectedCurrency);
       const formattedOceanFreight = `${selectedCurrency} ${oceanFreightSymbol}${oceanFreightAmount}`;
 
       // Format ACD/ENS/AFR with currency symbol
       const acdCurrencySymbol = getCurrencySymbol(acdCurrency);
-      const acdAmount = acd_ens_afr.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0";
-      const formattedAcdEnsAfr = acd_ens_afr ? `${acd_ens_afr.split(" ")[0]} ${acdCurrencySymbol}${acdAmount}` : "";
+      const acdAmount =
+        acd_ens_afr.split(" ")[1]?.replace(/[₹$€£¥]/g, "") || "0";
+      const formattedAcdEnsAfr = acd_ens_afr
+        ? `${acd_ens_afr.split(" ")[0]} ${acdCurrencySymbol}${acdAmount}`
+        : "";
 
       // Format custom charges with currency symbols for new format
       const formattedCustomCharges = customCharges
-        .filter(charge => charge.label && charge.value) // Only include charges with both label and value
-        .map(charge => ({
+        .filter((charge) => charge.label && charge.value) // Only include charges with both label and value
+        .map((charge) => ({
           ...charge,
-          value: charge.value ? `${getCurrencySymbol(charge.currency)}${charge.value.replace(/[₹$€£¥]/g, "")}` : "0"
+          value: charge.value
+            ? `${getCurrencySymbol(charge.currency)}${charge.value.replace(
+                /[₹$€£¥]/g,
+                ""
+              )}`
+            : "0",
         }));
 
       // Format custom charges for old format (backward compatibility)
       const customLabels = customCharges
-        .filter(charge => charge.label && charge.value)
-        .map(charge => charge.label);
+        .filter((charge) => charge.label && charge.value)
+        .map((charge) => charge.label);
       const customValues = customCharges
-        .filter(charge => charge.label && charge.value)
-        .map(charge => `${getCurrencySymbol(charge.currency)}${charge.value.replace(/[₹$€£¥]/g, "")}`);
+        .filter((charge) => charge.label && charge.value)
+        .map(
+          (charge) =>
+            `${getCurrencySymbol(charge.currency)}${charge.value.replace(
+              /[₹$€£¥]/g,
+              ""
+            )}`
+        );
       const customUnits = customCharges
-        .filter(charge => charge.label && charge.value)
-        .map(charge => charge.unit || "");
+        .filter((charge) => charge.label && charge.value)
+        .map((charge) => charge.unit || "");
 
       // Join with delimiter for old format
       const formattedCustomLabel = customLabels.join("|||");
@@ -912,15 +958,15 @@ const Add_rates = () => {
         oldFormat: {
           label: formattedCustomLabel,
           value: formattedCustomValue,
-          unit: formattedCustomUnit
-        }
+          unit: formattedCustomUnit,
+        },
       });
 
       if (editFormId) {
         // Editing existing form - Pass editFormId as the first parameter
         await editForm(
           editFormId, // Pass the form ID first
-          username,   // Then pass the username
+          username, // Then pass the username
           formattedBlFees,
           formattedThc,
           formattedMuc,
@@ -987,12 +1033,20 @@ const Add_rates = () => {
 
       // Clear form fields after successful submission
       clearFormFields();
-      
+
       // Refresh the rates list
       getUserForms();
+
+      // After successful submission, refresh POL options
+      await refreshPOLOptions();
+
+      // After successful submission, refresh shipping lines options
+      await refreshShippingLinesOptions();
     } catch (error) {
       console.error("Error submitting form:", error);
-      toast.error("Failed to submit rate filing. Please try again.");
+      setSubmitError(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -1557,7 +1611,8 @@ const Add_rates = () => {
     setpod(value);
 
     if (value) {
-      const filtered = podOptions.filter((option) =>
+      // Filter and ensure unique values
+      const filtered = [...new Set(podOptions)].filter((option) =>
         option.toLowerCase().includes(value.toLowerCase())
       );
       setPodSuggestions(filtered);
@@ -1573,8 +1628,11 @@ const Add_rates = () => {
     setPodInput(selectedPod);
     setpod(selectedPod);
     setShowPodSuggestions(false);
-    addPOD(selectedPod);
-    refreshOptions();
+    // Only add if it doesn't already exist
+    if (!podOptions.includes(selectedPod)) {
+      addPOD(selectedPod);
+      refreshPODOptions();
+    }
   };
 
   // Add this new function to handle POD input blur
@@ -1596,7 +1654,7 @@ const Add_rates = () => {
         toast.success("New POD added successfully!");
 
         // Force refresh the options
-        refreshOptions();
+        refreshPODOptions();
       } catch (error) {
         console.error("Error handling POD input blur:", error);
         toast.error("Failed to process POD. Please try again.");
@@ -1642,6 +1700,84 @@ const Add_rates = () => {
       return null;
     }
   };
+
+  // Add this function to handle POL input changes
+  const handlePolInputChange = (e) => {
+    const value = e.target.value;
+    setpol(value);
+    setPolInput(value);
+
+    // Filter suggestions based on input
+    if (value.trim()) {
+      const filtered = polOptions.filter((option) =>
+        option.toLowerCase().includes(value.toLowerCase())
+      );
+      setPolSuggestions(filtered);
+      setShowPolSuggestions(true);
+    } else {
+      setPolSuggestions([]);
+      setShowPolSuggestions(false);
+    }
+  };
+
+  // Add this function to handle POL selection
+  const handlePolSelect = (selectedPol) => {
+    setpol(selectedPol);
+    setPolInput(selectedPol);
+    setShowPolSuggestions(false);
+  };
+
+  // Add this function to handle POL input blur
+  const handlePolInputBlur = () => {
+    // Delay hiding suggestions to allow for click events
+    setTimeout(() => {
+      setShowPolSuggestions(false);
+    }, 200);
+  };
+
+  // Add useEffect to initialize polInput when pol changes
+  useEffect(() => {
+    setPolInput(pol);
+  }, [pol]);
+
+  // Add this function to handle shipping line input changes
+  const handleShippingLineInputChange = (e) => {
+    const value = e.target.value;
+    setShippingLineInput(value);
+    setshipping_lines(value);
+
+    // Filter suggestions based on input
+    if (value.trim()) {
+      const filtered = shippingLinesOptions.filter((option) =>
+        option.toLowerCase().includes(value.toLowerCase())
+      );
+      setShippingLineSuggestions(filtered);
+      setShowShippingLineSuggestions(true);
+    } else {
+      setShippingLineSuggestions([]);
+      setShowShippingLineSuggestions(false);
+    }
+  };
+
+  // Add this function to handle shipping line selection
+  const handleShippingLineSelect = (selectedShippingLine) => {
+    setshipping_lines(selectedShippingLine);
+    setShippingLineInput(selectedShippingLine);
+    setShowShippingLineSuggestions(false);
+  };
+
+  // Add this function to handle shipping line input blur
+  const handleShippingLineInputBlur = () => {
+    // Delay hiding suggestions to allow for click events
+    setTimeout(() => {
+      setShowShippingLineSuggestions(false);
+    }, 200);
+  };
+
+  // Add useEffect to initialize shippingLineInput when shipping_lines changes
+  useEffect(() => {
+    setShippingLineInput(shipping_lines);
+  }, [shipping_lines]);
 
   return (
     <>
@@ -1777,56 +1913,75 @@ const Add_rates = () => {
                         <label className="block text-sm font-medium text-black mb-1">
                           POR (Place of Receipt){" "}
                           <span className="text-red-500 ">*</span>
-                          {!optionsLoaded && (
-                            <span className="text-xs text-gray-500 ml-2 animate-pulse">
-                              (Loading...)
-                            </span>
-                          )}
                         </label>
-                        <div className="relative rounded-md shadow-sm  border border-blue-300">
-                          <div className="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                            <IoLocationOutline />
-                          </div>
+                        <div className="relative shadow-sm rounded-md border border-blue-300">
                           <select
                             value={por}
                             onChange={(e) => setpor(e.target.value)}
-                            className="appearance-none block w-full pl-8 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                             required
                           >
-                            <option value="" disabled>
-                              Select POR
-                            </option>
-                            {renderPOROptions()}
+                            <option value="">Select POR</option>
+                            {porOptions.map((option, index) => (
+                              <option key={index} value={option}>
+                                {option}
+                              </option>
+                            ))}
                           </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <IoIosArrowDown />
-                          </div>
                         </div>
+                        {porError && (
+                          <p className="mt-1 text-sm text-red-600">
+                            Error loading POR options: {porError}
+                          </p>
+                        )}
                       </div>
                       {/* Shipping Line */}
                       <div className="mb-1 sm:block hidden">
                         <label className="block text-sm font-medium text-black mb-1">
                           Shipping Line <span className="text-red-500 ">*</span>
                         </label>
-                        <div className="relative  shadow-sm rounded-md border border-blue-300">
+                        <div className="relative shadow-sm rounded-md border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <LiaShipSolid />
                           </div>
-                          <select
-                            value={shipping_lines}
-                            onChange={(e) => setshipping_lines(e.target.value)}
-                            className="appearance-none block w-full pl-10 pr-5 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                          <input
+                            type="text"
+                            value={shippingLineInput}
+                            onChange={handleShippingLineInputChange}
+                            onFocus={() => setShowShippingLineSuggestions(true)}
+                            onBlur={handleShippingLineInputBlur}
+                            className="block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            placeholder="Type or Select Shipping Line"
                             required
-                          >
-                            <option value="" disabled>
-                              Select Shipping Line
-                            </option>
-                            {renderShippingLinesOptions()}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <IoIosArrowDown />
-                          </div>
+                          />
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"></div>
+                          {showShippingLineSuggestions &&
+                            shippingLineSuggestions.length > 0 && (
+                              <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm">
+                                {shippingLineSuggestions.map(
+                                  (suggestion, index) => (
+                                    <div
+                                      key={index}
+                                      className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50"
+                                      onClick={() =>
+                                        handleShippingLineSelect(suggestion)
+                                      }
+                                    >
+                                      <span className="block truncate text-gray-700">
+                                        {suggestion}
+                                      </span>
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            )}
                         </div>
+                        {shippingLinesError && (
+                          <p className="mt-1 text-sm text-red-600">
+                            Error loading Shipping Line options:{" "}
+                            {shippingLinesError}
+                          </p>
+                        )}
                       </div>
                       {/* POL */}
                       <div className="mb-1">
@@ -1834,31 +1989,42 @@ const Add_rates = () => {
                           POL (Port of Loading){" "}
                           <span className="text-red-500 ">*</span>
                         </label>
-                        <div className="relative rounded-md shadow-sm  border border-blue-300">
+                        <div className="relative rounded-md shadow-sm border border-blue-300">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <LuShip />
                           </div>
-                          <select
-                            value={pol}
-                            onChange={(e) => setpol(e.target.value)}
-                            className="appearance-none block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                          <input
+                            type="text"
+                            value={polInput}
+                            onChange={handlePolInputChange}
+                            onFocus={() => setShowPolSuggestions(true)}
+                            onBlur={handlePolInputBlur}
+                            className="block w-full pl-10 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            placeholder="Type or Select POL"
                             required
-                          >
-                            <option value="" disabled>
-                              Select POL
-                            </option>
-                            {polOptions && polOptions.length > 0
-                              ? polOptions.map((option) => (
-                                  <option key={option} value={option}>
-                                    {option}
-                                  </option>
-                                ))
-                              : null}
-                          </select>
-                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                            <IoIosArrowDown />
-                          </div>
+                          />
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none"></div>
+                          {showPolSuggestions && polSuggestions.length > 0 && (
+                            <div className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base overflow-auto focus:outline-none sm:text-sm">
+                              {polSuggestions.map((suggestion, index) => (
+                                <div
+                                  key={index}
+                                  className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50"
+                                  onClick={() => handlePolSelect(suggestion)}
+                                >
+                                  <span className="block truncate text-gray-700">
+                                    {suggestion}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
+                        {polError && (
+                          <p className="mt-1 text-sm text-red-600">
+                            Error loading POL options: {polError}
+                          </p>
+                        )}
                       </div>
 
                       {/* Container Type */}
@@ -2008,7 +2174,7 @@ const Add_rates = () => {
                             <input
                               value={fdrr}
                               type="text"
-                              placeholder="Type or select Final Destination (Rail Ramp)"
+                              placeholder="Type or Select Final Destination (Rail Ramp)"
                               onChange={handleRailRampInputChange}
                               onFocus={handleRailRampFocus}
                               onBlur={() =>
