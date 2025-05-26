@@ -319,11 +319,11 @@ const View_rates = () => {
       <div className="container mx-auto p-2 sm:p-4 max-w-full">
         {/* Filters section */}
         <div className="mt-1 bg-white rounded-xl shadow-sm overflow-hidden px-2 sm:px-6 mb-4">
-          <div className="p-2 sm:p-3">
+          <div className="p-2 ">
             <div className="flex flex-col sm:flex-row gap-3 flex-wrap justify-evenly">
-              <div className="flex justify-around items-center w-full sm:w-auto gap-3">
+              <div className="flex justify-around items-center w-full sm:w-auto gap-2">
                 {/* POL Filter */}
-                <div className="w-full sm:max-w-60 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
+                <div className="w-full sm:max-w-60 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
                   <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
                     Port of Loading (POL)
                   </label>
@@ -373,7 +373,7 @@ const View_rates = () => {
                 </div>
 
                 {/* POD Filter */}
-                <div className="w-full sm:max-w-64 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1 min-w-[200px]">
+                <div className="w-full sm:max-w-64 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1 min-w-[200px]">
                   <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-1">
                     Port of Delivery (POD)
                   </label>
@@ -667,7 +667,7 @@ const View_rates = () => {
             </div>
 
             {/* Showing rates count */}
-            <div className="bg-blue-50 text-blue-700 rounded-lg px-4 py-2 font-medium inline-flex items-center text-center">
+            <div className="bg-blue-50 text-blue-700 rounded-lg px-2 py-2 font-medium inline-flex items-center text-center">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-5 w-5 mr-2"
@@ -945,7 +945,7 @@ const View_rates = () => {
                                     e.target.src = defaultUserImg;
                                   }}
                                 />
-                                <div className="flex flex-col items-center sm:items-start ml-1">
+                                <div className="flex flex-col items-center sm:items-start lg:ml-1 text-center ml-0 ">
                                   <span className="text-[8px] sm:text-xs font-medium text-gray-900 text-center sm:text-left">
                                     {item.name}
                                   </span>
