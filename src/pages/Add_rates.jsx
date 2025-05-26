@@ -1918,7 +1918,7 @@ const Add_rates = () => {
                           <select
                             value={por}
                             onChange={(e) => setpor(e.target.value)}
-                            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            className="block w-full border-0 py-1.5 pl-3 pr-10 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                             required
                           >
                             <option value="">Select POR</option>
