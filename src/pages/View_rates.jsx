@@ -4,6 +4,8 @@ import Navbar from "../components/Navbar";
 import harmeetImg from "../assets/harmeet.jpg";
 import vikramImg from "../assets/vikram.jpg";
 import kapilImg from "../assets/kapil.jpg";
+import tarunImg from "../assets/tarun.jpeg";
+import paramImg from "../assets/param.jpeg";
 // Default profile image for fallback
 import defaultUserImg from "../assets/omtrans.jpg";
 import { IoIosArrowDown } from "react-icons/io";
@@ -34,6 +36,8 @@ const View_rates = () => {
       Vikram: vikramImg,
       Harmeet: harmeetImg,
       Kapil: kapilImg,
+      Tarun: tarunImg,
+      Param: paramImg,
     };
     return userImages[name] || defaultUserImg;
   };
