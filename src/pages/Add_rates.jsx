@@ -1922,7 +1922,7 @@ const Add_rates = () => {
                           <select
                             value={por}
                             onChange={(e) => setpor(e.target.value)}
-                            className="block w-full border-0 py-1.5 pl-7 pr-10 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
+                            className="appearance-none block w-full pl-10 pr-4 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md transition-shadow duration-150 ease-in-out hover:border-indigo-300 text-gray-700"
                             required
                           >
                             <option value="">Select POR</option>
@@ -1932,7 +1932,9 @@ const Add_rates = () => {
                               </option>
                             ))}
                           </select>
-                           
+                          <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                            <IoIosArrowDown />
+                          </div>
                         </div>
                         {porError && (
                           <p className="mt-1 text-sm text-red-600">
