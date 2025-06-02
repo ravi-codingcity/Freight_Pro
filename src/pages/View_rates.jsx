@@ -47,6 +47,7 @@ const View_rates = () => {
       Vikram: { branch: "Delhi", phoneNumber: "701" },
       Harmeet: { branch: "Delhi", phoneNumber: "705" },
       Tarun: { branch: "Delhi", phoneNumber: "735" },
+      Chirag: { branch: "Delhi", phoneNumber: "703" },
       Archana: { branch: "Kolkata", phoneNumber: "" },
       Manoj: { branch: "Ahmedabad", phoneNumber: "450" },
       Manjunath: { branch: "Bengaluru", phoneNumber: "514" },

@@ -3,7 +3,9 @@ import Navbar from "../components/Navbar";
 // Import all user profile images
 import harmeetImg from "../assets/harmeet.jpg";
 import vikramImg from "../assets/vikram.jpg";
-import kapilImg from "../assets/kapil.jpg";// Using default for Rajeev if no specific image
+import kapilImg from "../assets/kapil.jpg";
+import tarunImg from "../assets/tarun.jpeg";
+import paramImg from "../assets/param.jpeg";// Using default for Rajeev if no specific image
 // Default profile image for fallback
 import defaultUserImg from "../assets/omtrans.jpg";
 import { LuShip } from "react-icons/lu";
@@ -30,6 +32,8 @@ function Expired_rates() {
       Vikram: vikramImg,
       Harmeet: harmeetImg,
       Kapil: kapilImg,
+      Tarun: tarunImg,
+      Param: paramImg,
      
     }),
     []
@@ -46,10 +50,20 @@ function Expired_rates() {
   // Memoize user data
   const userProfiles = useMemo(
     () => ({
-      Vikram: { branch: "Delhi", phoneNumber: "123456789" },
-      Harmeet: { branch: "Mumbai", phoneNumber: "987654321" },
-      Rajeev: { branch: "Kolkata", phoneNumber: "972586412" },
-      Kapil: { branch: "Bangalore", phoneNumber: "456789123" },
+      Vikram: { branch: "Delhi", phoneNumber: "701" },
+      Harmeet: { branch: "Delhi", phoneNumber: "705" },
+      Tarun: { branch: "Delhi", phoneNumber: "735" },
+      Chirag: { branch: "Delhi", phoneNumber: "703" },
+      Archana: { branch: "Kolkata", phoneNumber: "" },
+      Manoj: { branch: "Ahmedabad", phoneNumber: "450" },
+      Manjunath: { branch: "Bengaluru", phoneNumber: "514" },
+      Param: { branch: "Chennai", phoneNumber: "768" },
+      Mahesh: { branch: "Mumbai", phoneNumber: "" },
+      Rajeshwari: { branch: "Mumbai", phoneNumber: "" },
+      Ragbir: { branch: "Mumbai", phoneNumber: "" },
+      Macwin: { branch: "Mumbai", phoneNumber: "" },
+      Prashant: { branch: "Mumbai", phoneNumber: "" },
+      Ravi: { branch: "Delhi", phoneNumber: "724" },
     }),
     []
   );
@@ -909,69 +923,29 @@ function Expired_rates() {
                               : "hover:bg-gray-50"
                           } transition-colors duration-150`}
                         >
-                          <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                            <div className="flex flex-col items-center sm:flex-row sm:items-center">
-                              {/* Fix user info layout for mobile */}
-                              <img
-                                src={getUserProfileImage(item.name)}
-                                alt={item.name}
-                                className="h-8 w-8 rounded-full object-cover border border-gray-200 mb-1 sm:mb-0 sm:mr-3"
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.src = defaultUserImg;
-                                }}
-                              />
-                              <div className="min-w-0 flex-1">
-                                <div className="sm:flex sm:items-center">
-                                  <span className="text-xs sm:text-sm font-medium text-gray-900 sm:mr-2 block truncate">
-                                    {item.name || "N/A"}
+                           {/* User column */}
+                           <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
+                              <div className="flex flex-col items-center lg:flex-row lg:items-center">
+                                <img
+                                  src={getUserProfileImage(item.name)}
+                                  alt={item.name}
+                                  className="h-8 w-8 rounded-full object-cover border border-gray-200 mb-1 sm:mb-0 sm:mr-0"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = defaultUserImg;
+                                  }}
+                                />
+                                <div className="flex flex-col items-center sm:items-start lg:ml-1 text-center ml-0 ">
+                                  <span className="text-[8px] sm:text-xs font-medium text-gray-900 text-center sm:text-left">
+                                    {item.name}
                                   </span>
-
-                                  {/* Remarks badge - Only visible on desktop */}
-                                  {hasRemarks && (
-                                    <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 animate-pulse">
-                                      <svg
-                                        className="w-3 h-3 mr-1 flex-shrink-0"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-1 9a1 1 0 100-2 1 1 0 000 2zm0 0v-2a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
-                                      <span>Remarks</span>
-                                    </span>
-                                  )}
-                                </div>
-
-                                <div className="flex items-center">
-                                  <span className="text-[10px] sm:text-xs text-gray-500 truncate">
+                                  <span className="text-[8px] sm:text-xs text-gray-500 text-center sm:text-left">
                                     {userData.branch}
                                   </span>
-
-                                  {/* Remarks badge - Only visible on mobile, after the branch */}
-                                  {hasRemarks && (
-                                    <span className="sm:hidden inline-flex items-center ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-yellow-100 text-yellow-800 border border-yellow-300 animate-pulse">
-                                      <svg
-                                        className="w-2 h-2 mr-0.5 flex-shrink-0"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-1 9a1 1 0 100-2 1 1 0 000 2zm0 0v-2a1 1 0 011-1h2a1 1 0 110 2h-2a1 1 0 01-1-1z"
-                                          clipRule="evenodd"
-                                        />
-                                      </svg>
-                                      <span className="sr-only">Remarks</span>
-                                    </span>
-                                  )}
                                 </div>
                               </div>
-                            </div>
-                          </td>
+                            </td>
+
                           <td className="px-2 py-2 whitespace-nowrap border-r border-gray-200">
                               <span className="text-[10px] sm:text-xs font-medium text-gray-900">
                                 {item.shipping_lines}
@@ -998,13 +972,23 @@ function Expired_rates() {
                                 {item.container_type}
                               </span>
                             </td>
+                            <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
+                              <div className="text-[10px] sm:text-xs font-medium text-gray-900">
+                                {item.ocean_freight}
+                              </div>
+                              <div className="text-[8px] sm:text-xs text-gray-500">
+                                {item.acd_ens_afr}
+                              </div>
+                              {hasRemarks && (
+                                <div title="Important Remark">
+                                  <span className="text-[10px] text-red-600 animate-pulse">
+                                    Please Read Remark
+                                  </span>
+                                </div>
+                              )}
+                            </td>
                           <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                            <div className="text-xs sm:text-sm font-medium text-red-600">
-                              {item.ocean_freight || "N/A"}
-                            </div>
-                          </td>
-                          <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                            <span className="px-1.5 sm:px-2 py-1 inline-flex text-[10px] sm:text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                            <span className="px-1.5 sm:px-2 py-1 inline-flex text-[10px] sm:text-xs leading-5 font-semibold rounded-md bg-red-100 text-red-800">
                               {formatDate(item.validity)}
                             </span>
                           </td>
