@@ -5,7 +5,7 @@ import harmeetImg from "../assets/harmeet.jpg";
 import vikramImg from "../assets/vikram.jpg";
 import kapilImg from "../assets/kapil.jpg";
 import tarunImg from "../assets/tarun.jpeg";
-import paramImg from "../assets/param.jpeg";// Using default for Rajeev if no specific image
+import paramImg from "../assets/param.jpeg"; // Using default for Rajeev if no specific image
 // Default profile image for fallback
 import defaultUserImg from "../assets/omtrans.jpg";
 import { LuShip } from "react-icons/lu";
@@ -34,7 +34,6 @@ function Expired_rates() {
       Kapil: kapilImg,
       Tarun: tarunImg,
       Param: paramImg,
-     
     }),
     []
   );
@@ -120,17 +119,17 @@ function Expired_rates() {
 
   // Add this utility function at the top of your component
   const handleAuthError = (error) => {
-    if (error?.response?.status === 401 || error?.message?.includes('token')) {
+    if (error?.response?.status === 401 || error?.message?.includes("token")) {
       // Clear user data from localStorage
-      localStorage.removeItem('token');
-      localStorage.removeItem('username');
-      localStorage.removeItem('currentUser');
-      
+      localStorage.removeItem("token");
+      localStorage.removeItem("username");
+      localStorage.removeItem("currentUser");
+
       // Alert the user
-      alert('Your session has expired. Please login again.');
-      
+      alert("Your session has expired. Please login again.");
+
       // Redirect to login page
-      window.location.href = '/';
+      window.location.href = "/";
       return true;
     }
     return false;
@@ -144,8 +143,8 @@ function Expired_rates() {
     const token = localStorage.getItem("token");
     if (!token) {
       // If no token exists, redirect to login
-      alert('Authentication required. Please login.');
-      window.location.href = '/';
+      alert("Authentication required. Please login.");
+      window.location.href = "/";
       return;
     }
 
@@ -157,14 +156,17 @@ function Expired_rates() {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("https://freightpro-4kjlzqm0.b4a.run/api/forms/all", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`,
-          },
-          signal, // Pass the signal to make the fetch abortable
-        });
+        const response = await fetch(
+          "https://freightpro-4kjlzqm0.b4a.run/api/forms/all",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            signal, // Pass the signal to make the fetch abortable
+          }
+        );
 
         if (response.status === 401) {
           // Handle expired token
@@ -363,17 +365,18 @@ function Expired_rates() {
         }
 
         // Determine container size display based on container type
-        const containerSize = containerType && 
-          (containerType.startsWith("40") || containerType.startsWith("45")) 
-          ? "40ft" 
-          : "20ft";
+        const containerSize =
+          containerType &&
+          (containerType.startsWith("40") || containerType.startsWith("45"))
+            ? "40ft"
+            : "20ft";
 
         const result = (
           <div className="grid gap-1 mt-1">
             {Object.entries(ratesObj).map(([weightRange, rate]) => (
               <span key={weightRange} className="text-xs">
-                <span className="font-medium">{containerSize}:</span> {weightRange}{" "}
-                <span className="text-blue-600">{rate}</span>
+                <span className="font-medium">{containerSize}:</span>{" "}
+                {weightRange} <span className="text-blue-600">{rate}</span>
                 <span className="text-gray-500"> /Container</span>
               </span>
             ))}
@@ -398,7 +401,7 @@ function Expired_rates() {
         {/* Advanced Search Filters - Make responsive */}
         <div className="mt-1 bg-white rounded-xl shadow-sm overflow-hidden px-2 sm:px-6 mb-2 sm:mb-4">
           <div className="p-2 sm:p-3">
-          <div className="flex flex-col sm:flex-row gap-3 flex-wrap justify-evenly">
+            <div className="flex flex-col sm:flex-row gap-3 flex-wrap justify-evenly">
               <div className="flex justify-around items-center gap-2 flex-col sm:flex-row">
                 {/* POL Filter */}
                 <div className="w-full sm:w-60 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-2 sm:p-2 border border-gray-200 hover:shadow-md transition-shadow duration-200 flex-1">
@@ -407,7 +410,7 @@ function Expired_rates() {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <LuShip />
+                      <LuShip />
                     </div>
                     <select
                       value={selectedPOL}
@@ -422,7 +425,7 @@ function Expired_rates() {
                       ))}
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <IoIosArrowDown />
+                      <IoIosArrowDown />
                     </div>
                   </div>
                 </div>
@@ -434,7 +437,7 @@ function Expired_rates() {
                   </label>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <LuShip />
+                      <LuShip />
                     </div>
                     <select
                       value={selectedPOD}
@@ -449,7 +452,7 @@ function Expired_rates() {
                       ))}
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                    <IoIosArrowDown />
+                      <IoIosArrowDown />
                     </div>
                   </div>
                 </div>
@@ -923,70 +926,70 @@ function Expired_rates() {
                               : "hover:bg-gray-50"
                           } transition-colors duration-150`}
                         >
-                           {/* User column */}
-                           <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                              <div className="flex flex-col items-center lg:flex-row lg:items-center">
-                                <img
-                                  src={getUserProfileImage(item.name)}
-                                  alt={item.name}
-                                  className="h-8 w-8 rounded-full object-cover border border-gray-200 mb-1 sm:mb-0 sm:mr-0"
-                                  onError={(e) => {
-                                    e.target.onerror = null;
-                                    e.target.src = defaultUserImg;
-                                  }}
-                                />
-                                <div className="flex flex-col items-center sm:items-start lg:ml-1 text-center ml-0 ">
-                                  <span className="text-[8px] sm:text-xs font-medium text-gray-900 text-center sm:text-left">
-                                    {item.name}
-                                  </span>
-                                  <span className="text-[8px] sm:text-xs text-gray-500 text-center sm:text-left">
-                                    {userData.branch}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-
-                          <td className="px-2 py-2 whitespace-nowrap border-r border-gray-200">
-                              <span className="text-[10px] sm:text-xs font-medium text-gray-900">
-                                {item.shipping_lines}
-                              </span>
-                            </td>
-                          <td className="px-2  py-2 border-r border-gray-200">
-                              <div className="flex items-center text-[8px] sm:text-xs">
-                                <div className="">
-                                  <span className="text-[10px] sm:text-xs font-medium text-gray-900">
-                                    {item.pol}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-2  py-2 border-r border-gray-300">
-                              <div className="flex items-center text-[10px] sm:text-xs">
-                                <span className="font-medium text-black">
-                                  {item.fdrr ? item.fdrr : item.pod}
+                          {/* User column */}
+                          <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
+                            <div className="flex flex-col items-center lg:flex-row lg:items-center">
+                              <img
+                                src={getUserProfileImage(item.name)}
+                                alt={item.name}
+                                className="h-8 w-8 rounded-full object-cover border border-gray-200 mb-1 sm:mb-0 sm:mr-0"
+                                onError={(e) => {
+                                  e.target.onerror = null;
+                                  e.target.src = defaultUserImg;
+                                }}
+                              />
+                              <div className="flex flex-col items-center sm:items-start lg:ml-1 text-center ml-0 ">
+                                <span className="text-[8px] sm:text-xs font-medium text-gray-900 text-center sm:text-left">
+                                  {item.name}
+                                </span>
+                                <span className="text-[8px] sm:text-xs text-gray-500 text-center sm:text-left">
+                                  {userData.branch}
                                 </span>
                               </div>
-                            </td>
-                            <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                              <span className="text-[10px] sm:text-xs font-medium text-gray-900">
-                                {item.container_type}
+                            </div>
+                          </td>
+
+                          <td className="px-2 py-2 whitespace-nowrap border-r border-gray-200">
+                            <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                              {item.shipping_lines}
+                            </span>
+                          </td>
+                          <td className="px-2  py-2 border-r border-gray-200">
+                            <div className="flex items-center text-[8px] sm:text-xs">
+                              <div className="">
+                                <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                                  {item.pol}
+                                </span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-2  py-2 border-r border-gray-300">
+                            <div className="flex items-center text-[10px] sm:text-xs">
+                              <span className="font-medium text-black">
+                                {item.fdrr ? item.fdrr : item.pod}
                               </span>
-                            </td>
-                            <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
-                              <div className="text-[10px] sm:text-xs font-medium text-gray-900">
-                                {item.ocean_freight}
+                            </div>
+                          </td>
+                          <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
+                            <span className="text-[10px] sm:text-xs font-medium text-gray-900">
+                              {item.container_type}
+                            </span>
+                          </td>
+                          <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
+                            <div className="text-[10px] sm:text-xs font-medium text-gray-900">
+                              {item.ocean_freight}
+                            </div>
+                            <div className="text-[8px] sm:text-xs text-gray-500">
+                              {item.acd_ens_afr}
+                            </div>
+                            {hasRemarks && (
+                              <div title="Important Remark">
+                                <span className="text-[10px] text-red-600 animate-pulse">
+                                  Please Read Remark
+                                </span>
                               </div>
-                              <div className="text-[8px] sm:text-xs text-gray-500">
-                                {item.acd_ens_afr}
-                              </div>
-                              {hasRemarks && (
-                                <div title="Important Remark">
-                                  <span className="text-[10px] text-red-600 animate-pulse">
-                                    Please Read Remark
-                                  </span>
-                                </div>
-                              )}
-                            </td>
+                            )}
+                          </td>
                           <td className="px-2 sm:px-3 py-2 whitespace-nowrap border-r border-gray-200">
                             <span className="px-1.5 sm:px-2 py-1 inline-flex text-[10px] sm:text-xs leading-5 font-semibold rounded-md bg-red-100 text-red-800">
                               {formatDate(item.validity)}
@@ -1182,7 +1185,6 @@ function Expired_rates() {
                                         {item.toll || "N/A"} /Container
                                       </p>
                                     </div>
-                                 
                                   </div>
 
                                   {/* Custom Charges Section */}
@@ -1301,8 +1303,8 @@ function Expired_rates() {
 
                                   <div className="mt-2 border-t border-gray-200 pt-2">
                                     <span className="text-gray-500 text-xs">
-                                     IHC Rail Freight (Based on Cargo Weight + Tare
-                                      Weight)
+                                      IHC Rail Freight (Based on Cargo Weight +
+                                      Tare Weight)
                                     </span>
                                     <div className="mt-1">
                                       {item.railFreightRates ? (
