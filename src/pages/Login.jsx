@@ -210,7 +210,7 @@ const Login = () => {
         <div className="text-center text-sm text-gray-500 mt-3">
           Need support? Contact IT Department at{" "}
           <a className="text-red-600 font-medium" href="mailto:it@omtrans.com">
-            it@omtrans.com
+            it@omtrans.in
           </a>
         </div>
       </div>
