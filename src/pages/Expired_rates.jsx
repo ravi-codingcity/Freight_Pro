@@ -7,6 +7,7 @@ import kapilImg from "../assets/kapil.jpg";
 import tarunImg from "../assets/tarun.jpeg";
 import paramImg from "../assets/param.jpeg"; // Using default for Rajeev if no specific image
 import manojImg from "../assets/manoj.jpeg";
+import manjunathImg from "../assets/manjunath.jpeg";
 // Default profile image for fallback
 import defaultUserImg from "../assets/omtrans.jpg";
 import { LuShip } from "react-icons/lu";
@@ -36,6 +37,7 @@ function Expired_rates() {
       Tarun: tarunImg,
       Param: paramImg,
       Manoj: manojImg,
+      Manjunath: manjunathImg,
     }),
     []
   );

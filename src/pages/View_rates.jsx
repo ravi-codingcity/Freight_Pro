@@ -7,6 +7,7 @@ import kapilImg from "../assets/kapil.jpg";
 import tarunImg from "../assets/tarun.jpeg";
 import paramImg from "../assets/param.jpeg";
 import manojImg from "../assets/manoj.jpeg";
+import manjunathImg from "../assets/manjunath.jpeg";
 // Default profile image for fallback
 import defaultUserImg from "../assets/omtrans.jpg";
 import { IoIosArrowDown } from "react-icons/io";
@@ -40,6 +41,7 @@ const View_rates = () => {
       Tarun: tarunImg,
       Param: paramImg,
       Manoj: manojImg,
+      Manjunath: manjunathImg,
     };
     return userImages[name] || defaultUserImg;
   };
