@@ -13,6 +13,7 @@ export const getShippingLinesOptions = () => {
     "COSCO",
     "Emirates Shipping",
     "Evergreen",
+    "FESCO LINE",
     "Gold Star Line",
     "Goodrich Maritime",
     "HMM",
