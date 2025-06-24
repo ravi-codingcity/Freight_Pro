@@ -3,9 +3,10 @@ import { useState, useEffect } from "react";
 // Function that returns the Shipping Lines options array
 export const getShippingLinesOptions = () => {
   return [
-    "Allcargo Logistics",
+     "Allcargo Logistics",
     "Antong Holdings",
     "Arkas Line",
+    "ANL",
     "Bahri",
     "Balaji Shipping",
     "CMA CGM",
@@ -17,8 +18,13 @@ export const getShippingLinesOptions = () => {
     "HMM",
     "Hapag-Lloyd",
     "IRISL",
+    "INOX",
+    "KMTC",
     "Maersk",
+    "Maxicon Shipping Agencies",
     "MSC",
+    "NAVIS",
+    "NAVIO",
     "ONE",
     "OOCL",
     "PIL",
@@ -33,15 +39,18 @@ export const getShippingLinesOptions = () => {
     "Sinokor Merchant",
     "TASS",
     "TGLS",
+    "Trans Asia",
     "TLPL",
     "TS Lines",
     "Transworld Group",
+    "UAFL",
     "Unifeeder",
+    "UNITED LINER",
     "WINWIN Lines",
     "Wan Hai",
     "X-Press Feeders",
     "Yang Ming",
-    "ZIM"
+    "ZIM",
   ];
 };
 
