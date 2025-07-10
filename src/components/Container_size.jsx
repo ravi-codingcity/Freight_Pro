@@ -14,6 +14,8 @@ export const getContainerSizeOptions = () => {
     { label: "40ft Open Top Out-of-Gauge Container", value: "40ft OT-Out" },
     { label: "20ft Flat Rack Container", value: "20ft FR" },
     { label: "40ft Flat Rack Container", value: "40ft FR" },
+    { label: "20ft Hazardous Container", value: "20ft Haz" },
+    { label: "40ft Hazardous Container", value: "40ft Haz" },
   ];
 };
 

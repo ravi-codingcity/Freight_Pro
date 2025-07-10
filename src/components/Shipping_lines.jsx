@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 // Function that returns the Shipping Lines options array
 export const getShippingLinesOptions = () => {
   return [
-     "Allcargo Logistics",
+    "Allcargo Logistics",
     "Antong Holdings",
     "Arkas Line",
     "ANL",
