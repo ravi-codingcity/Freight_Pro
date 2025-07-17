@@ -11,6 +11,7 @@ export const getShippingLinesOptions = () => {
     "Balaji Shipping",
     "CMA CGM",
     "COSCO",
+    "Econ Line",
     "Emirates Shipping",
     "Evergreen",
     "FESCO LINE",
