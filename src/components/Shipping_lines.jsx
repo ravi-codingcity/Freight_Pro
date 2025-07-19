@@ -19,6 +19,7 @@ export const getShippingLinesOptions = () => {
     "Goodrich Maritime",
     "HMM",
     "Hapag-Lloyd",
+    "Interasia Line",
     "IRISL",
     "INOX",
     "KMTC",
