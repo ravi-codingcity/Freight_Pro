@@ -52,6 +52,7 @@ const POR_OPTIONS = [
   "Port Blair Port (AN)",
   "Sonepat ICD (HR)",
   "Sanand ICD (GJ)",
+  "TUMB ICD (GJ)",
   "Tughlakabad ICD (DL)",
   "Tuticorin Port (TN)",
   "Visakhapatnam Port (AP)",
