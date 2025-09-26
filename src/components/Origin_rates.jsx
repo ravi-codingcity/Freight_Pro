@@ -16,7 +16,7 @@ const fetchAllOriginRates = async () => {
   try {
     console.log("Fetching origin rates from API");
     const response = await fetch(
-      "https://originbackend-7uvypf08.b4a.run/api/origin/forms/all"
+      "https://origin-backend-3v3f.onrender.com/api/origin/forms/all"
     );
 
     if (!response.ok) {

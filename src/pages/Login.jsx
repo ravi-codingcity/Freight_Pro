@@ -1,5 +1,6 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDataContext } from "../context/DataContext";
 import logo from "../assets/omtrans_logo.png";
 import {
   FaLock,
@@ -13,6 +14,9 @@ import {
 } from "react-icons/fa";
 
 const Login = () => {
+  // Use data context to trigger pre-fetching after login
+  const { initializeData } = useDataContext();
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +52,20 @@ const Login = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", email);
         console.log("Login successful!");
+        
+        // Trigger data pre-fetching immediately after successful login
+        console.log("Initiating data pre-fetch for optimal performance...");
+        try {
+          // Start data initialization in the background (non-blocking)
+          initializeData().then(() => {
+            console.log("Data pre-fetching completed successfully");
+          }).catch((error) => {
+            console.warn("Data pre-fetching failed, but continuing with navigation:", error);
+          });
+        } catch (error) {
+          console.warn("Failed to start data pre-fetching:", error);
+        }
+        
         navigate("/import_export");
       } else {
         setError(

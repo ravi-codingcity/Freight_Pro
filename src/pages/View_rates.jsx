@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
+import { useDataContext } from "../context/DataContext";
 import Navbar from "../components/Navbar";
 // Import all user profile images
 import harmeetImg from "../assets/harmeet.jpg";
@@ -8,29 +10,93 @@ import tarunImg from "../assets/tarun.jpeg";
 import paramImg from "../assets/param.jpeg";
 import manojImg from "../assets/manoj.jpeg";
 import manjunathImg from "../assets/manjunath.jpeg";
+import TGLImg from "../assets/TGL_Logo.jpg";
 // Default profile image for fallback
 import defaultUserImg from "../assets/omtrans.jpg";
 import { IoIosArrowDown } from "react-icons/io";
 import { LuShip } from "react-icons/lu";
 
 const View_rates = () => {
+  const location = useLocation();
+  
+  // Use the global data context for optimized performance
+  const {
+    allFreightRates,
+    isDataLoading,
+    isInitialized,
+    error: dataError,
+    refreshData,
+    totalRates
+  } = useDataContext();
+  
   const [searchTerm, setSearchTerm] = useState("");
-  const [data, setData] = useState([]);
   const [currentUser, setCurrentUser] = useState("");
   const [expandedRows, setExpandedRows] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // New filter states
   const [showOnlyWithRemarks, setShowOnlyWithRemarks] = useState(false);
   const [selectedPOL, setSelectedPOL] = useState("");
   const [selectedPOD, setSelectedPOD] = useState("");
-  const [uniquePOLs, setUniquePOLs] = useState([]);
-  const [uniquePODs, setUniquePODs] = useState([]);
-
+  
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 30;
+
+  // Memoized data processing for performance
+  const { processedData, uniquePOLs, uniquePODs } = useMemo(() => {
+    console.log('[View_rates] Processing freight rates data...');
+    
+    if (!allFreightRates || allFreightRates.length === 0) {
+      return {
+        processedData: [],
+        uniquePOLs: [],
+        uniquePODs: []
+      };
+    }
+
+    // Process the data similar to the original fetchAllForms logic
+    const processedForms = allFreightRates.map((form) => {
+      return {
+        ...form,
+        origin_charges: form.origin_charges || "N/A",
+        thc: form.thc || "N/A",
+        muc: form.muc || "N/A",
+        tou: form.tou || "N/A",
+        acd_ams: form.acd_ams || "N/A",
+        ens: form.ens || "N/A",
+      };
+    });
+
+    // Extract unique POLs and PODs for dropdowns
+    const pols = [
+      ...new Set(processedForms.map((form) => form.pol).filter(Boolean)),
+    ].sort();
+    const pods = [
+      ...new Set(
+        processedForms
+          .map((form) => (form.fdrr ? form.fdrr : form.pod))
+          .filter(Boolean)
+      ),
+    ].sort();
+
+    // Sort by creation date (newest first)
+    const sortedData = processedForms.sort(
+      (a, b) => new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at)
+    );
+
+    console.log('[View_rates] Processed data:', {
+      total: sortedData.length,
+      uniquePOLs: pols.length,
+      uniquePODs: pods.length
+    });
+
+    return {
+      processedData: sortedData,
+      uniquePOLs: pols,
+      uniquePODs: pods
+    };
+  }, [allFreightRates]);
 
   // Function to get user profile image by name
   const getUserProfileImage = (name) => {
@@ -42,6 +108,7 @@ const View_rates = () => {
       Param: paramImg,
       Manoj: manojImg,
       Manjunath: manjunathImg,
+      Sandli: TGLImg,
     };
     return userImages[name] || defaultUserImg;
   };
@@ -62,6 +129,7 @@ const View_rates = () => {
       Macwin: { branch: "Mumbai", phoneNumber: "" },
       Prashant: { branch: "Mumbai", phoneNumber: "" },
       Ravi: { branch: "Delhi", phoneNumber: "724" },
+       Sandli: { branch: "Delhi", phoneNumber: "791" },
     };
     return userData[name] || { branch: "N/A", phoneNumber: "N/A" };
   };
@@ -97,77 +165,174 @@ const View_rates = () => {
       return;
     }
 
-    const fetchAllForms = async () => {
-      try {
-        setIsLoading(true);
-        setError(null);
+    // Handle any DataContext errors by displaying them
+    if (dataError) {
+      setError(dataError);
+    }
 
-        const response = await fetch(
-          "https://freightpro-4kjlzqm0.b4a.run/api/forms/all",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
+    console.log('[View_rates] Component mounted, using pre-fetched data');
+    console.log('[View_rates] DataContext state:', {
+      isInitialized,
+      isDataLoading,
+      totalRates,
+      dataError
+    });
+  }, [dataError, isInitialized, isDataLoading, totalRates]);
+
+  // Auto-highlighting useEffect for navigation from POD search
+  useEffect(() => {
+    const handleAutoHighlight = () => {
+      console.log('[View_rates] Auto-highlight function triggered');
+      console.log('[View_rates] location.state:', location.state);
+      
+      // Try to get navigation state from location.state first, then sessionStorage as fallback
+      let navigationState = location.state;
+      if (!navigationState) {
+        const storedState = sessionStorage.getItem('rateNavigationState');
+        console.log('[View_rates] Stored state from sessionStorage:', storedState);
+        if (storedState) {
+          try {
+            navigationState = JSON.parse(storedState);
+            console.log('[View_rates] Using stored navigation state from sessionStorage');
+            // Clear it after use
+            sessionStorage.removeItem('rateNavigationState');
+          } catch (e) {
+            console.error('[View_rates] Error parsing stored navigation state:', e);
+            return;
           }
-        );
-
-        if (response.status === 401) {
-          // Handle expired token
-          handleAuthError({ response: { status: 401 } });
-          return;
         }
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const forms = await response.json();
-
-        const processedForms = forms.map((form) => {
-          return {
-            ...form,
-            origin_charges: form.origin_charges || "N/A",
-            thc: form.thc || "N/A",
-            muc: form.muc || "N/A",
-            tou: form.tou || "N/A",
-            acd_ams: form.acd_ams || "N/A",
-            ens: form.ens || "N/A",
-          };
-        });
-
-        // Extract unique POLs and PODs for dropdowns
-        const pols = [
-          ...new Set(processedForms.map((form) => form.pol).filter(Boolean)),
-        ].sort();
-        const pods = [
-          ...new Set(
-            processedForms
-              .map((form) => (form.fdrr ? form.fdrr : form.pod))
-              .filter(Boolean)
-          ),
-        ].sort();
-        setUniquePOLs(pols);
-        setUniquePODs(pods);
-
-        setData(
-          processedForms.sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          )
-        );
-      } catch (error) {
-        // Check if this is an auth error
-        if (!handleAuthError(error)) {
-          console.error("Error fetching forms:", error);
-          setError(error.message);
-        }
-      } finally {
-        setIsLoading(false);
       }
+      
+      console.log('[View_rates] Final navigation state:', navigationState);
+      
+      // Check for proper navigation state structure
+      if (!navigationState) {
+        console.log('[View_rates] No navigation state found');
+        return;
+      }
+      
+      // Handle both new format (autoActions) and legacy format (autoOpen)
+      const shouldHighlight = navigationState.autoActions?.highlight || navigationState.autoOpen;
+      const rateIdentifier = navigationState.rateIdentifier;
+      
+      console.log('[View_rates] Should highlight:', shouldHighlight);
+      console.log('[View_rates] Rate identifier:', rateIdentifier);
+      
+      if (!shouldHighlight || !rateIdentifier) {
+        console.log('[View_rates] No highlighting requested or rate identifier missing', {
+          shouldHighlight,
+          rateIdentifier,
+          navigationState
+        });
+        return;
+      }
+
+      const { uiState } = navigationState;
+      
+      // Wait for data to be loaded
+      if (isDataLoading || !processedData.length) {
+        console.log('[View_rates] Data still loading or empty, waiting...', {
+          isDataLoading,
+          dataLength: processedData.length
+        });
+        return;
+      }
+      
+      console.log('[View_rates] Data loaded, proceeding with highlighting');
+
+      // Small delay to ensure DOM is rendered
+      const timeout = setTimeout(() => {
+        try {
+          console.log('[View_rates] Looking for element with data-rate-id:', rateIdentifier);
+          
+          // First, let's see what elements are available
+          const allElements = Array.from(document.querySelectorAll('[data-rate-id]'));
+          console.log('[View_rates] All available data-rate-id elements:', allElements.map(el => el.getAttribute('data-rate-id')));
+          
+          // Find the target element using the rate identifier
+          const targetElement = document.querySelector(`[data-rate-id="${rateIdentifier}"]`);
+          
+          // If exact match not found, try to find by ID only (more flexible matching)
+          let fallbackElement = null;
+          if (!targetElement) {
+            const rateId = rateIdentifier.split('-')[0];
+            console.log('[View_rates] Exact match not found, trying fallback with rate ID:', rateId);
+            fallbackElement = document.querySelector(`[data-rate-id^="${rateId}-"]`);
+            console.log('[View_rates] Fallback element found:', fallbackElement);
+          }
+          
+          const elementToHighlight = targetElement || fallbackElement;
+          
+          if (elementToHighlight) {
+            console.log('[View_rates] Found target element for highlighting:', elementToHighlight);
+            
+            // Show alert for testing
+          //  alert(`Found and highlighting element: ${elementToHighlight.getAttribute('data-rate-id')}`);
+            
+            // Apply highlight styling
+            const originalStyle = {
+              backgroundColor: elementToHighlight.style.backgroundColor,
+              boxShadow: elementToHighlight.style.boxShadow,
+              transform: elementToHighlight.style.transform
+            };
+
+            elementToHighlight.style.backgroundColor = uiState?.highlightColor || '#fef3c7';
+            elementToHighlight.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.5)';
+            elementToHighlight.style.transform = 'scale(1.02)';
+            elementToHighlight.style.transition = 'all 0.3s ease-in-out';
+
+            // Scroll to element
+            const scrollBehavior = uiState?.scrollBehavior || 'smooth';
+            elementToHighlight.scrollIntoView({ 
+              behavior: scrollBehavior, 
+              block: 'center',
+              inline: 'nearest'
+            });
+
+            // Auto-expand if requested
+            const shouldExpand = navigationState.autoActions?.expand || navigationState.autoOpen;
+            if (shouldExpand) {
+              // Extract the row ID from the rate identifier
+              const actualRateId = elementToHighlight.getAttribute('data-rate-id');
+              const rowId = actualRateId.split('-')[0];
+              if (rowId) {
+                console.log('[View_rates] Auto-expanding row:', rowId);
+                setExpandedRows(prev => ({
+                  ...prev,
+                  [rowId]: true
+                }));
+              }
+            }
+
+            // Remove highlight after specified duration
+            const highlightDuration = uiState?.highlightDuration || 3000;
+            setTimeout(() => {
+              elementToHighlight.style.backgroundColor = originalStyle.backgroundColor;
+              elementToHighlight.style.boxShadow = originalStyle.boxShadow;
+              elementToHighlight.style.transform = originalStyle.transform;
+            }, highlightDuration);
+
+            console.log('[View_rates] Auto-highlight completed successfully');
+          } else {
+            console.log('[View_rates] Target element not found for identifier:', rateIdentifier);
+            console.log('[View_rates] Available elements with data-rate-id:', 
+              Array.from(document.querySelectorAll('[data-rate-id]')).map(el => el.getAttribute('data-rate-id'))
+            );
+            
+            // Show alert for debugging
+            alert(`Element NOT found for: ${rateIdentifier}. Available: ${allElements.map(el => el.getAttribute('data-rate-id')).join(', ')}`);
+          }
+        } catch (error) {
+          console.error('[View_rates] Error in auto-highlighting:', error);
+          alert(`Error in auto-highlighting: ${error.message}`);
+        }
+      }, 2000); // Increased timeout to 2 seconds
+
+      return () => clearTimeout(timeout);
     };
 
-    fetchAllForms();
-  }, []);
+    handleAutoHighlight();
+  }, [location.state, isDataLoading, processedData]);
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
@@ -252,7 +417,7 @@ const View_rates = () => {
   };
 
   const sortedData = React.useMemo(() => {
-    return data
+    return processedData
       .filter((item) => !isValidityExpired(item.validity))
       .filter((item) => {
         // General search term filter
@@ -296,7 +461,7 @@ const View_rates = () => {
 
         return true;
       });
-  }, [data, searchTerm, showOnlyWithRemarks, selectedPOL, selectedPOD]);
+  }, [processedData, searchTerm, showOnlyWithRemarks, selectedPOL, selectedPOD]);
 
   // Calculate pagination values
   const totalItems = sortedData.length;
@@ -641,7 +806,7 @@ const View_rates = () => {
                 <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
               </svg>
               <span>
-                {isLoading ? (
+                {isDataLoading ? (
                   <span className="flex items-center">
                     <svg
                       className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-700"
@@ -681,10 +846,35 @@ const View_rates = () => {
             </div>
           </div>
 
-          {/* Bottom row for both mobile and desktop - Last updated and reset filters */}
+          {/* Bottom row for both mobile and desktop - Last updated, refresh, and reset filters */}
           <div className="flex flex-row items-center justify-between w-full">
-            {/* Reset filters button */}
-            <div className="flex items-center">
+            {/* Action buttons container */}
+            <div className="flex items-center space-x-2">
+              {/* Refresh data button */}
+              <button
+                onClick={() => refreshData()}
+                disabled={isDataLoading}
+                className="text-sm text-green-700 flex items-center bg-green-50 hover:bg-green-100 px-3 py-1 rounded-md shadow-sm font-bold transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Refresh data from server"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`h-4 w-4 mr-1 ${isDataLoading ? 'animate-spin' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                {isDataLoading ? 'Refreshing...' : 'Refresh Data'}
+              </button>
+
+              {/* Reset filters button */}
               {(showOnlyWithRemarks ||
                 selectedPOL ||
                 selectedPOD ||
@@ -714,12 +904,18 @@ const View_rates = () => {
           </div>
         </div>
 
-        {isLoading ? (
-          // Loading State UI
+        {isDataLoading ? (
+          // Loading State UI - Optimized with better UX messaging
           <div className="animate-pulse">
-            {/* Loading spinner */}
-            <div className="flex justify-center my-8">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500"></div>
+            {/* Loading spinner with enhanced messaging */}
+            <div className="flex flex-col items-center my-8">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-500 mb-4"></div>
+              <p className="text-lg font-medium text-gray-900">
+                {isInitialized ? 'Refreshing latest rates...' : 'Loading freight rates...'}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {totalRates > 0 ? `Processing ${totalRates} rates` : 'Fetching data from server'}
+              </p>
             </div>
 
             {/* Skeleton UI for the table */}
@@ -783,7 +979,7 @@ const View_rates = () => {
                 <div className="mt-4">
                   <button
                     type="button"
-                    onClick={() => window.location.reload()}
+                    onClick={() => refreshData()}
                     className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                   >
                     Try again
@@ -887,10 +1083,14 @@ const View_rates = () => {
                         item.remarks && item.remarks.trim().length > 0;
                       const isExpanded = expandedRows[item._id];
                       const userData = getUserData(item.name);
+                      
+                      // Create unique rate identifier for auto-highlighting
+                      const rateIdentifier = `${item._id}-${(item.shipping_lines || item.shipping_line || 'unknown').replace(/\s+/g, '_')}-${item.pod || item.fdrr || 'unknown'}`;
 
                       return (
                         <React.Fragment key={item._id}>
                           <tr
+                            data-rate-id={rateIdentifier}
                             className={`${
                               hasRemarks
                                 ? "bg-orange-100 hover:bg-orange-200"

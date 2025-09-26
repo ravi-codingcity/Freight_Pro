@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { useLocation } from "react-router-dom";
+import { useDataContext } from "../context/DataContext";
 import Navbar from "../components/Navbar";
 // Import all user profile images
 import harmeetImg from "../assets/harmeet.jpg";
@@ -8,15 +10,26 @@ import tarunImg from "../assets/tarun.jpeg";
 import paramImg from "../assets/param.jpeg"; // Using default for Rajeev if no specific image
 import manojImg from "../assets/manoj.jpeg";
 import manjunathImg from "../assets/manjunath.jpeg";
+import TGLImg from "../assets/TGL_Logo.jpg";
 // Default profile image for fallback
 import defaultUserImg from "../assets/omtrans.jpg";
 import { LuShip } from "react-icons/lu";
 import { IoIosArrowDown } from "react-icons/io";
 
 function Expired_rates() {
-  const [data, setData] = useState([]);
+  const location = useLocation();
+  
+  // Use the global data context for optimized performance
+  const {
+    allFreightRates,
+    isDataLoading,
+    isInitialized,
+    error: dataError,
+    refreshData,
+    totalRates
+  } = useDataContext();
+  
   const [filteredData, setFilteredData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentUser, setCurrentUser] = useState("");
   const [expandedRows, setExpandedRows] = useState({});
@@ -25,8 +38,74 @@ function Expired_rates() {
   const [showOnlyWithRemarks, setShowOnlyWithRemarks] = useState(false);
   const [selectedPOL, setSelectedPOL] = useState("");
   const [selectedPOD, setSelectedPOD] = useState("");
-  const [uniquePOLs, setUniquePOLs] = useState([]);
-  const [uniquePODs, setUniquePODs] = useState([]);
+  
+  // Define isValidityExpired function before using it in useMemo
+  const isValidityExpired = useCallback((validityDate) => {
+    if (!validityDate) return false;
+
+    try {
+      const validDate = new Date(validityDate);
+      if (isNaN(validDate.getTime())) return false;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      validDate.setHours(0, 0, 0, 0);
+
+      return validDate < today;
+    } catch (e) {
+      console.error("Error checking validity expiration:", e);
+      return false;
+    }
+  }, []);
+  
+  // Memoized data processing for performance - focusing on expired rates only
+  const { expiredRates, uniquePOLs, uniquePODs } = useMemo(() => {
+    console.log('[Expired_rates] Processing freight rates data for expired rates...');
+    
+    if (!allFreightRates || allFreightRates.length === 0) {
+      return {
+        expiredRates: [],
+        uniquePOLs: [],
+        uniquePODs: []
+      };
+    }
+
+    // Sort data by creation date (newest first)
+    const sortedData = [...allFreightRates].sort(
+      (a, b) => new Date(b.createdAt || b.created_at) - new Date(a.createdAt || a.created_at)
+    );
+
+    // Filter only expired rates
+    const expiredCards = sortedData.filter((item) => 
+      isValidityExpired(item.validity)
+    );
+
+    // Extract unique POLs and PODs using more efficient Set operations
+    const polSet = new Set();
+    const podSet = new Set();
+
+    expiredCards.forEach((form) => {
+      if (form.pol) polSet.add(form.pol);
+      // Use fdrr if present, otherwise pod
+      const podValue = form.fdrr ? form.fdrr : form.pod;
+      if (podValue) podSet.add(podValue);
+    });
+
+    const pols = [...polSet].sort();
+    const pods = [...podSet].sort();
+
+    console.log('[Expired_rates] Processed expired rates:', {
+      total: expiredCards.length,
+      uniquePOLs: pols.length,
+      uniquePODs: pods.length
+    });
+
+    return {
+      expiredRates: expiredCards,
+      uniquePOLs: pols,
+      uniquePODs: pods
+    };
+  }, [allFreightRates]);
 
   // Add optimization with useMemo for frequently accessed data
   const userImages = useMemo(
@@ -38,6 +117,7 @@ function Expired_rates() {
       Param: paramImg,
       Manoj: manojImg,
       Manjunath: manjunathImg,
+      Sandli: TGLImg,
     }),
     []
   );
@@ -67,6 +147,7 @@ function Expired_rates() {
       Macwin: { branch: "Mumbai", phoneNumber: "" },
       Prashant: { branch: "Mumbai", phoneNumber: "" },
       Ravi: { branch: "Delhi", phoneNumber: "724" },
+      Sandli: { branch: "Delhi", phoneNumber: "791" },
     }),
     []
   );
@@ -77,25 +158,6 @@ function Expired_rates() {
     },
     [userProfiles]
   );
-
-  // Optimize other functions with useCallback for better performance
-  const isValidityExpired = useCallback((validityDate) => {
-    if (!validityDate) return false;
-
-    try {
-      const validDate = new Date(validityDate);
-      if (isNaN(validDate.getTime())) return false;
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      validDate.setHours(0, 0, 0, 0);
-
-      return validDate < today;
-    } catch (e) {
-      console.error("Error checking validity expiration:", e);
-      return false;
-    }
-  }, []);
 
   const toggleRowExpansion = useCallback((id) => {
     setExpandedRows((prev) => ({
@@ -152,96 +214,178 @@ function Expired_rates() {
       return;
     }
 
-    // Add AbortController for proper fetch cleanup
-    const controller = new AbortController();
-    const signal = controller.signal;
+    // Handle any DataContext errors by displaying them
+    if (dataError) {
+      setError(dataError);
+    }
 
-    const fetchAllForms = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch(
-          "https://freightpro-4kjlzqm0.b4a.run/api/forms/all",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            signal, // Pass the signal to make the fetch abortable
+    // Set filtered data when expired rates are processed
+    setFilteredData(expiredRates);
+
+    console.log('[Expired_rates] Component mounted, using pre-fetched data');
+    console.log('[Expired_rates] DataContext state:', {
+      isInitialized,
+      isDataLoading,
+      totalRates,
+      expiredRatesCount: expiredRates.length,
+      dataError
+    });
+  }, [dataError, isInitialized, isDataLoading, totalRates, expiredRates]);
+
+  // Auto-highlighting useEffect for navigation from POD search
+  useEffect(() => {
+    const handleAutoHighlight = () => {
+      // Try to get navigation state from location.state first, then sessionStorage as fallback
+      let navigationState = location.state;
+      if (!navigationState) {
+        const storedState = sessionStorage.getItem('rateNavigationState');
+        if (storedState) {
+          try {
+            navigationState = JSON.parse(storedState);
+            console.log('[Expired_rates] Using stored navigation state from sessionStorage');
+            // Clear it after use
+            sessionStorage.removeItem('rateNavigationState');
+          } catch (e) {
+            console.error('[Expired_rates] Error parsing stored navigation state:', e);
+            return;
           }
-        );
-
-        if (response.status === 401) {
-          // Handle expired token
-          handleAuthError({ response: { status: 401 } });
-          return;
-        }
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const forms = await response.json();
-
-        const sortedData = forms.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-
-        // Extract unique POLs and PODs using more efficient Set operations
-        const polSet = new Set();
-        const podSet = new Set();
-
-        sortedData.forEach((form) => {
-          if (form.pol) polSet.add(form.pol);
-          // Use fdrr if present, otherwise pod
-          const podValue = form.fdrr ? form.fdrr : form.pod;
-          if (podValue) podSet.add(podValue);
-        });
-
-        setUniquePOLs([...polSet].sort());
-        setUniquePODs([...podSet].sort());
-
-        setData(sortedData);
-
-        const expiredCards = sortedData.filter((item) =>
-          isValidityExpired(item.validity)
-        );
-
-        setFilteredData(expiredCards);
-      } catch (error) {
-        // Only set error if the fetch wasn't aborted
-        if (!signal.aborted) {
-          // Check if this is an auth error
-          if (!handleAuthError(error)) {
-            console.error("Error fetching forms:", error);
-            setError("Failed to fetch data. Please try again later.");
-          }
-        }
-      } finally {
-        if (!signal.aborted) {
-          setLoading(false);
         }
       }
+      
+      console.log('[Expired_rates] Navigation state received:', navigationState);
+      
+      // Check for proper navigation state structure
+      if (!navigationState) {
+        console.log('[Expired_rates] No navigation state found');
+        return;
+      }
+      
+      // Handle both new format (autoActions) and legacy format (autoOpen)
+      const shouldHighlight = navigationState.autoActions?.highlight || navigationState.autoOpen;
+      const rateIdentifier = navigationState.rateIdentifier;
+      
+      if (!shouldHighlight || !rateIdentifier) {
+        console.log('[Expired_rates] No highlighting requested or rate identifier missing', {
+          shouldHighlight,
+          rateIdentifier,
+          navigationState
+        });
+        return;
+      }
+
+      const { uiState } = navigationState;
+      
+      // Wait for data to be loaded
+      if (isDataLoading || !filteredData.length) {
+        console.log('[Expired_rates] Data still loading or empty, waiting...', {
+          isDataLoading,
+          filteredDataLength: filteredData.length
+        });
+        return;
+      }
+      
+      console.log('[Expired_rates] Data loaded, proceeding with highlighting');
+
+      // Small delay to ensure DOM is rendered
+      const timeout = setTimeout(() => {
+        try {
+          console.log('[Expired_rates] Looking for element with data-rate-id:', rateIdentifier);
+          
+          // First, let's see what elements are available
+          const allElements = Array.from(document.querySelectorAll('[data-rate-id]'));
+          console.log('[Expired_rates] All available data-rate-id elements:', allElements.map(el => el.getAttribute('data-rate-id')));
+          
+          // Find the target element using the rate identifier
+          const targetElement = document.querySelector(`[data-rate-id="${rateIdentifier}"]`);
+          
+          // If exact match not found, try to find by ID only (more flexible matching)
+          let fallbackElement = null;
+          if (!targetElement) {
+            const rateId = rateIdentifier.split('-')[0];
+            console.log('[Expired_rates] Exact match not found, trying fallback with rate ID:', rateId);
+            fallbackElement = document.querySelector(`[data-rate-id^="${rateId}-"]`);
+            console.log('[Expired_rates] Fallback element found:', fallbackElement);
+          }
+          
+          const elementToHighlight = targetElement || fallbackElement;
+          
+          if (elementToHighlight) {
+            console.log('[Expired_rates] Found target element for highlighting:', elementToHighlight);
+            
+            // Show alert for testing
+           // alert(`Found and highlighting element: ${elementToHighlight.getAttribute('data-rate-id')}`);
+            
+            // Apply highlight styling
+            const originalStyle = {
+              backgroundColor: elementToHighlight.style.backgroundColor,
+              boxShadow: elementToHighlight.style.boxShadow,
+              transform: elementToHighlight.style.transform
+            };
+
+            elementToHighlight.style.backgroundColor = uiState?.highlightColor || '#fef3c7';
+            elementToHighlight.style.boxShadow = '0 0 20px rgba(245, 158, 11, 0.5)';
+            elementToHighlight.style.transform = 'scale(1.02)';
+            elementToHighlight.style.transition = 'all 0.3s ease-in-out';
+
+            // Scroll to element
+            const scrollBehavior = uiState?.scrollBehavior || 'smooth';
+            elementToHighlight.scrollIntoView({ 
+              behavior: scrollBehavior, 
+              block: 'center',
+              inline: 'nearest'
+            });
+
+            // Auto-expand if requested
+            const shouldExpand = navigationState.autoActions?.expand || navigationState.autoOpen;
+            if (shouldExpand) {
+              // Extract the row ID from the rate identifier
+              const actualRateId = elementToHighlight.getAttribute('data-rate-id');
+              const rowId = actualRateId.split('-')[0];
+              if (rowId) {
+                console.log('[Expired_rates] Auto-expanding row:', rowId);
+                setExpandedRows(prev => ({
+                  ...prev,
+                  [rowId]: true
+                }));
+              }
+            }
+
+            // Remove highlight after specified duration
+            const highlightDuration = uiState?.highlightDuration || 4000;
+            setTimeout(() => {
+              elementToHighlight.style.backgroundColor = originalStyle.backgroundColor;
+              elementToHighlight.style.boxShadow = originalStyle.boxShadow;
+              elementToHighlight.style.transform = originalStyle.transform;
+            }, highlightDuration);
+
+            console.log('[Expired_rates] Auto-highlight completed successfully');
+          } else {
+            console.log('[Expired_rates] Target element not found for identifier:', rateIdentifier);
+            console.log('[Expired_rates] Available elements with data-rate-id:', 
+              Array.from(document.querySelectorAll('[data-rate-id]')).map(el => el.getAttribute('data-rate-id'))
+            );
+            
+            // Show alert for debugging
+            alert(`Element NOT found for: ${rateIdentifier}. Available: ${allElements.map(el => el.getAttribute('data-rate-id')).join(', ')}`);
+          }
+        } catch (error) {
+          console.error('[Expired_rates] Error in auto-highlighting:', error);
+          alert(`Error in auto-highlighting: ${error.message}`);
+        }
+      }, 2000); // Increased timeout to 2 seconds
+
+      return () => clearTimeout(timeout);
     };
 
-    fetchAllForms();
+    handleAutoHighlight();
+  }, [location.state, isDataLoading, filteredData]);
 
-    // Cleanup function to abort fetch request if component unmounts
-    return () => controller.abort();
-  }, [isValidityExpired]);
-
-  // Optimize filter logic with useMemo
+  // Optimize filter logic with useMemo - now working with pre-filtered expired rates
   useEffect(() => {
-    if (!data.length) return;
+    if (!expiredRates.length) return;
 
-    // First filter expired cards
-    const expiredCards = data.filter((item) =>
-      isValidityExpired(item.validity)
-    );
-
-    // Then apply all the other filters
-    const filtered = expiredCards.filter((item) => {
+    // Apply filters to the already expired rates
+    const filtered = expiredRates.filter((item) => {
       // Remarks filter
       if (
         showOnlyWithRemarks &&
@@ -264,7 +408,7 @@ function Expired_rates() {
     });
 
     setFilteredData(filtered);
-  }, [data, showOnlyWithRemarks, selectedPOL, selectedPOD, isValidityExpired]);
+  }, [expiredRates, showOnlyWithRemarks, selectedPOL, selectedPOD]);
 
   // Optimize weight rates formatting with caching
   const weightRatesCache = useMemo(() => new Map(), []);
@@ -631,12 +775,18 @@ function Expired_rates() {
           </div>
         </div>
 
-        {/* Enhanced Loading State with Skeleton UI */}
-        {loading && (
+        {/* Enhanced Loading State with better UX messaging */}
+        {isDataLoading && (
           <div className="animate-pulse">
-            {/* Loading spinner at the top */}
-            <div className="flex justify-center my-6">
-              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-500"></div>
+            {/* Loading spinner with enhanced messaging */}
+            <div className="flex flex-col items-center my-8">
+              <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-red-500 mb-4"></div>
+              <p className="text-lg font-medium text-gray-900">
+                {isInitialized ? 'Refreshing expired rates...' : 'Loading expired freight rates...'}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">
+                {totalRates > 0 ? `Processing ${totalRates} rates for expired entries` : 'Fetching data from server'}
+              </p>
             </div>
 
             {/* Stats Bar Skeleton */}
@@ -736,7 +886,7 @@ function Expired_rates() {
         )}
 
         {/* Filter summary and action bar */}
-        {!loading && !error && (
+        {!isDataLoading && !error && (
           <div className="flex flex-col mb-1 sm:mb-3 bg-white p-1 rounded-xl shadow-sm mx-1">
             {/* Top row container for mobile and desktop */}
             <div className="flex flex-col justify-between items-center w-full gap-2 sm:gap-3">
@@ -790,8 +940,33 @@ function Expired_rates() {
                 </div>
               </div>
 
-              {/* Reset filters button - below on both mobile and desktop */}
-              <div className="w-full">
+              {/* Action buttons section - refresh and reset filters */}
+              <div className="w-full space-y-2">
+                {/* Refresh data button */}
+                <button
+                  onClick={() => refreshData()}
+                  disabled={isDataLoading}
+                  className="text-sm text-green-700 flex items-center bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-md shadow-sm font-bold transition-colors duration-200 w-full justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Refresh expired rates from server"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`h-4 w-4 mr-1 ${isDataLoading ? 'animate-spin' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  {isDataLoading ? 'Refreshing...' : 'Refresh Data'}
+                </button>
+
+                {/* Reset filters button */}
                 {(showOnlyWithRemarks || selectedPOL || selectedPOD) && (
                   <button
                     onClick={clearAllFilters}
@@ -820,7 +995,7 @@ function Expired_rates() {
         )}
 
         {/* No results message */}
-        {!loading && !error && filteredData.length === 0 && (
+        {!isDataLoading && !error && filteredData.length === 0 && (
           <div className="bg-gray-50 rounded-xl p-4 sm:p-12 text-center">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -858,7 +1033,7 @@ function Expired_rates() {
         )}
 
         {/* Table View for Expired Rates - Make responsive */}
-        {!loading && !error && filteredData.length > 0 && (
+        {!isDataLoading && !error && filteredData.length > 0 && (
           <div className="overflow-x-auto shadow-md rounded-lg border border-red-300 mx-5">
             <div className="inline-block min-w-full align-middle">
               <table className="min-w-full divide-y divide-gray-200 table-fixed border-collapse">
@@ -920,10 +1095,14 @@ function Expired_rates() {
                       item.remarks && item.remarks.trim().length > 0;
                     const isExpanded = expandedRows[item._id || item.id];
                     const userData = getUserData(item.name);
+                    
+                    // Create unique rate identifier for auto-highlighting
+                    const rateIdentifier = `${item._id}-${(item.shipping_lines || item.shipping_line || 'unknown').replace(/\s+/g, '_')}-${item.pod || item.fdrr || 'unknown'}`;
 
                     return (
                       <React.Fragment key={item._id || item.id}>
                         <tr
+                          data-rate-id={rateIdentifier}
                           className={`${
                             hasRemarks
                               ? "bg-yellow-50 hover:bg-yellow-100"

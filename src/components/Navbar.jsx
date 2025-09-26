@@ -107,6 +107,19 @@ const Navbar = () => {
             >
               Expired Rates
             </Link>
+                <Link
+              to="/pod_lines"
+              className={`transition-colors duration-300 font-medium text-base lg:text-lg px-2 py-1 rounded-md ${
+                isActive("/pod_lines")
+                  ? "text-red-600 font-bold bg-red-50"
+                  : "text-gray-700 hover:text-red-600 hover:bg-gray-100"
+              }`}
+            >
+              Destinations
+            </Link>
+            
+             
+
             {isLoggedIn ? (
               <div className="flex items-center space-x-2 md:space-x-4">
                 <button
