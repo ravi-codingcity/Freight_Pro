@@ -10,6 +10,7 @@ export const getShippingLinesOptions = () => {
     "ANL",
     "Bahri",
     "Balaji Shipping",
+    "BLPL Singapore",
     "CMA CGM",
     "COSCO",
     "CARAVEL",
@@ -34,9 +35,11 @@ export const getShippingLinesOptions = () => {
     "MSC",
     "NAVIS",
     "NAVIO",
+    "Novel Lines",
     "ONE",
     "OOCL",
     "PIL",
+    "Samsara Group",
     "SCI",
     "SITC Container",
     "SM Line",
@@ -90,13 +93,17 @@ export const fetchShippingLinesOptions = async () => {
     }
 
     const forms = await response.json();
-    
+
     // Extract unique shipping lines from forms
-    const dynamicShippingLines = [...new Set(forms.map(form => form.shipping_lines).filter(Boolean))];
-    
+    const dynamicShippingLines = [
+      ...new Set(forms.map((form) => form.shipping_lines).filter(Boolean)),
+    ];
+
     // Combine with static options and remove duplicates
-    const allShippingLines = [...new Set([...getShippingLinesOptions(), ...dynamicShippingLines])].sort();
-    
+    const allShippingLines = [
+      ...new Set([...getShippingLinesOptions(), ...dynamicShippingLines]),
+    ].sort();
+
     return allShippingLines;
   } catch (error) {
     console.error("Error fetching Shipping Lines options:", error);
